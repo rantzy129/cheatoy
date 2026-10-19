@@ -10,7 +10,6 @@ import {
   storeUser,
   clearStoredUser,
   signInWithDiscord,
-  signOut,
   DiscordUser,
   SUPABASE_URL,
 } from "@/lib/supabase";
@@ -323,13 +322,6 @@ export default function ProfilePage() {
     setTimeout(() => setIsCopied(false), 2200);
   };
 
-  const handleLogout = async () => {
-    await signOut();
-    setDiscordUser(null);
-    setActiveLicense(null);
-    setUserOrders([]);
-  };
-
   // Remaining time calculation
   const getRemainingTime = () => {
     if (!activeLicense) return null;
@@ -515,16 +507,8 @@ export default function ProfilePage() {
                     <span>↻ Refresh</span>
                   </button>
                   <Link href="/#pricing" className="btn-vault-subtle">
-                    <span>+ Extend</span>
+                    <span>+ Extend Pass</span>
                   </Link>
-                  <button
-                    type="button"
-                    className="btn-vault-logout"
-                    onClick={handleLogout}
-                    title="Sign Out"
-                  >
-                    <span>Sign Out</span>
-                  </button>
                 </div>
               </div>
             </header>
