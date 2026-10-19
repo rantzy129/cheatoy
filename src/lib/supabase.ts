@@ -52,7 +52,7 @@ export function extractDiscordUser(user: any): DiscordUser | null {
   }
   if (!avatarUrl && discordId) {
     try {
-      const idx = (BigInt(discordId) >> 22n) % 6n;
+      const idx = Number((BigInt(discordId) >> BigInt(22)) % BigInt(6));
       avatarUrl = `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
     } catch {
       avatarUrl = "https://cdn.discordapp.com/embed/avatars/0.png";
