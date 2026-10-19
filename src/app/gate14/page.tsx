@@ -207,7 +207,7 @@ export default function AdminPage() {
   // Authentication State (100% HTTP-Only Cookie, Zero Frontend Storage)
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -255,14 +255,17 @@ export default function AdminPage() {
   useEffect(() => {
     let isMounted = true;
     fetch("/api/admin/session")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return { authenticated: false };
+        return res.json();
+      })
       .then((data) => {
         if (!isMounted) return;
-        setIsAuthenticated(Boolean(data.authenticated));
+        if (data?.authenticated) {
+          setIsAuthenticated(true);
+        }
       })
-      .catch(() => {
-        if (isMounted) setIsAuthenticated(false);
-      });
+      .catch(() => {});
 
     return () => {
       isMounted = false;
@@ -543,135 +546,98 @@ export default function AdminPage() {
   }, [orders]);
 
   /* ─────────────────────────────────────────────────────────────
-     1. INITIAL LOADING SPLASH
-     ───────────────────────────────────────────────────────────── */
-  /* ─────────────────────────────────────────────────────────────
-     1. INITIAL LOADING SPLASH
-     ───────────────────────────────────────────────────────────── */
-  if (isAuthenticated === null) {
-    return (
-      <div className="admin-login-fullscreen">
-        <div className="admin-bg-grid" />
-        <div className="admin-bg-orb admin-bg-orb-cyan" />
-        <div className="admin-bg-orb admin-bg-orb-emerald" />
-        <div className="admin-loading-container">
-          <div className="admin-loading-emblem">
-            <Image
-              src="/logo.png"
-              alt="Chameleon Logo"
-              width={46}
-              height={46}
-              priority
-            />
-          </div>
-          <div className="admin-loading-spinner-ring" />
-          <p className="admin-loading-text">INITIALIZING SECURE ENCLAVE...</p>
-          <span className="admin-loading-sub">Zero-Knowledge Cryptographic Authentication</span>
-        </div>
-      </div>
-    );
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     2. STANDALONE RESTRICTED ACCESS GATE (No Customer Navbar/Footer)
+     STANDALONE RESTRICTED ACCESS GATE (No Customer Navbar/Footer)
      ───────────────────────────────────────────────────────────── */
   if (!isAuthenticated) {
     return (
       <div className="admin-login-fullscreen">
-        {/* Ambient Atmosphere */}
-        <div className="admin-bg-grid" />
-        <div className="admin-bg-scanlines" />
-        <div className="admin-bg-orb admin-bg-orb-cyan" />
-        <div className="admin-bg-orb admin-bg-orb-emerald" />
+        <div className="admin-login-card">
+          <div className="admin-login-brand">
+            <div className="admin-login-logo">
+              <Image
+                src="/logo.png"
+                alt="Chameleon Cheats Logo"
+                width={36}
+                height={36}
+                priority
+              />
+            </div>
+          </div>
 
-        <div className="admin-login-wrapper">
-          <div className="admin-login-box">
-            {/* Tactical Corner Crosshairs */}
-            <span className="card-corner corner-tl" />
-            <span className="card-corner corner-tr" />
-            <span className="card-corner corner-bl" />
-            <span className="card-corner corner-br" />
+          <h1 className="admin-login-title">Staff Console Access</h1>
+          <p className="admin-login-desc">
+            Enter master security key to manage licenses, verify GCash transactions, and issue VIP passes.
+          </p>
 
-            {/* Emblem with Rotating Holographic Ring & Chameleon Brand Logo */}
-            <div className="admin-emblem-wrapper">
-              <div className="admin-emblem-ring" />
-              <div className="admin-login-emblem">
-                <Image
-                  src="/logo.png"
-                  alt="Chameleon Cheats Logo"
-                  width={44}
-                  height={44}
-                  priority
+          <form onSubmit={handleLogin} className="admin-login-form">
+            <div className="admin-input-group">
+              <label className="admin-input-label" htmlFor="admin-pin-field">
+                Master Security Key
+              </label>
+              <div className="admin-input-container">
+                <div className="admin-input-lead-icon">
+                  <IconKey size={16} />
+                </div>
+                <input
+                  id="admin-pin-field"
+                  type={showPin ? "text" : "password"}
+                  placeholder="Enter security key..."
+                  value={pin}
+                  onChange={(e) => {
+                    setPin(e.target.value);
+                    setErrorMessage(null);
+                  }}
+                  className="admin-pin-field"
+                  autoFocus
+                  disabled={isVerifying}
+                  autoComplete="off"
+                  spellCheck="false"
                 />
+                <button
+                  type="button"
+                  className="admin-input-toggle-btn"
+                  onClick={() => setShowPin(!showPin)}
+                  tabIndex={-1}
+                  aria-label={showPin ? "Hide key" : "Show key"}
+                >
+                  {showPin ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+                </button>
               </div>
             </div>
 
-            <div className="admin-chip-badge">LEVEL 5 ACCESS GATEWAY</div>
-
-            <h2 className="admin-login-title">COMMAND CENTER</h2>
-            <p className="admin-login-desc">
-              Restricted Administrative Enclave &bull; Chameleon Cheats Staff Only
-            </p>
-
-            <form onSubmit={handleLogin} className="admin-login-form">
-              <div className="admin-input-group">
-                <label className="admin-input-label">MASTER SECURITY KEY</label>
-                <div className="admin-input-container">
-                  <div className="admin-input-lead-icon">
-                    <IconKey size={18} />
-                  </div>
-                  <input
-                    type={showPin ? "text" : "password"}
-                    placeholder="Enter security key..."
-                    value={pin}
-                    onChange={(e) => {
-                      setPin(e.target.value);
-                      setErrorMessage(null);
-                    }}
-                    className="admin-pin-field"
-                    autoFocus
-                    disabled={isVerifying}
-                    autoComplete="off"
-                    spellCheck="false"
-                  />
-                  <button
-                    type="button"
-                    className="admin-input-toggle-btn"
-                    onClick={() => setShowPin(!showPin)}
-                    tabIndex={-1}
-                    aria-label={showPin ? "Hide key" : "Show key"}
-                  >
-                    {showPin ? <IconEyeOff size={18} /> : <IconEye size={18} />}
-                  </button>
-                </div>
+            {errorMessage && (
+              <div className="admin-login-error" role="alert">
+                <span className="admin-error-icon">!</span>
+                <span>{errorMessage}</span>
               </div>
+            )}
 
-              {errorMessage && (
-                <div className="admin-login-error">
-                  <span className="admin-error-icon">!</span>
-                  <span>{errorMessage}</span>
-                </div>
+            <button
+              type="submit"
+              className="admin-btn-auth"
+              disabled={isVerifying || !pin.trim()}
+            >
+              {isVerifying ? (
+                <span className="admin-btn-content">
+                  <span className="admin-button-spinner" />
+                  <span>Verifying Credentials...</span>
+                </span>
+              ) : (
+                <span className="admin-btn-content">
+                  <IconShieldLock size={16} />
+                  <span>Authenticate Console</span>
+                </span>
               )}
+            </button>
+          </form>
 
-              <button
-                type="submit"
-                className="admin-btn-auth"
-                disabled={isVerifying || !pin.trim()}
-              >
-                {isVerifying ? (
-                  <span className="admin-btn-content">
-                    <span className="admin-button-spinner" />
-                    <span>Verifying Cryptographic Credentials...</span>
-                  </span>
-                ) : (
-                  <span className="admin-btn-content">
-                    <IconShieldLock size={17} />
-                    <span>Authenticate & Unlock</span>
-                    <IconArrowRight size={16} />
-                  </span>
-                )}
-              </button>
-            </form>
+          <div className="admin-login-footer">
+            <Link href="/" className="admin-return-link">
+              ← Return to Storefront
+            </Link>
+            <span className="admin-security-badge">
+              HTTP-Only Encrypted
+            </span>
           </div>
         </div>
       </div>
@@ -762,17 +728,7 @@ export default function AdminPage() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "8px 12px",
-              borderRadius: 8,
-              fontSize: 12,
-              color: "#94a3b8",
-              textDecoration: "none",
-              background: "rgba(255, 255, 255, 0.02)",
-            }}
+            className="admin-storefront-link"
           >
             <span>Live Storefront</span>
             <IconExternalLink size={12} />
@@ -793,7 +749,7 @@ export default function AdminPage() {
             <div className="admin-header-breadcrumb">
               <span>Admin</span>
               <span>/</span>
-              <span style={{ color: "#ffffff", fontWeight: 700 }}>
+              <span className="admin-breadcrumb-active">
                 {activeTab === "orders" && "GCash Orders & Approvals"}
                 {activeTab === "licenses" && "License Vault & HWID Management"}
                 {activeTab === "generator" && "Instant VIP Key Minting"}
@@ -807,18 +763,7 @@ export default function AdminPage() {
               type="button"
               onClick={loadAllData}
               disabled={loading}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "rgba(255, 255, 255, 0.04)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                color: "#94a3b8",
-                padding: "7px 12px",
-                borderRadius: 8,
-                fontSize: 12,
-                cursor: "pointer",
-              }}
+              className="admin-btn-sync"
             >
               <IconRefresh size={13} />
               <span>{loading ? "Syncing..." : "Sync DB"}</span>
@@ -827,19 +772,7 @@ export default function AdminPage() {
             <button
               type="button"
               onClick={() => setActiveTab("generator")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "linear-gradient(135deg, #00d2ff, #00b4d8)",
-                color: "#020610",
-                border: "none",
-                padding: "7px 14px",
-                borderRadius: 8,
-                fontSize: 12.5,
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
+              className="admin-btn-mint-cta"
             >
               <IconKeyMint size={14} />
               <span>Mint Key</span>
@@ -857,8 +790,8 @@ export default function AdminPage() {
                 <div className="admin-kpi-card">
                   <div className="admin-kpi-header">
                     <span className="admin-kpi-title">Pending Validations</span>
-                    <div className="admin-kpi-icon" style={{ color: "#f59e0b" }}>
-                      <IconOrders size={16} />
+                    <div className="admin-kpi-icon admin-kpi-icon-amber">
+                      <IconOrders size={15} />
                     </div>
                   </div>
                   <div className="admin-kpi-value" style={{ color: pendingOrdersCount > 0 ? "#f59e0b" : "#ffffff" }}>
@@ -870,7 +803,7 @@ export default function AdminPage() {
                 <div className="admin-kpi-card">
                   <div className="admin-kpi-header">
                     <span className="admin-kpi-title">Verified Revenue</span>
-                    <div className="admin-kpi-icon" style={{ color: "#10b981" }}>
+                    <div className="admin-kpi-icon admin-kpi-icon-green">
                       ₱
                     </div>
                   </div>
@@ -883,8 +816,8 @@ export default function AdminPage() {
                 <div className="admin-kpi-card">
                   <div className="admin-kpi-header">
                     <span className="admin-kpi-title">Approved Passes</span>
-                    <div className="admin-kpi-icon" style={{ color: "#00d2ff" }}>
-                      <IconCheck size={16} />
+                    <div className="admin-kpi-icon admin-kpi-icon-cyan">
+                      <IconCheck size={15} />
                     </div>
                   </div>
                   <div className="admin-kpi-value">{approvedOrdersCount}</div>
@@ -895,7 +828,7 @@ export default function AdminPage() {
                   <div className="admin-kpi-header">
                     <span className="admin-kpi-title">Total Submissions</span>
                     <div className="admin-kpi-icon">
-                      <IconOverview size={16} />
+                      <IconOverview size={15} />
                     </div>
                   </div>
                   <div className="admin-kpi-value">{orders.length}</div>
@@ -953,8 +886,8 @@ export default function AdminPage() {
               {/* Orders Table */}
               <div className="admin-card-table">
                 {filteredOrders.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "60px 20px", color: "#64748b" }}>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: "#f8fafc", marginBottom: 6 }}>
+                  <div className="admin-table-empty">
+                    <p className="admin-table-empty-title">
                       No orders found
                     </p>
                     <span style={{ fontSize: 13 }}>
@@ -981,7 +914,7 @@ export default function AdminPage() {
                       <tbody>
                         {filteredOrders.map((order) => (
                           <tr key={order.id}>
-                            <td style={{ fontFamily: "monospace", fontSize: 12.5, color: "#94a3b8" }}>
+                            <td style={{ fontFamily: "monospace", fontSize: 12, color: "#8da0b8" }}>
                               {order.order_id}
                             </td>
 
@@ -989,8 +922,8 @@ export default function AdminPage() {
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                 <div
                                   style={{
-                                    width: 28,
-                                    height: 28,
+                                    width: 26,
+                                    height: 26,
                                     borderRadius: "50%",
                                     background: "#5865f2",
                                     color: "#ffffff",
@@ -998,16 +931,17 @@ export default function AdminPage() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     fontWeight: 800,
-                                    fontSize: 12,
+                                    fontSize: 11,
+                                    flexShrink: 0,
                                   }}
                                 >
                                   {order.discord_username?.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                  <div style={{ fontWeight: 700, color: "#f8fafc" }}>
+                                  <div style={{ fontWeight: 700, color: "#f1f5f9" }}>
                                     {order.discord_username}
                                   </div>
-                                  <div style={{ fontSize: 11, fontFamily: "monospace", color: "#64748b" }}>
+                                  <div style={{ fontSize: 11, fontFamily: "monospace", color: "#556882" }}>
                                     {order.discord_id}
                                   </div>
                                 </div>
@@ -1015,23 +949,10 @@ export default function AdminPage() {
                             </td>
 
                             <td>
-                              <span
-                                style={{
-                                  background: order.tier?.includes("Lifetime")
-                                    ? "rgba(16, 185, 129, 0.15)"
-                                    : "rgba(0, 210, 255, 0.12)",
-                                  color: order.tier?.includes("Lifetime") ? "#10b981" : "#00d2ff",
-                                  padding: "3px 8px",
-                                  borderRadius: 6,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  display: "inline-block",
-                                  marginBottom: 4,
-                                }}
-                              >
+                              <span className="admin-status-badge admin-status-badge-approved" style={{ marginBottom: 4 }}>
                                 {order.tier}
                               </span>
-                              <div style={{ fontWeight: 800, color: "#ffffff", fontSize: 13 }}>
+                              <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 13 }}>
                                 {order.price}
                               </div>
                             </td>
@@ -1044,26 +965,18 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleCopy(order.reference_no)}
-                                  style={{
-                                    background: "rgba(255, 255, 255, 0.05)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                                    color: copiedKey === order.reference_no ? "#10b981" : "#94a3b8",
-                                    padding: "3px 8px",
-                                    borderRadius: 6,
-                                    fontSize: 11,
-                                    cursor: "pointer",
-                                  }}
+                                  className="admin-btn-copy-inline"
                                 >
                                   {copiedKey === order.reference_no ? "Copied" : "Copy"}
                                 </button>
                               </div>
                             </td>
 
-                            <td style={{ color: order.sender_name ? "#f1f5f9" : "#64748b" }}>
+                            <td style={{ color: order.sender_name ? "#f1f5f9" : "#556882" }}>
                               {order.sender_name || "—"}
                             </td>
 
-                            <td style={{ fontSize: 12, color: "#94a3b8", whiteSpace: "nowrap" }}>
+                            <td style={{ fontSize: 12, color: "#70849e", whiteSpace: "nowrap" }}>
                               {new Date(order.created_at).toLocaleString([], {
                                 month: "short",
                                 day: "numeric",
@@ -1073,56 +986,19 @@ export default function AdminPage() {
                             </td>
 
                             <td>
-                              <span
-                                style={{
-                                  padding: "4px 10px",
-                                  borderRadius: 999,
-                                  fontSize: 11,
-                                  fontWeight: 800,
-                                  letterSpacing: "0.05em",
-                                  textTransform: "uppercase",
-                                  background:
-                                    order.status === "approved"
-                                      ? "rgba(16, 185, 129, 0.15)"
-                                      : order.status === "pending"
-                                      ? "rgba(245, 158, 11, 0.15)"
-                                      : "rgba(239, 68, 68, 0.15)",
-                                  color:
-                                    order.status === "approved"
-                                      ? "#10b981"
-                                      : order.status === "pending"
-                                      ? "#f59e0b"
-                                      : "#ef4444",
-                                  border: `1px solid ${
-                                    order.status === "approved"
-                                      ? "rgba(16, 185, 129, 0.3)"
-                                      : order.status === "pending"
-                                      ? "rgba(245, 158, 11, 0.3)"
-                                      : "rgba(239, 68, 68, 0.3)"
-                                  }`,
-                                }}
-                              >
+                              <span className={`admin-status-badge admin-status-badge-${order.status}`}>
                                 {order.status}
                               </span>
                             </td>
 
                             <td style={{ textAlign: "right" }}>
                               {order.status === "pending" && (
-                                <div style={{ display: "inline-flex", gap: 8 }}>
+                                <div style={{ display: "inline-flex", gap: 6 }}>
                                   <button
                                     type="button"
                                     onClick={() => handleApproveOrder(order)}
                                     disabled={actionLoading === order.id}
-                                    style={{
-                                      background: "#10b981",
-                                      color: "#020610",
-                                      border: "none",
-                                      padding: "6px 14px",
-                                      borderRadius: 6,
-                                      fontWeight: 800,
-                                      fontSize: 12,
-                                      cursor: "pointer",
-                                    }}
+                                    className="admin-btn-approve"
                                   >
                                     {actionLoading === order.id ? "Issuing..." : "Approve & Issue"}
                                   </button>
@@ -1130,15 +1006,8 @@ export default function AdminPage() {
                                     type="button"
                                     onClick={() => handleRejectOrder(order)}
                                     disabled={actionLoading === order.id}
-                                    style={{
-                                      background: "rgba(239, 68, 68, 0.15)",
-                                      border: "1px solid rgba(239, 68, 68, 0.3)",
-                                      color: "#fca5a5",
-                                      padding: "6px 10px",
-                                      borderRadius: 6,
-                                      fontSize: 12,
-                                      cursor: "pointer",
-                                    }}
+                                    className="admin-btn-reject"
+                                    title="Reject Order"
                                   >
                                     ✕
                                   </button>
@@ -1154,15 +1023,7 @@ export default function AdminPage() {
                                     <button
                                       type="button"
                                       onClick={() => handleCopy(order.license_key!)}
-                                      style={{
-                                        background: "rgba(255, 255, 255, 0.05)",
-                                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                                        color: copiedKey === order.license_key ? "#10b981" : "#94a3b8",
-                                        padding: "3px 8px",
-                                        borderRadius: 6,
-                                        fontSize: 11,
-                                        cursor: "pointer",
-                                      }}
+                                      className="admin-btn-copy-inline"
                                     >
                                       {copiedKey === order.license_key ? "Copied" : "Copy"}
                                     </button>
@@ -1189,27 +1050,14 @@ export default function AdminPage() {
             <>
               <div className="admin-toolbar">
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0, color: "#ffffff" }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: "#ffffff" }}>
                     Total Active Keys: {licenses.length}
                   </h3>
                   <button
                     type="button"
                     onClick={handleSyncUserListToDiscord}
                     disabled={isSyncingUsers}
-                    style={{
-                      background: "rgba(99, 102, 241, 0.15)",
-                      border: "1px solid rgba(99, 102, 241, 0.35)",
-                      color: "#a5b4fc",
-                      padding: "6px 14px",
-                      borderRadius: 8,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 7,
-                      cursor: isSyncingUsers ? "not-allowed" : "pointer",
-                      transition: "all 0.2s ease",
-                    }}
+                    className="admin-btn-discord-sync"
                   >
                     <IconDiscord size={15} />
                     <span>{isSyncingUsers ? "Broadcasting..." : "Sync User List to Discord"}</span>
@@ -1254,20 +1102,15 @@ export default function AdminPage() {
                         <tr key={lic.id}>
                           <td>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontFamily: "monospace", fontWeight: 800, color: "#00d2ff" }}>
+                              <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#00d2ff" }}>
                                 {lic.license_key}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleCopy(lic.license_key)}
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  color: copiedKey === lic.license_key ? "#10b981" : "#64748b",
-                                  cursor: "pointer",
-                                }}
+                                className="admin-btn-copy-inline"
                               >
-                                {copiedKey === lic.license_key ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                                {copiedKey === lic.license_key ? "Copied" : "Copy"}
                               </button>
                             </div>
                           </td>
@@ -1277,14 +1120,14 @@ export default function AdminPage() {
                               {lic.discord_username || "Unassigned"}
                             </span>
                             {lic.discord_id && (
-                              <div style={{ fontSize: 11, fontFamily: "monospace", color: "#64748b" }}>
+                              <div style={{ fontSize: 11, fontFamily: "monospace", color: "#556882" }}>
                                 {lic.discord_id}
                               </div>
                             )}
                           </td>
 
                           <td>
-                            <span style={{ fontSize: 12, color: "#94a3b8" }}>{lic.tier || "Standard Pass"}</span>
+                            <span style={{ fontSize: 12, color: "#8da0b8" }}>{lic.tier || "Standard Pass"}</span>
                           </td>
 
                           <td>
@@ -1300,21 +1143,12 @@ export default function AdminPage() {
                             )}
                           </td>
 
-                          <td style={{ fontSize: 12, color: "#94a3b8" }}>
+                          <td style={{ fontSize: 12, color: "#8da0b8" }}>
                             {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString() : "Permanent VIP"}
                           </td>
 
                           <td>
-                            <span
-                              style={{
-                                padding: "3px 8px",
-                                borderRadius: 4,
-                                fontSize: 11,
-                                fontWeight: 800,
-                                background: lic.is_banned ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.15)",
-                                color: lic.is_banned ? "#ef4444" : "#10b981",
-                              }}
-                            >
+                            <span className={`admin-status-badge ${lic.is_banned ? "admin-status-badge-rejected" : "admin-status-badge-approved"}`}>
                               {lic.is_banned ? "BANNED" : "ACTIVE"}
                             </span>
                           </td>
@@ -1325,15 +1159,7 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleResetHWID(lic.id)}
-                                  style={{
-                                    background: "rgba(245, 158, 11, 0.15)",
-                                    border: "1px solid rgba(245, 158, 11, 0.3)",
-                                    color: "#f59e0b",
-                                    padding: "4px 8px",
-                                    borderRadius: 6,
-                                    fontSize: 11,
-                                    cursor: "pointer",
-                                  }}
+                                  className="admin-btn-hwid-reset"
                                   title="Unbind HWID"
                                 >
                                   Reset HWID
@@ -1342,15 +1168,7 @@ export default function AdminPage() {
                               <button
                                 type="button"
                                 onClick={() => handleToggleBan(lic.id)}
-                                style={{
-                                  background: lic.is_banned ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)",
-                                  border: `1px solid ${lic.is_banned ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
-                                  color: lic.is_banned ? "#10b981" : "#ef4444",
-                                  padding: "4px 8px",
-                                  borderRadius: 6,
-                                  fontSize: 11,
-                                  cursor: "pointer",
-                                }}
+                                className={`admin-btn-ban-toggle ${lic.is_banned ? "unban" : "ban"}`}
                               >
                                 {lic.is_banned ? "Unban" : "Ban Key"}
                               </button>
@@ -1367,59 +1185,31 @@ export default function AdminPage() {
 
           {/* ─── TAB 3: INSTANT KEY MINTING ─── */}
           {activeTab === "generator" && (
-            <div style={{ maxWidth: 600, margin: "0 auto" }}>
-              <div
-                style={{
-                  background: "#070d1a",
-                  border: "1px solid rgba(0, 210, 255, 0.25)",
-                  borderRadius: 16,
-                  padding: 32,
-                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.6)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: "rgba(0, 210, 255, 0.12)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#00d2ff",
-                    }}
-                  >
-                    <IconKeyMint size={22} />
+            <div className="admin-mint-wrapper">
+              <div className="admin-mint-card">
+                <div className="admin-mint-header">
+                  <div className="admin-mint-icon">
+                    <IconKeyMint size={20} />
                   </div>
                   <div>
-                    <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: "#ffffff" }}>
-                      Mint Assault Fire PH VIP Key
+                    <h2 className="admin-mint-title">
+                      Mint VIP Access Key
                     </h2>
-                    <span style={{ fontSize: 12, color: "#94a3b8" }}>
-                      Cryptographic loader activation license generator
+                    <span className="admin-mint-sub">
+                      Issue manual loader license key for customer or giveaway
                     </span>
                   </div>
                 </div>
 
                 <form onSubmit={handleMintKey}>
-                  <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>
-                      TIER DURATION
+                  <div className="admin-form-group">
+                    <label className="admin-form-label">
+                      Tier Duration
                     </label>
                     <select
                       value={genTier}
                       onChange={(e) => setGenTier(e.target.value)}
-                      style={{
-                        width: "100%",
-                        background: "#03060d",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
-                        borderRadius: 8,
-                        padding: "12px 14px",
-                        color: "#ffffff",
-                        fontSize: 14,
-                        outline: "none",
-                      }}
+                      className="admin-form-select"
                     >
                       <option value="7 Days Pass">7 Days Pass (₱500 / $9.99)</option>
                       <option value="15 Days Pass">15 Days Pass (₱1,000 / $18.99)</option>
@@ -1428,62 +1218,33 @@ export default function AdminPage() {
                     </select>
                   </div>
 
-                  <div style={{ marginBottom: 24 }}>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>
-                      RECIPIENT / DISCORD HANDLE (OPTIONAL)
+                  <div className="admin-form-group" style={{ marginBottom: 20 }}>
+                    <label className="admin-form-label">
+                      Recipient / Discord Handle (Optional)
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. somaris1 or Giveaway Winner"
+                      placeholder="e.g. somaris1 or Staff Issue"
                       value={genUser}
                       onChange={(e) => setGenUser(e.target.value)}
-                      style={{
-                        width: "100%",
-                        background: "#03060d",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
-                        borderRadius: 8,
-                        padding: "12px 14px",
-                        color: "#ffffff",
-                        fontSize: 14,
-                        outline: "none",
-                      }}
+                      className="admin-form-input"
                     />
                   </div>
 
                   {mintedKey && (
-                    <div
-                      style={{
-                        background: "rgba(16, 185, 129, 0.12)",
-                        border: "1px solid rgba(16, 185, 129, 0.4)",
-                        borderRadius: 12,
-                        padding: 18,
-                        marginBottom: 20,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
+                    <div className="admin-mint-result">
                       <div>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: "#10b981", textTransform: "uppercase" }}>
+                        <span className="admin-mint-key-label">
                           Generated Key:
                         </span>
-                        <div style={{ fontFamily: "monospace", fontSize: 18, fontWeight: 900, color: "#ffffff", marginTop: 4 }}>
+                        <div className="admin-mint-key-val">
                           {mintedKey}
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleCopy(mintedKey)}
-                        style={{
-                          background: "#10b981",
-                          color: "#020610",
-                          border: "none",
-                          padding: "8px 14px",
-                          borderRadius: 8,
-                          fontWeight: 800,
-                          fontSize: 12,
-                          cursor: "pointer",
-                        }}
+                        className="admin-btn-approve"
                       >
                         {copiedKey === mintedKey ? "Copied!" : "Copy Key"}
                       </button>
@@ -1493,19 +1254,9 @@ export default function AdminPage() {
                   <button
                     type="submit"
                     disabled={isMinting}
-                    style={{
-                      width: "100%",
-                      padding: "14px",
-                      background: "linear-gradient(135deg, #00d2ff, #00b4d8)",
-                      color: "#020610",
-                      border: "none",
-                      borderRadius: 10,
-                      fontWeight: 800,
-                      fontSize: 14,
-                      cursor: "pointer",
-                    }}
+                    className="admin-btn-mint-submit"
                   >
-                    {isMinting ? "Minting Cryptographic Key..." : "Mint License Key"}
+                    {isMinting ? "Minting Key..." : "Mint License Key"}
                   </button>
                 </form>
               </div>
@@ -1514,32 +1265,32 @@ export default function AdminPage() {
 
           {/* ─── TAB 4: ANALYTICS OVERVIEW ─── */}
           {activeTab === "overview" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div className="admin-kpi-grid">
                 <div className="admin-kpi-card">
                   <span className="admin-kpi-title">Gross Revenue</span>
-                  <div className="admin-kpi-value" style={{ color: "#10b981", marginTop: 8 }}>
+                  <div className="admin-kpi-value" style={{ color: "#10b981", marginTop: 6 }}>
                     ₱{totalRevenue.toLocaleString()}
                   </div>
                   <span className="admin-kpi-sub">Total approved orders</span>
                 </div>
                 <div className="admin-kpi-card">
                   <span className="admin-kpi-title">Active Licenses</span>
-                  <div className="admin-kpi-value" style={{ color: "#00d2ff", marginTop: 8 }}>
+                  <div className="admin-kpi-value" style={{ color: "#00d2ff", marginTop: 6 }}>
                     {licenses.filter((l) => !l.is_banned).length}
                   </div>
                   <span className="admin-kpi-sub">Valid keys in circulation</span>
                 </div>
                 <div className="admin-kpi-card">
                   <span className="admin-kpi-title">Pending Backlog</span>
-                  <div className="admin-kpi-value" style={{ color: "#f59e0b", marginTop: 8 }}>
+                  <div className="admin-kpi-value" style={{ color: "#f59e0b", marginTop: 6 }}>
                     {pendingOrdersCount}
                   </div>
                   <span className="admin-kpi-sub">Awaiting confirmation</span>
                 </div>
                 <div className="admin-kpi-card">
                   <span className="admin-kpi-title">Bound Hardware Locks</span>
-                  <div className="admin-kpi-value" style={{ marginTop: 8 }}>
+                  <div className="admin-kpi-value" style={{ marginTop: 6 }}>
                     {licenses.filter((l) => l.hwid).length}
                   </div>
                   <span className="admin-kpi-sub">Locked to single PC</span>
@@ -1547,40 +1298,33 @@ export default function AdminPage() {
               </div>
 
               {/* Security Health Box */}
-              <div
-                style={{
-                  background: "#070d19",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  borderRadius: 14,
-                  padding: 24,
-                }}
-              >
-                <h3 style={{ fontSize: 16, fontWeight: 800, color: "#ffffff", marginBottom: 12 }}>
+              <div className="admin-architecture-card">
+                <h3 className="admin-architecture-title">
                   System Architecture & Enclave Status
                 </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-                  <div style={{ background: "#040812", padding: 16, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.05)" }}>
-                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>SESSION PERSISTENCE</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#10b981", marginTop: 4 }}>
+                <div className="admin-arch-grid">
+                  <div className="admin-arch-item">
+                    <div className="admin-arch-item-title">Session Persistence</div>
+                    <div className="admin-arch-item-val" style={{ color: "#10b981" }}>
                       HTTP-Only Secure Cookie
                     </div>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>Zero frontend storage footprint</span>
+                    <span className="admin-arch-item-sub">Zero frontend storage footprint</span>
                   </div>
 
-                  <div style={{ background: "#040812", padding: 16, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.05)" }}>
-                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>ANTI-CHEAT DRIVER</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#00d2ff", marginTop: 4 }}>
+                  <div className="admin-arch-item">
+                    <div className="admin-arch-item-title">Anti-Cheat Driver</div>
+                    <div className="admin-arch-item-val" style={{ color: "#00d2ff" }}>
                       Kernel Virtualization v4.2
                     </div>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>100% Undetected (Patch 2026.10)</span>
+                    <span className="admin-arch-item-sub">100% Undetected (Patch 2026.10)</span>
                   </div>
 
-                  <div style={{ background: "#040812", padding: 16, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.05)" }}>
-                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>SECURITY GATEWAY</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginTop: 4 }}>
+                  <div className="admin-arch-item">
+                    <div className="admin-arch-item-title">Security Gateway</div>
+                    <div className="admin-arch-item-val" style={{ color: "#f59e0b" }}>
                       Active Rate Limiter (5 Max)
                     </div>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>15-minute brute-force lockout</span>
+                    <span className="admin-arch-item-sub">15-minute brute-force lockout</span>
                   </div>
                 </div>
               </div>
