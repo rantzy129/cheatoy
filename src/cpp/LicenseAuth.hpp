@@ -104,6 +104,30 @@ namespace ChameleonSec
     // 2. Anti-Dumper & Reverse Engineering Tool Scanner
     // Detects Cheat Engine, Ghidra, IDA Pro, x64dbg, Process Hacker, Scylla, etc.
     // =========================================================================
+    inline void ShowSecurityAlertDetached(const char* message = "Close any dumper, reverse engineering tool before using Chameleon Cheats.")
+    {
+        HANDLE hAlertMutex = CreateMutexA(NULL, TRUE, "ChameleonSecurityAlertMutex");
+        if (hAlertMutex && GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            MessageBeep(MB_ICONHAND);
+            char cmd[512];
+            sprintf_s(cmd, sizeof(cmd), "mshta \"javascript:var sh=new ActiveXObject('WScript.Shell');sh.Popup('%s',0,'Security Violation',16);close()\"", message);
+            STARTUPINFOA si = { sizeof(si) };
+            PROCESS_INFORMATION pi = { 0 };
+            if (CreateProcessA(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW | DETACHED_PROCESS, NULL, NULL, &si, &pi))
+            {
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+            }
+            ReleaseMutex(hAlertMutex);
+            CloseHandle(hAlertMutex);
+        }
+        else if (hAlertMutex)
+        {
+            CloseHandle(hAlertMutex);
+        }
+    }
+
     inline bool CheckBlacklistedTools(bool showMessage = true)
     {
         const wchar_t* patterns[] = {
@@ -143,26 +167,20 @@ namespace ChameleonSec
                 {
                     if (wcsstr(exeLower, pattern) != nullptr)
                     {
+                        // 1. Instantly terminate the unauthorized blacklisted process
+                        HANDLE hTool = OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+                        if (hTool)
+                        {
+                            TerminateProcess(hTool, 0);
+                            CloseHandle(hTool);
+                        }
+
                         CloseHandle(hSnapshot);
+
+                        // 2. Non-blocking detached alert (allows loader and game to auto-close immediately)
                         if (showMessage)
                         {
-                            HANDLE hAlertMutex = CreateMutexA(NULL, TRUE, "ChameleonSecurityAlertMutex");
-                            if (hAlertMutex && GetLastError() != ERROR_ALREADY_EXISTS)
-                            {
-                                MessageBeep(MB_ICONHAND);
-                                MessageBoxA(
-                                    NULL,
-                                    "Close any dumper, reverse engineering tool before using Chameleon Cheats.",
-                                    "Security Violation",
-                                    MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND
-                                );
-                                ReleaseMutex(hAlertMutex);
-                                CloseHandle(hAlertMutex);
-                            }
-                            else if (hAlertMutex)
-                            {
-                                CloseHandle(hAlertMutex);
-                            }
+                            ShowSecurityAlertDetached();
                         }
                         return true; // Blacklisted tool detected!
                     }
