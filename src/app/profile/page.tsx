@@ -396,16 +396,16 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="profile-page-root">
-      {/* Global Unified Navigation (Taste-Skill) */}
+    <div className="vault-page-root">
+      {/* Global Unified Navigation */}
       <Navbar />
 
-      {/* Main Profile Page Content */}
-      <main className="profile-page-container">
+      {/* Main Vault Workspace Container */}
+      <main className="vault-container">
         {!discordUser ? (
           /* ================= GUEST / LOGIN PROMPT SCREEN ================= */
-          <div className="profile-guest-card">
-            <h2>Member Profile &amp; License Vault</h2>
+          <div className="vault-guest-station">
+            <h1>Member Vault &amp; License Access</h1>
             <p>
               Sign in with your verified Discord account to view active VIP subscriptions,
               retrieve your private Assault Fire PH license keys, and download the latest loader.
@@ -418,7 +418,7 @@ export default function ProfilePage() {
               id="profile-discord-login-btn"
             >
               <IconDiscord size={20} />
-              <span>Sign In with Discord</span>
+              <span>Sign in with Discord</span>
             </button>
 
             <div className="modal-discord-banner" style={{ maxWidth: 440, margin: "20px auto 0" }}>
@@ -445,10 +445,10 @@ export default function ProfilePage() {
 
             <div className="guest-card-footer">
               <div className="guest-secondary-actions">
-                <Link href="/" className="btn-profile-secondary">
+                <Link href="/" className="btn-vault-subtle">
                   Return to Storefront
                 </Link>
-                <Link href="/#pricing" className="btn-profile-secondary">
+                <Link href="/#pricing" className="btn-vault-subtle">
                   View VIP Pricing
                 </Link>
               </div>
@@ -459,80 +459,67 @@ export default function ProfilePage() {
             </div>
           </div>
         ) : (
-          /* ================= AUTHENTICATED PROFILE VIEW ================= */
+          /* ================= AUTHENTICATED WORKSPACE VIEW ================= */
           <>
-            {/* 1. DISCORD PROFILE HERO CARD (Actual Discord Avatar & Info) */}
-            <section className="profile-hero-card" aria-label="Discord Profile">
-              <div className="profile-hero-inner">
-                <div className="profile-user-summary">
-                  {/* Actual Discord Avatar Frame */}
-                  <div className="discord-avatar-frame">
-                    {discordUser.avatar_url ? (
-                      <img
-                        src={discordUser.avatar_url}
-                        alt={`${discordUser.username}'s Discord Avatar`}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://cdn.discordapp.com/embed/avatars/0.png";
-                        }}
-                      />
-                    ) : (
-                      <div className="discord-avatar-fallback">
-                        {discordUser.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <span className="discord-online-badge" title="Discord Account Active" />
-                  </div>
+            {/* 1. TOP WORKSPACE HEADER & USER IDENTITY STRIP */}
+            <header className="vault-header" aria-label="Member Vault Header">
+              <div className="vault-header-title">
+                <h1>Member Vault</h1>
+                <p>
+                  Assault Fire PH VIP licenses, PC hardware binding, and loader distribution.
+                </p>
+              </div>
 
-                  <div className="profile-names-wrap">
-                    <h1>
-                      <span>{discordUser.global_name || discordUser.username}</span>
-                      <span className="profile-badge-discord">
-                        <IconDiscord size={14} />
-                        <span>Verified Discord</span>
-                      </span>
-                    </h1>
-
-                    <div className="profile-meta-pills">
-                      <span className="profile-sub-pill" title="Discord Username Handle">
-                        @{discordUser.username}
-                        {discordUser.tag && discordUser.tag !== "Discord" && discordUser.tag !== "0"
-                          ? `#${discordUser.tag}`
-                          : ""}
-                      </span>
-                      {discordUser.id && (
-                        <span className="profile-sub-pill" title="Discord Unique ID">
-                          ID: {discordUser.id}
-                        </span>
-                      )}
-                      <span
-                        className="profile-sub-pill"
-                        style={{
-                          background: activeLicense ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)",
-                          color: activeLicense ? "#10b981" : "#f59e0b",
-                          borderColor: activeLicense ? "rgba(16, 185, 129, 0.3)" : "rgba(245, 158, 11, 0.3)",
-                        }}
-                      >
-                        {activeLicense ? "● VIP Member" : "● No Active VIP Pass"}
-                      </span>
+              <div className="vault-user-console">
+                <div className="vault-user-info">
+                  {discordUser.avatar_url ? (
+                    <img
+                      src={discordUser.avatar_url}
+                      alt={`${discordUser.username}'s avatar`}
+                      className="vault-avatar"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://cdn.discordapp.com/embed/avatars/0.png";
+                      }}
+                    />
+                  ) : (
+                    <div className="vault-avatar-fallback">
+                      {discordUser.username.charAt(0).toUpperCase()}
                     </div>
+                  )}
+
+                  <div className="vault-user-meta">
+                    <span className="vault-user-name">
+                      @{discordUser.username}
+                      {discordUser.global_name && discordUser.global_name !== discordUser.username && (
+                        <span style={{ color: "#94a3b8", fontWeight: 400 }}> ({discordUser.global_name})</span>
+                      )}
+                    </span>
+                    <span className="vault-user-sub">
+                      {activeLicense ? (
+                        <span className="vault-status-dot-active">● Active VIP</span>
+                      ) : (
+                        <span className="vault-status-dot-none">● Free Member</span>
+                      )}
+                      {discordUser.id && <span>ID: {discordUser.id}</span>}
+                    </span>
                   </div>
                 </div>
 
-                <div className="profile-hero-actions">
+                <div className="vault-header-actions">
                   <button
                     type="button"
-                    className="btn-profile-secondary"
+                    className="btn-vault-subtle"
                     onClick={() => fetchUserData(discordUser)}
                     title="Refresh subscription status from database"
                   >
-                    <span>↻ Refresh Status</span>
+                    <span>↻ Refresh</span>
                   </button>
-                  <Link href="/#pricing" className="btn-profile-secondary">
-                    <span>+ Extend Pass</span>
+                  <Link href="/#pricing" className="btn-vault-subtle">
+                    <span>+ Extend</span>
                   </Link>
                   <button
                     type="button"
-                    className="btn-profile-logout"
+                    className="btn-vault-logout"
                     onClick={handleLogout}
                     title="Sign Out"
                   >
@@ -540,16 +527,16 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-            </section>
+            </header>
 
-            {/* 2. TWO-COLUMN GRID: VIP SUBSCRIPTION & LOADER DOWNLOAD */}
-            <div className="profile-grid">
-              {/* Left Column: Active Subscription & Hidden License Key */}
-              <div className="profile-vip-card">
-                <div className="profile-card-header">
-                  <div className="profile-card-title">
+            {/* 2. TWO-COLUMN COMMAND DESK */}
+            <div className="vault-grid">
+              {/* Left Column: Subscription Telemetry, Private Key, HWID */}
+              <div className="vault-card">
+                <div className="vault-card-head">
+                  <div className="vault-card-title">
                     <IconShieldCheck size={18} />
-                    <span>Active Subscription & License Key</span>
+                    <span>Active Subscription &amp; License Key</span>
                   </div>
 
                   {activeLicense ? (
@@ -566,110 +553,87 @@ export default function ProfilePage() {
                 {activeLicense ? (
                   <>
                     {/* Live Remaining Time Box */}
-                    <div className="vip-countdown-display">
-                      <div className="vip-countdown-label">
+                    <div className="vault-telemetry-box">
+                      <div className="vault-telemetry-label">
                         {activeLicense.tier || "VIP Pass"} • Remaining duration
                       </div>
-                      <div className="vip-countdown-timer">
+                      <div className="vault-telemetry-value">
                         {remaining ? remaining.text : "Calculating..."}
                       </div>
-                      <div className="vip-expiry-detail">
-                        <span>
-                          {activeLicense.expires_at
-                            ? `Valid until ${new Date(activeLicense.expires_at).toLocaleString()}`
-                            : "Lifetime Access • Unlimited Duration"}
-                        </span>
+                      <div className="vault-telemetry-sub">
+                        {activeLicense.expires_at
+                          ? `Valid until ${new Date(activeLicense.expires_at).toLocaleString()}`
+                          : "Lifetime Access • Unlimited Duration"}
                       </div>
                     </div>
 
-                    {/* License Key Vault (Taste-Skill Requirement: DEFAULT AS HIDDEN) */}
-                    <div className="profile-key-vault">
-                      <div className="vault-top">
-                        <div className="vault-top-title">
+                    {/* Private License Key Box */}
+                    <div className="vault-key-container">
+                      <div className="vault-key-header">
+                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, color: "#cbd5e1" }}>
                           <IconKey size={14} />
                           <span>Private Loader License Key</span>
-                        </div>
-                        <span style={{ fontSize: 11, color: "#64748b" }}>
-                          Bound to @{discordUser.username}
                         </span>
+                        <span>Bound to @{discordUser.username}</span>
                       </div>
 
-                      <div className="vault-key-box">
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div className="vault-key-row">
+                        <div>
                           {isKeyRevealed ? (
-                            <span className="vault-key-string" id="user-license-key-text">
+                            <span className="vault-key-code" id="user-license-key-text">
                               {activeLicense.license_key}
                             </span>
                           ) : (
-                            <span className="vault-key-masked" id="user-license-key-masked">
+                            <span className="vault-key-masked-code" id="user-license-key-masked">
                               {getMaskedKey(activeLicense.license_key)}
                             </span>
                           )}
                         </div>
 
-                        <div className="vault-btn-group">
-                          {/* Toggle View / Hide Button */}
+                        <div className="vault-key-buttons">
                           <button
                             type="button"
-                            className="btn-vault-action"
+                            className="btn-key-action"
                             onClick={() => setIsKeyRevealed(!isKeyRevealed)}
                             id="toggle-license-visibility-btn"
                             title={isKeyRevealed ? "Hide private license key" : "Click to view full license key"}
                           >
                             {isKeyRevealed ? (
                               <>
-                                <IconEyeOff size={16} />
+                                <IconEyeOff size={15} />
                                 <span>Hide Key</span>
                               </>
                             ) : (
                               <>
-                                <IconEye size={16} />
-                                <span>Click to View</span>
+                                <IconEye size={15} />
+                                <span>Show Key</span>
                               </>
                             )}
                           </button>
 
-                          {/* Copy Button */}
                           <button
                             type="button"
-                            className="btn-vault-copy"
+                            className="btn-key-copy"
                             onClick={() => handleCopyKey(activeLicense.license_key)}
                             id="copy-license-key-btn"
                             title="Copy license key to clipboard"
                           >
-                            <IconCopy size={16} />
+                            <IconCopy size={15} />
                             <span>{isCopied ? "Copied!" : "Copy Key"}</span>
                           </button>
                         </div>
                       </div>
 
-                      <div className="vault-tip-row">
-                        <IconShield size={14} />
-                        <span>
-                          Keep this key private. It locks automatically to your PC HWID on first injection.
-                        </span>
+                      <div className="vault-key-hint">
+                        Keep this key private. It locks automatically to your PC motherboard on first injection.
                       </div>
                     </div>
 
-                    {/* Machine HWID Lock Status */}
-                    <div
-                      style={{
-                        background: "#080e18",
-                        border: "1px solid #162438",
-                        borderRadius: 10,
-                        padding: "16px 20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: 12,
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700 }}>
-                          Machine HWID Binding
-                        </div>
-                        <div style={{ fontSize: 13, color: "#ffffff", fontWeight: 600, marginTop: 2 }}>
+                    {/* HWID Binding Telemetry */}
+                    <div className="vault-hwid-box">
+                      <div className="vault-hwid-detail">
+                        <div className="vault-hwid-title">Machine HWID Binding</div>
+                        <div className="vault-hwid-status">
                           {activeLicense.hwid ? (
                             <span style={{ color: "#38bdf8", fontVariantNumeric: "tabular-nums" }}>
                               Locked: {activeLicense.hwid.substring(0, 16)}...
@@ -682,13 +646,12 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <div style={{ fontSize: 11, color: "#64748b" }}>
+                      <div className="vault-hwid-discord">
                         Need HWID reset?{" "}
                         <a
                           href="https://discord.gg/Whwxq9QAEN"
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: "#5865f2", textDecoration: "underline", fontWeight: 600 }}
                         >
                           Open a ticket in Discord ↗
                         </a>
@@ -696,15 +659,15 @@ export default function ProfilePage() {
                     </div>
                   </>
                 ) : (
-                  /* No Active License Found */
+                  /* Empty state when user has no pass */
                   <div style={{ textAlign: "center", padding: "40px 20px" }}>
                     <div
                       style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 18,
+                        width: 52,
+                        height: 52,
+                        borderRadius: 8,
                         background: "rgba(245, 158, 11, 0.1)",
-                        border: "1px solid rgba(245, 158, 11, 0.3)",
+                        border: "1px solid rgba(245, 158, 11, 0.25)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -712,18 +675,17 @@ export default function ProfilePage() {
                         color: "#f59e0b",
                       }}
                     >
-                      <IconKey size={28} />
+                      <IconKey size={24} />
                     </div>
-                    <h3 style={{ fontSize: 18, fontWeight: 800, color: "#ffffff", marginBottom: 6 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#ffffff", marginBottom: 6 }}>
                       No Active VIP Pass
                     </h3>
-                    <p style={{ fontSize: 13, color: "#94a3b8", maxWidth: 400, margin: "0 auto 20px auto", lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 13, color: "#94a3b8", maxWidth: 380, margin: "0 auto 20px auto", lineHeight: 1.5 }}>
                       You don't have an active Assault Fire PH license key bound to this Discord account yet.
-                      Choose a pass below to start dominating.
                     </p>
                     <Link
                       href="/#pricing"
-                      className="btn-vault-copy"
+                      className="btn-key-copy"
                       style={{ textDecoration: "none", display: "inline-flex" }}
                     >
                       Browse Passes (From ₱500)
@@ -732,83 +694,78 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Right Column: Loader Download & Injection Guide */}
-              <div className="profile-side-card">
+              {/* Right Column: Loader Deployment & Setup Guide */}
+              <div className="vault-card">
                 <div>
-                  <div className="loader-badge-banner">
+                  <div className="vault-loader-status-banner">
                     <h3>
                       <IconShield size={16} />
                       <span>Chameleon Loader v2.6.4</span>
                     </h3>
                     <p>
-                      Official Undetected Memory Virtualization Loader for Assault Fire PH (Legacy/Reborn/etc).
+                      Official memory virtualization loader for Assault Fire PH (Legacy &amp; Reborn).
                     </p>
                   </div>
 
                   <a
                     href="/downloads/Chameleon_VIP.zip"
                     download="Chameleon_VIP.zip"
-                    className="btn-download-loader"
+                    className="btn-vault-download"
                     id="download-loader-profile-btn"
                   >
-                    <IconDownload size={20} />
+                    <IconDownload size={18} />
                     <span>Download Loader (ZIP)</span>
                   </a>
 
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#cbd5e1", marginBottom: 12 }}>
-                    Quick setup guide
-                  </div>
+                  <div className="vault-instructions-block">
+                    <div className="vault-instructions-title">Quick setup guide</div>
 
-                  <div className="step-guide-list">
-                    <div className="step-guide-item">
-                      <span className="step-num-pill">1</span>
-                      <div>
+                    <ol className="vault-instructions-list">
+                      <li>
                         <strong>Extract Loader</strong>: Extract the downloaded archive into a private folder on your PC.
-                      </div>
-                    </div>
-                    <div className="step-guide-item">
-                      <span className="step-num-pill">2</span>
-                      <div>
-                        <strong>Run as Admin</strong>: Right click <code>ChameleonLoader.exe</code> and select Run as Administrator.
-                      </div>
-                    </div>
-                    <div className="step-guide-item">
-                      <span className="step-num-pill">3</span>
-                      <div>
-                        <strong>Input License</strong>: Paste your license key from this profile page.
-                      </div>
-                    </div>
-                    <div className="step-guide-item">
-                      <span className="step-num-pill">4</span>
-                      <div>
-                        <strong>Launch Game</strong>: Start Assault Fire PH. Press <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: 4, color: "#00d2ff" }}>F8</kbd> for Chams, <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: 4, color: "#a855f7" }}>F7</kbd> to change colors, and <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: 4, color: "#10b981" }}>INSERT</kbd> for Snaplines.
-                      </div>
+                      </li>
+                      <li>
+                        <strong>Run as Admin</strong>: Right-click <code>ChameleonLoader.exe</code> and select Run as administrator.
+                      </li>
+                      <li>
+                        <strong>Input License</strong>: Paste your private key from the license console.
+                      </li>
+                      <li>
+                        <strong>Launch Game</strong>: Start Assault Fire PH and use the in-game keybinds below.
+                      </li>
+                    </ol>
+
+                    <div className="vault-keybinds-row">
+                      <span>In-game controls:</span>
+                      <span><kbd>F8</kbd> Chams</span>
+                      <span><kbd>F7</kbd> Color cycle</span>
+                      <span><kbd>INSERT</kbd> Snaplines</span>
                     </div>
                   </div>
                 </div>
 
-                <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#64748b" }}>
-                  <span style={{ color: "#00ff87" }}>Status: Undetected ●</span>
-                  <span>Patch: 2026.10</span>
+                <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#64748b" }}>
+                  <span style={{ color: "#00ff87", fontWeight: 600 }}>Status: Undetected ●</span>
+                  <span style={{ fontVariantNumeric: "tabular-nums" }}>Patch: 2026.10</span>
                 </div>
               </div>
             </div>
 
-            {/* 3. ORDER HISTORY TABLE */}
-            <section className="profile-orders-section" aria-label="Order History">
-              <div className="profile-card-header" style={{ marginBottom: 16 }}>
-                <div className="profile-card-title">
+            {/* 3. ORDER & PAYMENT HISTORY */}
+            <section className="vault-orders-card" aria-label="Order History">
+              <div className="vault-card-head">
+                <div className="vault-card-title">
                   <IconDocument size={16} />
-                  <span>Your Order & Payment History</span>
+                  <span>Your Order &amp; Payment History</span>
                 </div>
-                <span style={{ fontSize: 12, color: "#64748b" }}>
+                <span style={{ fontSize: 12, color: "#64748b", fontVariantNumeric: "tabular-nums" }}>
                   {userOrders.length} transaction{userOrders.length !== 1 ? "s" : ""}
                 </span>
               </div>
 
               {userOrders.length > 0 ? (
-                <div className="orders-table-wrapper">
-                  <table className="profile-table">
+                <div className="vault-orders-table-wrapper">
+                  <table className="vault-table">
                     <thead>
                       <tr>
                         <th>Order ID</th>
@@ -897,7 +854,7 @@ export default function ProfilePage() {
         )}
       </main>
 
-      {/* Global Unified Footer (Taste-Skill) */}
+      {/* Global Unified Footer */}
       <Footer />
     </div>
   );

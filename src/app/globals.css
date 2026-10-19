@@ -2188,7 +2188,11 @@ a {
    DEDICATED PROFILE PAGE STYLES (Taste-Skill Cyber Obsidian Direction)
    ========================================================================== */
 
-.profile-page-root {
+/* ==========================================================================
+   MEMBER VAULT & WORKSPACE (Anti-Slop Relayout)
+   ========================================================================== */
+
+.vault-page-root {
   min-height: 100vh;
   background: var(--bg-surface-0);
   color: #f1f5f9;
@@ -2196,280 +2200,269 @@ a {
   overflow-x: hidden;
 }
 
-.profile-page-container {
-  max-width: 1140px;
+.vault-container {
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 40px 24px 80px 24px;
+  padding: 36px 24px 80px 24px;
 }
 
-/* Discord Profile Hero Card */
-.profile-hero-card {
-  background: var(--bg-surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 28px 32px;
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.profile-hero-inner {
+/* Workspace Header / Identity Strip */
+.vault-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 24px;
   flex-wrap: wrap;
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.profile-user-summary {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.discord-avatar-frame {
-  position: relative;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-  border: 1px solid #5865f2;
-  overflow: hidden;
-}
-
-.discord-avatar-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: var(--bg-surface-2);
-  display: block;
-}
-
-.discord-avatar-fallback {
-  width: 100%;
-  height: 100%;
-  background: var(--bg-surface-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 800;
-  color: #38bdf8;
-}
-
-.discord-online-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 12px;
-  height: 12px;
-  background: #23a55a;
-  border: 2px solid var(--bg-surface-1);
-  border-radius: 50%;
-}
-
-.profile-names-wrap h1 {
-  font-size: 22px;
+.vault-header-title h1 {
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 6px;
 }
 
-.profile-badge-discord {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(88, 101, 242, 0.12);
-  border: 1px solid rgba(88, 101, 242, 0.3);
-  color: #a5b4fc;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-  font-size: 11px;
-  font-weight: 600;
+.vault-header-title p {
+  font-size: 13.5px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.5;
 }
 
-.profile-meta-pills {
+.vault-user-console {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
   flex-wrap: wrap;
 }
 
-.profile-sub-pill {
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  background: var(--bg-surface-2);
-  border: 1px solid var(--border-subtle);
-  color: #94a3b8;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-}
-
-.profile-hero-actions {
+.vault-user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.btn-profile-secondary {
+.vault-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+  border: 1px solid #5865f2;
+  background: var(--bg-surface-2);
+  display: block;
+  flex-shrink: 0;
+}
+
+.vault-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface-2);
+  border: 1px solid #5865f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.vault-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vault-user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-user-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vault-status-dot-active {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.vault-status-dot-none {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.vault-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.btn-vault-subtle {
   background: var(--bg-surface-2);
   border: 1px solid var(--border-subtle);
   color: #cbd5e1;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-  text-decoration: none;
 }
 
-.btn-profile-secondary:hover {
+.btn-vault-subtle:hover {
   background: #1c2b44;
-  color: #ffffff;
   border-color: #2b3e5f;
+  color: #ffffff;
 }
 
-.btn-profile-logout {
-  background: rgba(239, 68, 68, 0.1);
+.btn-vault-logout {
+  background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.25);
   color: #fca5a5;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.btn-profile-logout:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ffffff;
+.btn-vault-logout:hover {
+  background: rgba(239, 68, 68, 0.18);
   border-color: #ef4444;
+  color: #ffffff;
 }
 
-/* Grid Layout for Profile Dashboard */
-.profile-grid {
+/* Two-Column Command Grid */
+.vault-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
 }
 
-@media (max-width: 900px) {
-  .profile-grid {
+@media (max-width: 960px) {
+  .vault-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Main VIP Subscription Box */
-.profile-vip-card {
+/* Panels */
+.vault-card {
   background: var(--bg-surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 24px 28px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.profile-card-header {
+.vault-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.profile-card-title {
-  font-size: 13px;
+.vault-card-title {
+  font-size: 14px;
   font-weight: 700;
-  color: #cbd5e1;
+  color: #f1f5f9;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.vip-countdown-display {
+/* Time & Telemetry Block */
+.vault-telemetry-box {
   background: var(--bg-surface-0);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 18px 20px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.vip-countdown-label {
+.vault-telemetry-label {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
-.vip-countdown-timer {
+.vault-telemetry-value {
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #00d2ff;
   font-variant-numeric: tabular-nums;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 6px;
 }
 
-.vip-expiry-detail {
+.vault-telemetry-sub {
   font-size: 12px;
   color: #94a3b8;
-  margin-top: 6px;
   font-variant-numeric: tabular-nums;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-/* Taste-Skill Key Vault */
-.profile-key-vault {
+/* Key Display & Controls */
+.vault-key-container {
   background: var(--bg-surface-0);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 16px 18px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.vault-top {
+.vault-key-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+  font-size: 11.5px;
+  color: #94a3b8;
 }
 
-.vault-top-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #cbd5e1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.vault-key-box {
+.vault-key-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   background: var(--bg-surface-1);
   border: 1px solid var(--border-subtle);
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: var(--radius-xs);
   flex-wrap: wrap;
 }
 
-.vault-key-string {
+.vault-key-code {
   font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 600;
@@ -2478,7 +2471,7 @@ a {
   user-select: all;
 }
 
-.vault-key-masked {
+.vault-key-masked-code {
   font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 600;
@@ -2486,13 +2479,13 @@ a {
   color: #64748b;
 }
 
-.vault-btn-group {
+.vault-key-buttons {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-vault-action {
+.btn-key-action {
   background: var(--bg-surface-2);
   border: 1px solid var(--border-subtle);
   color: #cbd5e1;
@@ -2504,16 +2497,16 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.btn-vault-action:hover {
+.btn-key-action:hover {
   background: #1c2b44;
-  color: #00d2ff;
   border-color: #2b3e5f;
+  color: #00d2ff;
 }
 
-.btn-vault-copy {
+.btn-key-copy {
   background: #00d2ff;
   color: #070a10;
   border: 1px solid #00d2ff;
@@ -2528,32 +2521,59 @@ a {
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.btn-vault-copy:hover {
+.btn-key-copy:hover {
   background: #38bdf8;
   border-color: #38bdf8;
 }
 
-.vault-tip-row {
+.vault-key-hint {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Machine HWID Lock Box */
+.vault-hwid-box {
+  background: var(--bg-surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.vault-hwid-detail {
+  font-size: 12px;
+}
+
+.vault-hwid-title {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.vault-hwid-status {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.vault-hwid-discord {
   font-size: 11.5px;
   color: #64748b;
 }
 
-/* Side Card: Loader & Quick Actions */
-.profile-side-card {
-  background: var(--bg-surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.vault-hwid-discord a {
+  color: #5865f2;
+  text-decoration: underline;
+  font-weight: 600;
 }
 
-.loader-badge-banner {
+/* Loader Deployment Desk */
+.vault-loader-status-banner {
   background: var(--bg-surface-0);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -2561,7 +2581,7 @@ a {
   margin-bottom: 16px;
 }
 
-.loader-badge-banner h3 {
+.vault-loader-status-banner h3 {
   font-size: 13.5px;
   font-weight: 700;
   color: #00ff87;
@@ -2571,14 +2591,14 @@ a {
   margin-bottom: 4px;
 }
 
-.loader-badge-banner p {
+.vault-loader-status-banner p {
   font-size: 12px;
   color: #94a3b8;
-  line-height: 1.5;
   margin: 0;
+  line-height: 1.45;
 }
 
-.btn-download-loader {
+.btn-vault-download {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2586,51 +2606,77 @@ a {
   background: #00d2ff;
   color: #070a10;
   font-weight: 700;
-  font-size: 13px;
-  padding: 10px 18px;
+  font-size: 13.5px;
+  padding: 12px 20px;
   border-radius: var(--radius-sm);
   text-decoration: none;
   transition: background-color 0.15s ease;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.btn-download-loader:hover {
+.btn-vault-download:hover {
   background: #38bdf8;
 }
 
-.step-guide-list {
+.vault-instructions-block {
+  margin-top: 4px;
+}
+
+.vault-instructions-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.vault-instructions-list {
+  padding-left: 20px;
+  margin: 0 0 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.step-guide-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   font-size: 12px;
-  color: #cbd5e1;
-  line-height: 1.4;
+  color: #94a3b8;
+  line-height: 1.45;
 }
 
-.step-num-pill {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-xs);
+.vault-instructions-list strong {
+  color: #e2e8f0;
+}
+
+.vault-instructions-list code {
   background: var(--bg-surface-2);
-  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
+  border-radius: 4px;
   color: #38bdf8;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+}
+
+.vault-keybinds-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  font-size: 11.5px;
+  color: #94a3b8;
 }
 
-/* Order History Section */
-.profile-orders-section {
+.vault-keybinds-row kbd {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #00d2ff;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Orders History Section */
+.vault-orders-card {
   background: var(--bg-surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -2638,19 +2684,19 @@ a {
   margin-bottom: 32px;
 }
 
-.orders-table-wrapper {
+.vault-orders-table-wrapper {
   overflow-x: auto;
   margin-top: 14px;
 }
 
-.profile-table {
+.vault-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   text-align: left;
 }
 
-.profile-table th {
+.vault-table th {
   padding: 10px 14px;
   color: var(--text-muted);
   font-size: 11.5px;
@@ -2658,18 +2704,18 @@ a {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.profile-table td {
+.vault-table td {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   color: #e2e8f0;
 }
 
-.profile-table tr:hover td {
+.vault-table tr:hover td {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Guest / Login Callout Screen */
-.profile-guest-card {
+/* Guest / Login Station */
+.vault-guest-station {
   max-width: 520px;
   margin: 60px auto;
   background: var(--bg-surface-1);
@@ -2677,22 +2723,9 @@ a {
   border-radius: var(--radius-md);
   padding: 36px 32px;
   text-align: center;
-  position: relative;
 }
 
-.guest-portal-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #818cf8;
-  background: rgba(88, 101, 242, 0.12);
-  border: 1px solid rgba(88, 101, 242, 0.3);
-  border-radius: var(--radius-xs);
-  margin-bottom: 16px;
-}
-
-.profile-guest-card h2 {
+.vault-guest-station h1 {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.015em;
@@ -2700,62 +2733,11 @@ a {
   margin-bottom: 10px;
 }
 
-.profile-guest-card p {
+.vault-guest-station p {
   font-size: 13.5px;
   color: #94a3b8;
   line-height: 1.6;
   margin-bottom: 24px;
-  max-width: 440px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.btn-discord-login-large {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: #5865f2;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  border: 1px solid #5865f2;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-  width: 100%;
-}
-
-.btn-discord-login-large:hover {
-  background: #4752c4;
-  border-color: #4752c4;
-}
-
-.guest-card-footer {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.guest-secondary-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.guest-security-note {
-  font-size: 11.5px;
-  color: #64748b;
-}
-
-.user-avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-xs);
-  object-fit: cover;
-  border: 1px solid #5865f2;
 }
 
 /* ==========================================================================
