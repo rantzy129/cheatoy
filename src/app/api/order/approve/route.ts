@@ -7,6 +7,7 @@ import {
   sendOrderApprovedWebhook,
   sendOrderRejectedWebhook,
 } from "@/lib/discordWebhook";
+import { assignDiscordVipRoleAndSendDm } from "@/lib/discordBot";
 
 function calculateExpiry(tier: string) {
   const now = new Date();
@@ -119,11 +120,27 @@ export async function POST(request: Request) {
       console.warn("Approve webhook notice:", e)
     );
 
+    // Automated Discord VIP Role Assignment & Private DM Dispatch
+    let discordBotStatus: any = null;
+    if (order.discord_id) {
+      discordBotStatus = await assignDiscordVipRoleAndSendDm({
+        discordUserId: order.discord_id,
+        discordUsername: order.discord_username,
+        tier: order.tier,
+        licenseKey: newKey,
+        expiresAt: expiresAt,
+      }).catch((e) => {
+        console.warn("Discord Bot auto-role notice:", e);
+        return { roleAssigned: false, dmSent: false, error: e.message };
+      });
+    }
+
     return NextResponse.json({
       success: true,
       status: "approved",
       license_key: newKey,
       expires_at: expiresAt,
+      discord_bot: discordBotStatus,
       message: `Order ${order_id} approved. Key issued for ${order.discord_username}`,
     });
   } catch (err: any) {

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { assignDiscordVipRoleAndSendDm } from "@/lib/discordBot";
 
 function calculateExpiry(tier: string) {
   const now = new Date();
@@ -53,9 +54,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
+    // Auto-assign VIP role and DM customer if Discord ID is provided
+    let discordBotStatus: any = null;
+    if (discord_id) {
+      discordBotStatus = await assignDiscordVipRoleAndSendDm({
+        discordUserId: String(discord_id).trim(),
+        discordUsername: discord_username,
+        tier: tier,
+        licenseKey: newKey,
+        expiresAt: expiresAt,
+      }).catch((e) => {
+        console.warn("Discord Bot auto-role exception:", e);
+        return { roleAssigned: false, dmSent: false, error: e.message };
+      });
+    }
+
     return NextResponse.json({
       success: true,
       license: data,
+      discord_bot: discordBotStatus,
       message: `Successfully generated ${tier} key`,
     });
   } catch (err: any) {
