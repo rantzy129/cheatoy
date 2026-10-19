@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://emdjnrokrgotaxebqrpo.supabase.co";
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
 const VALID_TIERS: Record<string, { duration: string; pricePhp: string; priceUsd: string }> = {
   "7days": { duration: "7 Days Pass", pricePhp: "₱500", priceUsd: "$9.99" },

@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { sendUserAuthWebhook } from "@/lib/discordWebhook";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://emdjnrokrgotaxebqrpo.supabase.co";
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const SIGNING_SECRET = process.env.LICENSE_SIGNING_SECRET || process.env.ADMIN_SECRET_KEY || "chameleon_client_sign_key_9921";
+const SIGNING_SECRET =
+  process.env.LICENSE_SIGNING_SECRET ||
+  process.env.ADMIN_SECRET_KEY ||
+  "4f2e2368fc5f669483af135071a355d4130a9832f8b304024d6cddc7b28c9351";
 
 export async function POST(request: Request) {
   try {
