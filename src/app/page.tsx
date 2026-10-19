@@ -581,26 +581,90 @@ export default function Home() {
     setIsGcashModalOpen(true);
   };
 
-  const handleReceiptFileChange = (file?: File | null) => {
+  const [isProcessingReceipt, setIsProcessingReceipt] = useState(false);
+
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const rawResult = (e.target?.result as string) || "";
+        if (typeof window === "undefined" || !rawResult) {
+          resolve(rawResult);
+          return;
+        }
+        const img = new (window as any).Image();
+        img.onload = () => {
+          try {
+            const maxDim = 1400;
+            let width = img.width;
+            let height = img.height;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              resolve(rawResult);
+              return;
+            }
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            resolve(dataUrl);
+          } catch {
+            resolve(rawResult);
+          }
+        };
+        img.onerror = () => resolve(rawResult);
+        img.src = rawResult;
+      };
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleReceiptFileChange = async (file?: File | null) => {
     if (!file) return;
-    const allowed = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
-    if (!allowed.includes(file.type.toLowerCase())) {
+    const nameLower = (file.name || "").toLowerCase();
+    const typeLower = (file.type || "").toLowerCase();
+    const isImage =
+      typeLower.startsWith("image/") ||
+      nameLower.endsWith(".png") ||
+      nameLower.endsWith(".jpg") ||
+      nameLower.endsWith(".jpeg") ||
+      nameLower.endsWith(".webp") ||
+      nameLower.endsWith(".bmp");
+
+    if (!isImage) {
       setOrderError("Unsupported image format. Please upload PNG, JPG, or WEBP.");
-      return;
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      setOrderError("Receipt file exceeds 8MB limit. Please attach a compressed screenshot.");
       return;
     }
 
     setOrderError("");
     setReceiptFile(file);
+    setIsProcessingReceipt(true);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setReceiptPreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const optimizedDataUrl = await compressImage(file);
+      if (optimizedDataUrl) {
+        setReceiptPreview(optimizedDataUrl);
+      }
+    } catch {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setReceiptPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsProcessingReceipt(false);
+    }
   };
 
   const handleRemoveReceipt = () => {
@@ -616,6 +680,11 @@ export default function Home() {
     }
     if (!gcashRefNo.trim() || gcashRefNo.trim().length < 6) {
       setOrderError("Please enter a valid GCash / Bank reference number (at least 6 digits)");
+      return;
+    }
+
+    if (isProcessingReceipt) {
+      setOrderError("Optimizing receipt screenshot... Please wait a moment.");
       return;
     }
 
@@ -678,7 +747,7 @@ export default function Home() {
         <section className="hero">
           <div className="hero-content">
             <h1 className="hero-title">
-              Assault Fire PH VIP — Wallhack, Chams, Health &amp; 2D Box
+              Assault Fire PH VIP Wallhack
             </h1>
 
             <p className="hero-desc">
@@ -1629,9 +1698,15 @@ export default function Home() {
                   <button
                     type="submit"
                     className="gcash-btn-submit"
-                    disabled={isSubmittingOrder}
+                    disabled={isSubmittingOrder || isProcessingReceipt}
                   >
-                    <span>{isSubmittingOrder ? "Submitting Order..." : "Submit Payment for Admin Approval"}</span>
+                    <span>
+                      {isSubmittingOrder
+                        ? "Submitting Order..."
+                        : isProcessingReceipt
+                        ? "Optimizing Slip..."
+                        : "Submit Payment for Admin Approval"}
+                    </span>
                     <IconArrowUpRight size={15} />
                   </button>
                 </form>

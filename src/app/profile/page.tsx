@@ -127,6 +127,74 @@ export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
   const [ticker, setTicker] = useState(0);
 
+  // Attach slip state
+  const [attachingOrderId, setAttachingOrderId] = useState<string | null>(null);
+  const [attachStatus, setAttachStatus] = useState<{ id: string; msg: string; isError?: boolean } | null>(null);
+
+
+  const formatOrderPrice = (price?: string | null, tier?: string) => {
+    if (!price) {
+      if (tier?.includes("15")) return "₱1,000";
+      if (tier?.includes("Month")) return "₱1,500";
+      if (tier?.includes("Lifetime")) return "₱2,500";
+      return "₱500";
+    }
+    const isUsd = price.includes("$");
+    const digits = price.replace(/[^\d,.]/g, "");
+    if (!digits) {
+      if (tier?.includes("15")) return "₱1,000";
+      if (tier?.includes("Month")) return "₱1,500";
+      if (tier?.includes("Lifetime")) return "₱2,500";
+      return "₱500";
+    }
+    return isUsd ? `$${digits}` : `₱${digits}`;
+  };
+
+  const handleAttachSlipToOrder = async (orderId: string, file: File) => {
+    setAttachingOrderId(orderId);
+    setAttachStatus({ id: orderId, msg: "Reading & attaching slip..." });
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const rawData = e.target?.result as string;
+        try {
+          const res = await fetch("/api/order/attach-receipt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              order_id: orderId,
+              receipt_image: rawData,
+              receipt_name: file.name,
+            }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            setAttachStatus({ id: orderId, msg: "Slip attached! Admin will review shortly." });
+            if (discordUser) {
+              fetchUserData(discordUser);
+            }
+          } else {
+            setAttachStatus({ id: orderId, msg: data.error || "Failed to attach slip", isError: true });
+          }
+        } catch (err: any) {
+          setAttachStatus({ id: orderId, msg: "Upload failed: " + err.message, isError: true });
+        } finally {
+          setAttachingOrderId(null);
+          setTimeout(() => setAttachStatus(null), 5000);
+        }
+      };
+      reader.onerror = () => {
+        setAttachingOrderId(null);
+        setAttachStatus({ id: orderId, msg: "Could not read file", isError: true });
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setAttachingOrderId(null);
+      setAttachStatus({ id: orderId, msg: "File selection error", isError: true });
+    }
+  };
+
   // Live countdown ticker (updates every second for smooth seconds ticking)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -906,68 +974,115 @@ export default function ProfilePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {userOrders.map((order) => (
-                        <tr key={order.id || order.order_id}>
-                          <td style={{ fontVariantNumeric: "tabular-nums", color: "#00d2ff", fontWeight: 600 }}>
-                            {order.order_id}
-                          </td>
-                          <td style={{ fontWeight: 700 }}>{order.tier}</td>
-                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
-                            ₱{order.amount_php || order.amount}
-                            {order.amount_usd ? ` ($${order.amount_usd})` : ""}
-                          </td>
-                          <td>
-                            <span style={{ color: "#007dfe", fontWeight: 700 }}>
-                              {order.payment_method || "GCash"}
-                            </span>
-                          </td>
-                          <td style={{ fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>
-                            {order.gcash_ref_no || "N/A"}
-                          </td>
-                          <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
-                            {new Date(order.created_at).toLocaleDateString()}
-                          </td>
-                          <td>
-                            {order.status === "approved" ? (
-                              <span className="subscription-status-badge status-active-pill">
-                                Approved
+                      {userOrders.map((order) => {
+                        const hasSlip = order.payment_method?.includes("[receipt:");
+                        const isPending = order.status === "pending";
+
+                        return (
+                          <tr key={order.id || order.order_id}>
+                            <td style={{ fontVariantNumeric: "tabular-nums", color: "#00d2ff", fontWeight: 600 }}>
+                              {order.order_id}
+                            </td>
+                            <td style={{ fontWeight: 700 }}>{order.tier}</td>
+                            <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                              {formatOrderPrice(order.price, order.tier)}
+                            </td>
+                            <td>
+                              <span style={{ color: "#007dfe", fontWeight: 700 }}>
+                                {(order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "")}
                               </span>
-                            ) : order.status === "rejected" ? (
-                              <span
-                                className="subscription-status-badge"
-                                style={{ background: "rgba(239, 68, 68, 0.15)", color: "#ef4444" }}
-                              >
-                                Rejected
-                              </span>
-                            ) : (
-                              <span className="subscription-status-badge status-pending-pill">
-                                Pending approval
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
-                            {order.license_key ? (
-                              <button
-                                type="button"
-                                onClick={() => handleCopyKey(order.license_key)}
-                                style={{
-                                  background: "transparent",
-                                  border: "none",
-                                  color: "#38bdf8",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  textDecoration: "underline",
-                                }}
-                                title="Click to copy key"
-                              >
-                                Copy key
-                              </button>
-                            ) : (
-                              <span style={{ color: "#64748b" }}>—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td style={{ fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>
+                              <div>{order.reference_no || order.gcash_ref_no || "N/A"}</div>
+                              {hasSlip ? (
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#10b981", fontSize: 11, marginTop: 4 }}>
+                                  ● Slip Attached
+                                </span>
+                              ) : isPending ? (
+                                <div style={{ marginTop: 4 }}>
+                                  <label
+                                    htmlFor={`attach-slip-${order.order_id}`}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: 4,
+                                      background: "rgba(56, 189, 248, 0.12)",
+                                      color: "#38bdf8",
+                                      padding: "3px 8px",
+                                      borderRadius: 4,
+                                      fontSize: 11,
+                                      cursor: attachingOrderId === order.order_id ? "wait" : "pointer",
+                                      border: "1px solid rgba(56, 189, 248, 0.3)",
+                                      userSelect: "none",
+                                    }}
+                                  >
+                                    <span>{attachingOrderId === order.order_id ? "Uploading..." : "📎 Attach Slip"}</span>
+                                    <input
+                                      id={`attach-slip-${order.order_id}`}
+                                      type="file"
+                                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                                      style={{ display: "none" }}
+                                      disabled={attachingOrderId === order.order_id}
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleAttachSlipToOrder(order.order_id, e.target.files[0]);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                  {attachStatus?.id === order.order_id && (
+                                    <span style={{ display: "block", fontSize: 10, color: attachStatus.isError ? "#ef4444" : "#38bdf8", marginTop: 2 }}>
+                                      {attachStatus.msg}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : null}
+                            </td>
+                            <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
+                              {new Date(order.created_at).toLocaleDateString()}
+                            </td>
+                            <td>
+                              {order.status === "approved" ? (
+                                <span className="subscription-status-badge status-active-pill">
+                                  Approved
+                                </span>
+                              ) : order.status === "rejected" ? (
+                                <span
+                                  className="subscription-status-badge"
+                                  style={{ background: "rgba(239, 68, 68, 0.15)", color: "#ef4444" }}
+                                >
+                                  Rejected
+                                </span>
+                              ) : (
+                                <span className="subscription-status-badge status-pending-pill">
+                                  Pending approval
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                              {order.license_key ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyKey(order.license_key)}
+                                  style={{
+                                    background: "transparent",
+                                    border: "none",
+                                    color: "#38bdf8",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    textDecoration: "underline",
+                                  }}
+                                  title="Click to copy key"
+                                >
+                                  Copy key
+                                </button>
+                              ) : (
+                                <span style={{ color: "#64748b" }}>—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

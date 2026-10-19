@@ -73,13 +73,20 @@ export async function POST(request: Request) {
 
     if (receipt_image && typeof receipt_image === "string") {
       try {
-        const matches = receipt_image.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
-        const mimeType = matches ? matches[1].toLowerCase() : "png";
-        const base64Data = matches ? matches[2] : receipt_image;
-        const buffer = Buffer.from(base64Data, "base64");
+        let base64Clean = receipt_image;
+        let mimeType = "png";
+        if (receipt_image.includes(";base64,")) {
+          const parts = receipt_image.split(";base64,");
+          const header = parts[0];
+          base64Clean = parts[1];
+          const m = header.match(/data:image\/([a-zA-Z0-9+.-]+)/i);
+          if (m) mimeType = m[1].toLowerCase();
+        }
+        base64Clean = base64Clean.replace(/\s+/g, "");
+        const buffer = Buffer.from(base64Clean, "base64");
 
-        // Validate max 10MB
-        if (buffer.length <= 10 * 1024 * 1024) {
+        // Validate max 15MB
+        if (buffer.length > 0 && buffer.length <= 15 * 1024 * 1024) {
           const ext = mimeType === "jpeg" || mimeType === "jpg" ? "jpg" : mimeType === "webp" ? "webp" : "png";
           const receiptsDir = path.join(process.cwd(), "public", "receipts");
           if (!fs.existsSync(receiptsDir)) {

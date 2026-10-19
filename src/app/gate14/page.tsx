@@ -483,6 +483,39 @@ export default function AdminPage() {
     }
   };
 
+  // Admin attach slip to order
+  const handleAdminAttachSlip = async (orderId: string, file: File) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const rawData = e.target?.result as string;
+      try {
+        const res = await fetch("/api/order/attach-receipt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            order_id: orderId,
+            receipt_image: rawData,
+            receipt_name: file.name,
+          }),
+        });
+        const data = await res.json();
+        if (data.success && data.receipt_url) {
+          setOrders((prev) =>
+            prev.map((o) =>
+              o.order_id === orderId ? { ...o, receipt_url: data.receipt_url } : o
+            )
+          );
+          alert("Slip attached successfully! You can now click 'View Slip'.");
+        } else {
+          alert("Failed to attach slip: " + (data.error || "Unknown error"));
+        }
+      } catch (err: any) {
+        alert("Upload error: " + err.message);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Reset HWID Binding
   const handleResetHWID = async (licenseId: string) => {
     if (!confirm("Reset hardware lock for this license key? The user can bind a new PC.")) return;
@@ -1040,7 +1073,28 @@ export default function AdminPage() {
                                     <span>View Slip</span>
                                   </button>
                                 ) : (
-                                  <span className="admin-no-receipt-label">No slip (Manual ref)</span>
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                                    <span className="admin-no-receipt-label">No slip (Manual ref)</span>
+                                    <label
+                                      htmlFor={`admin-slip-upload-${order.order_id}`}
+                                      className="admin-btn-copy-inline"
+                                      style={{ cursor: "pointer", fontSize: 10, padding: "2px 6px", textDecoration: "none" }}
+                                      title="Upload receipt screenshot received via Discord"
+                                    >
+                                      + Attach
+                                      <input
+                                        id={`admin-slip-upload-${order.order_id}`}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                                        style={{ display: "none" }}
+                                        onChange={(e) => {
+                                          if (e.target.files && e.target.files[0]) {
+                                            handleAdminAttachSlip(order.order_id, e.target.files[0]);
+                                          }
+                                        }}
+                                      />
+                                    </label>
+                                  </div>
                                 )}
                               </div>
                             </td>
