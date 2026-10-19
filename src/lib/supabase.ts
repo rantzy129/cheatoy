@@ -1,15 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 export const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL || "https://emdjnrokrgotaxebqrpo.supabase.co";
 
 export const SUPABASE_ANON_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtZGpucm9rcmdvdGF4ZWJxcnBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMTg4MzMsImV4cCI6MjEwNzg5NDgzM30.2ywjxIchxg3wHZcUGuVkq4UrGwJmKs-QmesbB-An8Gg";
 
-export const supabase =
-  SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.length > 10
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
+export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 export interface DiscordUser {
   id: string;

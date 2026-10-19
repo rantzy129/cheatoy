@@ -167,7 +167,7 @@ export default function ProfilePage() {
       if (licData && licData.length > 0) {
         setActiveLicense(licData[0]);
         // Auto-link real Discord Snowflake ID if missing
-        if (user.id && licData[0].discord_id !== user.id) {
+        if (user.id && licData[0].discord_id !== user.id && supabase) {
           supabase
             .from("licenses")
             .update({ discord_id: user.id })
@@ -200,10 +200,11 @@ export default function ProfilePage() {
           }
         }
         // Auto-link real Discord Snowflake ID on orders
-        if (user.id) {
+        if (user.id && supabase) {
+          const client = supabase;
           ordData.forEach((ord) => {
             if (ord.discord_id !== user.id) {
-              supabase
+              client
                 .from("orders")
                 .update({ discord_id: user.id })
                 .eq("id", ord.id)
