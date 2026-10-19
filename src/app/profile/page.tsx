@@ -769,15 +769,16 @@ export default function ProfilePage() {
                           <strong>Input License</strong>: Paste your private key from the license console.
                         </li>
                         <li>
-                          <strong>Launch Game</strong>: Start Assault Fire PH and use the in-game keybinds below.
+                          <strong>Launch Game</strong>: Start Assault Fire PH and press <kbd>INSERT</kbd> to open the in-game VIP control menu.
                         </li>
                       </ol>
 
                       <div className="vault-keybinds-row">
-                        <span>In-game controls:</span>
-                        <span><kbd>F8</kbd> Chams</span>
-                        <span><kbd>F7</kbd> Color cycle</span>
-                        <span><kbd>INSERT</kbd> Snaplines</span>
+                        <span>Menu keybind:</span>
+                        <span><kbd>INSERT</kbd> Open / Close Menu</span>
+                        <span style={{ color: "#94a3b8", marginLeft: "auto", fontSize: 11 }}>
+                          Full Control: Wallhack, Chams, Health &amp; 2D Box
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -110,6 +110,12 @@ export default function Navbar() {
             Home
           </Link>
           <Link
+            href="/#features"
+            className="site-nav-item"
+          >
+            Features
+          </Link>
+          <Link
             href="/#architecture"
             className="site-nav-item"
           >

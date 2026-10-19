@@ -984,7 +984,7 @@ export default function Home() {
             <div className="pricing-info-col">
               <h2>VIP Access Passes</h2>
               <p>
-                Get full access to the undetected Assault Fire PH build. Login with Discord to bind your license key to your account, receive instant automated role assignment, and access our VIP downloads.
+                Get full access to the complete undetected Assault Fire PH VIP suite. Login with Discord to bind your license key to your account, receive instant automated role assignment, and access our VIP downloads.
               </p>
 
               <ul className="checklist">
@@ -992,31 +992,37 @@ export default function Home() {
                   <span className="check-icon">
                     <IconCheck size={14} />
                   </span>
-                  <span>Full Enemy Chams (Custom Colors: Visible & Occluded)</span>
+                  <span>Direct-Memory Wallhack (Full silhouette visibility through walls)</span>
                 </li>
                 <li>
                   <span className="check-icon">
                     <IconCheck size={14} />
                   </span>
-                  <span>Clean Player ESP & Distance Indicators</span>
+                  <span>Custom Player Chams (Dual-tone visible &amp; occluded coloring)</span>
                 </li>
                 <li>
                   <span className="check-icon">
                     <IconCheck size={14} />
                   </span>
-                  <span>Undetected Anti-Cheat Protection for Assault Fire PH</span>
+                  <span>Real-Time Health ESP (Live HP status bars &amp; combat readings)</span>
                 </li>
                 <li>
                   <span className="check-icon">
                     <IconCheck size={14} />
                   </span>
-                  <span>Lightweight 1-Click Loader with Instant Injection</span>
+                  <span>Dynamic 2D Box ESP (Auto-scaling bounding hitboxes)</span>
                 </li>
                 <li>
                   <span className="check-icon">
                     <IconCheck size={14} />
                   </span>
-                  <span>Discord-Bound Automated Key Delivery & VIP Role</span>
+                  <span>Interactive In-Game Menu (Full control toggled with [INSERT])</span>
+                </li>
+                <li>
+                  <span className="check-icon">
+                    <IconCheck size={14} />
+                  </span>
+                  <span>Undetected Anti-Cheat Architecture &amp; Automated Discord Delivery</span>
                 </li>
               </ul>
             </div>
@@ -1033,8 +1039,8 @@ export default function Home() {
                     className="checkout-af-thumb"
                   />
                   <div className="product-tag-wrap">
-                    <h3>Assault Fire PH Chams</h3>
-                    <span>Private Direct-Memory Edition</span>
+                    <h3>Assault Fire PH VIP Suite</h3>
+                    <span>Wallhack • Chams • Health • 2D Box</span>
                   </div>
                 </div>
               </div>
