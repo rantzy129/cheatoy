@@ -122,9 +122,10 @@ export async function POST(request: Request) {
 
     // Automated Discord VIP Role Assignment & Private DM Dispatch
     let discordBotStatus: any = null;
-    if (order.discord_id) {
+    const targetUserIdOrName = order.discord_id || order.discord_username;
+    if (targetUserIdOrName) {
       discordBotStatus = await assignDiscordVipRoleAndSendDm({
-        discordUserId: order.discord_id,
+        discordUserId: targetUserIdOrName,
         discordUsername: order.discord_username,
         tier: order.tier,
         licenseKey: newKey,

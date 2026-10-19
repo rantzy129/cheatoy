@@ -377,6 +377,18 @@ export default function AdminPage() {
           )
         );
         fetchLicenses();
+
+        if (data.discord_bot) {
+          const { roleAssigned, dmSent, roleError, dmError } = data.discord_bot;
+          if (!roleAssigned || !dmSent) {
+            const errs = [];
+            if (!roleAssigned && roleError) errs.push(`• Role: ${roleError}`);
+            if (!dmSent && dmError) errs.push(`• DM: ${dmError}`);
+            if (errs.length > 0) {
+              alert(`Key issued successfully (${data.license_key})!\n\n⚠️ Discord Notification Notice:\n${errs.join("\n")}`);
+            }
+          }
+        }
       }
     } catch (err: any) {
       alert("Error: " + err.message);

@@ -23,7 +23,14 @@ export function extractDiscordUser(user: any): DiscordUser | null {
   if (!user) return null;
   const meta = user.user_metadata || {};
   
-  const discordId = meta.provider_id || meta.sub || user.id || "";
+  const discordId =
+    meta.provider_id ||
+    meta.sub ||
+    user.identities?.[0]?.id ||
+    user.identities?.[0]?.identity_data?.provider_id ||
+    user.identities?.[0]?.identity_data?.sub ||
+    user.id ||
+    "";
   const rawUsername =
     meta.user_name ||
     meta.preferred_username ||

@@ -510,8 +510,8 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tier_id: selectedTier.id,
-          discord_id: discordUser.username,
-          discord_username: `${discordUser.username}#${discordUser.tag}`,
+          discord_id: discordUser.id || discordUser.username,
+          discord_username: discordUser.tag ? `${discordUser.username}#${discordUser.tag}` : discordUser.username,
           reference_no: gcashRefNo.trim(),
           sender_name: senderName.trim(),
           currency: currency,
@@ -894,15 +894,49 @@ export default function Home() {
                   </button>
                 )
               ) : (
-                <button
-                  type="button"
-                  className="btn-discord-checkout"
-                  onClick={handleDiscordLogin}
-                  id="checkout-discord-button"
-                >
-                  <IconDiscord size={20} />
-                  <span>Login with Discord to Purchase</span>
-                </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
+                  <button
+                    type="button"
+                    className="btn-discord-checkout"
+                    onClick={handleDiscordLogin}
+                    id="checkout-discord-button"
+                  >
+                    <IconDiscord size={20} />
+                    <span>Login with Discord to Purchase</span>
+                  </button>
+                  <div
+                    style={{
+                      background: "rgba(88, 101, 242, 0.08)",
+                      border: "1px dashed rgba(88, 101, 242, 0.35)",
+                      borderRadius: 10,
+                      padding: "8px 12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 8,
+                      fontSize: 11.5,
+                      color: "#94a3b8",
+                      textAlign: "left",
+                    }}
+                  >
+                    <span>
+                      👉 Make sure you are in our server for instant @VIP role & DM:
+                    </span>
+                    <a
+                      href="https://discord.gg/Whwxq9QAEN"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: "#5865F2",
+                        fontWeight: 700,
+                        textDecoration: "underline",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Join Server ↗
+                    </a>
+                  </div>
+                </div>
               )}
 
               <div className="checkout-trust-row">
@@ -1002,9 +1036,55 @@ export default function Home() {
                   </div>
                 </div>
 
-                <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5, textAlign: "center", marginBottom: 16 }}>
+                <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5, textAlign: "center", marginBottom: 14 }}>
                   Our admin verifies incoming GCash merchant payments manually. Once validated, your license key will activate automatically and appear here.
                 </p>
+
+                <div
+                  style={{
+                    background: "rgba(88, 101, 242, 0.12)",
+                    border: "1px solid rgba(88, 101, 242, 0.35)",
+                    borderRadius: 12,
+                    padding: "12px 16px",
+                    marginBottom: 16,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    textAlign: "left",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ color: "#5865F2", flexShrink: 0 }}>
+                      <IconDiscord size={22} />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#ffffff", display: "block" }}>
+                        Join our Discord Server
+                      </span>
+                      <span style={{ fontSize: 11, color: "#94a3b8" }}>
+                        Required for automated @VIP role & instant DM!
+                      </span>
+                    </div>
+                  </div>
+                  <a
+                    href="https://discord.gg/Whwxq9QAEN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: "#5865F2",
+                      color: "#ffffff",
+                      fontSize: 11.5,
+                      fontWeight: 800,
+                      padding: "8px 14px",
+                      borderRadius: 8,
+                      textDecoration: "none",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Join Server ↗
+                  </a>
+                </div>
 
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
@@ -1084,9 +1164,56 @@ export default function Home() {
                     />
                   </div>
 
-                  <div style={{ fontSize: 11, color: "#64748b", margin: "10px 0 16px", display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ fontSize: 11, color: "#64748b", margin: "10px 0 12px", display: "flex", alignItems: "center", gap: 6 }}>
                     <IconDiscord size={14} />
                     <span>Key will be bound to Discord: <b>{discordUser?.username}#{discordUser?.tag}</b></span>
+                  </div>
+
+                  <div
+                    style={{
+                      background: "rgba(88, 101, 242, 0.1)",
+                      border: "1px solid rgba(88, 101, 242, 0.28)",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      marginBottom: 16,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 10,
+                      textAlign: "left",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ color: "#5865F2", flexShrink: 0 }}>
+                        <IconDiscord size={18} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 11.5, fontWeight: 700, color: "#ffffff" }}>
+                          Joined our Discord Server?
+                        </div>
+                        <div style={{ fontSize: 10.5, color: "#94a3b8" }}>
+                          Buyers in our server receive their @VIP role & private key DM in &lt;1s!
+                        </div>
+                      </div>
+                    </div>
+                    <a
+                      href="https://discord.gg/Whwxq9QAEN"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        background: "#5865F2",
+                        color: "#ffffff",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}
+                    >
+                      Join Server ↗
+                    </a>
                   </div>
 
                   {orderError && (

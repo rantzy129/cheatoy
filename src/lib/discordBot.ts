@@ -44,17 +44,55 @@ export async function assignDiscordVipRoleAndSendDm(
   // If no bot token configured, log and gracefully return
   if (!token) {
     console.warn("[Discord Bot] DISCORD_BOT_TOKEN is not configured in environment variables.");
-    result.roleError = "DISCORD_BOT_TOKEN not configured";
-    result.dmError = "DISCORD_BOT_TOKEN not configured";
+    result.roleError = "DISCORD_BOT_TOKEN not configured in Vercel / environment";
+    result.dmError = "DISCORD_BOT_TOKEN not configured in Vercel / environment";
     return result;
   }
 
-  // Check if userId is a numeric snowflake (17-20 digits)
-  const isSnowflake = /^\d{17,20}$/.test(rawUserId);
+  // Resolve target numeric snowflake ID
+  let targetUserId = rawUserId;
+  let isSnowflake = /^\d{17,20}$/.test(targetUserId);
+
+  // If not a numeric snowflake, attempt auto-resolution by querying Discord guild members
+  if (!isSnowflake && guildId) {
+    const candidateName = (params.discordUsername || rawUserId).replace(/#.*$/, "").trim();
+    if (candidateName) {
+      try {
+        console.log(`[Discord Bot] Resolving ID "${rawUserId}" via guild member search for "${candidateName}"...`);
+        const searchRes = await fetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members/search?query=${encodeURIComponent(candidateName)}&limit=5`,
+          {
+            headers: {
+              Authorization: `Bot ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (searchRes.ok) {
+          const members = await searchRes.json();
+          const cleanQ = candidateName.toLowerCase();
+          const match = members.find((m: any) =>
+            m.user?.username?.toLowerCase() === cleanQ ||
+            m.user?.global_name?.toLowerCase() === cleanQ ||
+            m.nick?.toLowerCase() === cleanQ
+          ) || members[0];
+
+          if (match?.user?.id) {
+            targetUserId = match.user.id;
+            isSnowflake = true;
+            console.log(`[Discord Bot] Resolved "${candidateName}" to Snowflake ID: ${targetUserId}`);
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[Discord Bot] Guild member auto-resolution failed:`, err);
+      }
+    }
+  }
+
   if (!isSnowflake) {
     console.warn(`[Discord Bot] Invalid or non-numeric Discord user ID: "${rawUserId}". Cannot assign role or DM.`);
-    result.roleError = `Invalid user ID format (${rawUserId}). Must be a numeric snowflake.`;
-    result.dmError = `Invalid user ID format (${rawUserId}).`;
+    result.roleError = `User ID "${rawUserId}" is not a numeric snowflake and was not found in the server.`;
+    result.dmError = `User not found in server. Buyer must join https://discord.gg/Whwxq9QAEN`;
     return result;
   }
 
@@ -62,7 +100,7 @@ export async function assignDiscordVipRoleAndSendDm(
   if (guildId && roleId) {
     try {
       const roleRes = await fetch(
-        `https://discord.com/api/v10/guilds/${guildId}/members/${rawUserId}/roles/${roleId}`,
+        `https://discord.com/api/v10/guilds/${guildId}/members/${targetUserId}/roles/${roleId}`,
         {
           method: "PUT",
           headers: {
@@ -75,18 +113,24 @@ export async function assignDiscordVipRoleAndSendDm(
 
       if (roleRes.status === 204) {
         result.roleAssigned = true;
-        console.log(`[Discord Bot] Successfully granted VIP role to user ${rawUserId}`);
+        console.log(`[Discord Bot] Successfully granted VIP role to user ${targetUserId}`);
+      } else if (roleRes.status === 404) {
+        result.roleError = "Buyer is not in your Discord server (Unknown Member). They must join https://discord.gg/Whwxq9QAEN";
+        console.warn(`[Discord Bot] User ${targetUserId} not in guild ${guildId}`);
+      } else if (roleRes.status === 403) {
+        result.roleError = "Bot lacks permission to assign role. Ensure Bot role is ABOVE VIP role in Server Settings -> Roles.";
+        console.warn(`[Discord Bot] Missing permissions to assign role to ${targetUserId}`);
       } else {
         const errText = await roleRes.text().catch(() => "");
-        result.roleError = `Discord API returned ${roleRes.status}: ${errText}`;
-        console.warn(`[Discord Bot] Failed to assign role to ${rawUserId}:`, errText);
+        result.roleError = `Discord API returned HTTP ${roleRes.status}: ${errText}`;
+        console.warn(`[Discord Bot] Failed to assign role to ${targetUserId}:`, errText);
       }
     } catch (e: any) {
       result.roleError = e.message;
       console.warn(`[Discord Bot] Role assignment exception:`, e);
     }
   } else {
-    result.roleError = "DISCORD_GUILD_ID or DISCORD_VIP_ROLE_ID not set.";
+    result.roleError = "DISCORD_GUILD_ID or DISCORD_VIP_ROLE_ID not configured in Vercel.";
   }
 
   // 2. Send Automated DM with License Key & Instructions
@@ -98,13 +142,13 @@ export async function assignDiscordVipRoleAndSendDm(
         Authorization: `Bot ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ recipient_id: rawUserId }),
+      body: JSON.stringify({ recipient_id: targetUserId }),
     });
 
     if (!dmChannelRes.ok) {
       const errText = await dmChannelRes.text().catch(() => "");
-      result.dmError = `Could not open DM channel: ${errText}`;
-      console.warn(`[Discord Bot] Failed to create DM channel with ${rawUserId}:`, errText);
+      result.dmError = `Could not open DM channel (${dmChannelRes.status}): User has closed DMs or is not in server.`;
+      console.warn(`[Discord Bot] Failed to create DM channel with ${targetUserId}:`, errText);
       return result;
     }
 
@@ -117,7 +161,7 @@ export async function assignDiscordVipRoleAndSendDm(
 
     // Step B: Send Rich Embed Message
     const embedPayload = {
-      content: `Hello <@${rawUserId}>! Your **Chameleon Cheats** order has been verified and approved.`,
+      content: `Hello <@${targetUserId}>! Your **Chameleon Cheats** order has been verified and approved.`,
       embeds: [
         {
           title: "🦎 CHAMELEON CHEATS — VIP LICENSE ACTIVATED",
@@ -169,11 +213,11 @@ export async function assignDiscordVipRoleAndSendDm(
 
     if (msgRes.ok) {
       result.dmSent = true;
-      console.log(`[Discord Bot] Successfully sent DM to user ${rawUserId}`);
+      console.log(`[Discord Bot] Successfully sent DM to user ${targetUserId}`);
     } else {
       const errText = await msgRes.text().catch(() => "");
-      result.dmError = `Failed to send DM message: ${errText}`;
-      console.warn(`[Discord Bot] Failed to send message to ${rawUserId}:`, errText);
+      result.dmError = `Failed to send DM message (${msgRes.status}): User likely has closed DMs from server members.`;
+      console.warn(`[Discord Bot] Failed to send message to ${targetUserId}:`, errText);
     }
   } catch (e: any) {
     result.dmError = e.message;

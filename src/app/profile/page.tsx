@@ -423,6 +423,56 @@ export default function ProfilePage() {
               <span>Sign In with Discord</span>
             </button>
 
+            <div
+              style={{
+                marginTop: 16,
+                background: "rgba(88, 101, 242, 0.1)",
+                border: "1px solid rgba(88, 101, 242, 0.25)",
+                borderRadius: 12,
+                padding: "12px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                textAlign: "left",
+                maxWidth: 420,
+                width: "100%",
+                margin: "16px auto 0 auto",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ color: "#5865F2", flexShrink: 0 }}>
+                  <IconDiscord size={22} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#ffffff" }}>
+                    Join Official Discord Server
+                  </div>
+                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    Be in the server for instant @VIP role & DM dispatch upon approval!
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://discord.gg/Whwxq9QAEN"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: "#5865F2",
+                  color: "#ffffff",
+                  fontSize: 11,
+                  fontWeight: 800,
+                  padding: "7px 12px",
+                  borderRadius: 8,
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Join Server ↗
+              </a>
+            </div>
+
             <div className="guest-card-footer">
               <div className="guest-secondary-actions">
                 <Link href="/" className="btn-profile-secondary">
@@ -663,7 +713,15 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ fontSize: 11, color: "#64748b" }}>
-                        Need HWID reset? Open a ticket in Discord.
+                        Need HWID reset?{" "}
+                        <a
+                          href="https://discord.gg/Whwxq9QAEN"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "#5865f2", textDecoration: "underline", fontWeight: 600 }}
+                        >
+                          Open a ticket in Discord ↗
+                        </a>
                       </div>
                     </div>
                   </>

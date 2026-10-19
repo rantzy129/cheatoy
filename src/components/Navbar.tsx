@@ -133,11 +133,17 @@ export default function Navbar() {
           >
             Profile & Vault
           </Link>
-          {pathname === "/admin" && (
-            <span className="site-nav-item active" style={{ color: "#f59e0b" }}>
-              Admin [Restricted]
-            </span>
-          )}
+          <a
+            href="https://discord.gg/Whwxq9QAEN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="site-nav-item"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#5865F2" }}
+            title="Join official Discord community"
+          >
+            <IconDiscord size={15} />
+            <span>Discord Server</span>
+          </a>
         </nav>
 
         {/* Right action section */}

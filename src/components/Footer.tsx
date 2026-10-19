@@ -58,6 +58,16 @@ export default function Footer() {
             <li><Link href="/#pricing">Pass Pricing (₱500+)</Link></li>
             <li><Link href="/#faq">Frequently Asked Questions</Link></li>
             <li><Link href="/profile">VIP Profile & Key Vault</Link></li>
+            <li>
+              <a
+                href="https://discord.gg/Whwxq9QAEN"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#5865F2", fontWeight: 700 }}
+              >
+                Join Discord Server ↗
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -65,10 +75,10 @@ export default function Footer() {
         <div className="site-footer-col">
           <h4 className="footer-col-title">VIP Passes</h4>
           <ul className="footer-links-list">
-            <li><Link href="/#pricing">7 Days Pass — ₱500 ($9.99)</Link></li>
-            <li><Link href="/#pricing">15 Days Pass — ₱1,000 ($18.99)</Link></li>
-            <li><Link href="/#pricing">1 Month Pass — ₱1,500 ($27.99)</Link></li>
-            <li><Link href="/#pricing">Lifetime VIP — ₱2,500 ($45.99)</Link></li>
+            <li><Link href="/#pricing">7 Days Pass  ₱500</Link></li>
+            <li><Link href="/#pricing">15 Days Pass  ₱1,000</Link></li>
+            <li><Link href="/#pricing">1 Month Pass  ₱1,500</Link></li>
+            <li><Link href="/#pricing">Lifetime VIP  ₱2,500</Link></li>
           </ul>
         </div>
 
