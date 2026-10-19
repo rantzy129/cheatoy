@@ -54,7 +54,6 @@ export default function Footer() {
           <h4 className="footer-col-title">Navigation</h4>
           <ul className="footer-links-list">
             <li><Link href="/">Home</Link></li>
-            <li><Link href="/#studio">Live Chams Studio</Link></li>
             <li><Link href="/#architecture">Kernel Architecture</Link></li>
             <li><Link href="/#pricing">Pass Pricing (₱500+)</Link></li>
             <li><Link href="/#faq">Frequently Asked Questions</Link></li>
