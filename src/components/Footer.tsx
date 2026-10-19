@@ -43,9 +43,9 @@ export default function Footer() {
             Next-generation undetected Chams and Wallhack for Assault Fire PH.
             Built with hardware-level memory virtualization to ensure zero FPS drop and 100% anti-cheat evasion.
           </p>
-          <div className="footer-status-pill">
+          <div className="footer-status-row">
             <span className="footer-status-dot" />
-            <span>Anti-Cheat Status: Undetected (Patch 2026.10)</span>
+            <span className="footer-status-text">Undetected on PlayPark patch 2026.10</span>
           </div>
         </div>
 
@@ -108,6 +108,11 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+      </div>
+
+      {/* Designed Close: Brand Wordmark returns at full scale */}
+      <div className="footer-giant-brand-row" aria-hidden="true">
+        <span className="footer-giant-wordmark">CHAMELEON</span>
       </div>
 
       {/* Footer Bottom Legal Bar */}

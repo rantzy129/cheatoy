@@ -592,8 +592,9 @@ export default function Home() {
           <div className="arch-grid">
             {/* Column A: Conventional Detected Cheats */}
             <div className="arch-col-detected">
-              <span className="arch-tag-danger">Conventional Injections (Detected)</span>
-              <h3 className="arch-title">Direct Process Modification</h3>
+              <h3 className="arch-title">
+                Direct Process Modification <span className="arch-badge-danger">Detected</span>
+              </h3>
               <p className="arch-desc">
                 Public tools inject untrusted DLL libraries into the Assault Fire game process, triggering automated anti-cheat signatures and server-side tripwires.
               </p>
@@ -622,8 +623,9 @@ export default function Home() {
 
             {/* Column B: Chameleon Kernel Virtualization */}
             <div className="arch-col-safe">
-              <span className="arch-tag-safe">Chameleon Virtualization (100% Undetected)</span>
-              <h3 className="arch-title">External Read-Only Pipeline</h3>
+              <h3 className="arch-title">
+                External Read-Only Pipeline <span className="arch-badge-safe">Undetected</span>
+              </h3>
               <p className="arch-desc">
                 Chameleon never modifies or writes to Assault Fire process memory. Entity matrices are decoded externally and projected onto Windows DWM.
               </p>
@@ -723,14 +725,13 @@ export default function Home() {
                   />
                   <div className="product-tag-wrap">
                     <h3>Assault Fire PH Chams</h3>
-                    <span>Chameleon Cheats Private Edition</span>
+                    <span>Private Direct-Memory Edition</span>
                   </div>
                 </div>
-                <span className="badge-game">AF PH</span>
               </div>
 
               <div className="selector-heading">
-                <span>Select Access Length</span>
+                <span>Select access duration</span>
                 <button
                   type="button"
                   className="currency-toggle"
@@ -858,34 +859,13 @@ export default function Home() {
                     <IconDiscord size={20} />
                     <span>Login with Discord to Purchase</span>
                   </button>
-                  <div
-                    style={{
-                      background: "rgba(88, 101, 242, 0.08)",
-                      border: "1px dashed rgba(88, 101, 242, 0.35)",
-                      borderRadius: 10,
-                      padding: "8px 12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 8,
-                      fontSize: 11.5,
-                      color: "#94a3b8",
-                      textAlign: "left",
-                    }}
-                  >
-                    <span>
-                      👉 Make sure you are in our server for instant @VIP role & DM:
-                    </span>
+                  <div className="discord-server-banner">
+                    <span>Make sure you are in our server for instant @VIP role &amp; DM:</span>
                     <a
                       href="https://discord.gg/Whwxq9QAEN"
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{
-                        color: "#5865F2",
-                        fontWeight: 700,
-                        textDecoration: "underline",
-                        whiteSpace: "nowrap",
-                      }}
+                      className="discord-banner-link"
                     >
                       Join Server ↗
                     </a>
@@ -950,20 +930,16 @@ export default function Home() {
               // Order Pending State
               <div>
                 <div className="gcash-modal-header">
-                  <span className="order-status-badge">
-                    <IconClock size={14} />
-                    <span>Payment Under Review</span>
-                  </span>
-                  <h3 className="gcash-modal-title">Order Submitted</h3>
+                  <h3 className="gcash-modal-title">Payment Under Review</h3>
                   <p className="gcash-modal-sub">
-                    Your GCash payment is awaiting validation by the admin.
+                    Your GCash transaction reference is awaiting administrator validation.
                   </p>
                 </div>
 
                 <div className="order-status-card">
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
                     <span style={{ color: "#94a3b8" }}>Order ID:</span>
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-mono)", color: "#00d2ff" }}>
+                    <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#00d2ff" }}>
                       {userOrder.order_id}
                     </span>
                   </div>
@@ -977,7 +953,7 @@ export default function Home() {
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
                     <span style={{ color: "#94a3b8" }}>GCash Reference No:</span>
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-mono)", color: "#f8fafc" }}>
+                    <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#f8fafc" }}>
                       {userOrder.reference_no}
                     </span>
                   </div>
@@ -993,30 +969,15 @@ export default function Home() {
                   Our admin verifies incoming GCash merchant payments manually. Once validated, your license key will activate automatically and appear here.
                 </p>
 
-                <div
-                  style={{
-                    background: "rgba(88, 101, 242, 0.12)",
-                    border: "1px solid rgba(88, 101, 242, 0.35)",
-                    borderRadius: 12,
-                    padding: "12px 16px",
-                    marginBottom: 16,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    textAlign: "left",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ color: "#5865F2", flexShrink: 0 }}>
-                      <IconDiscord size={22} />
-                    </div>
+                <div className="modal-discord-banner">
+                  <div className="modal-discord-banner-info">
+                    <IconDiscord size={20} className="modal-discord-icon" />
                     <div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "#ffffff", display: "block" }}>
-                        Join our Discord Server
+                      <span className="modal-discord-banner-title">
+                        Joined our Discord Server?
                       </span>
-                      <span style={{ fontSize: 11, color: "#94a3b8" }}>
-                        Required for automated @VIP role & instant DM!
+                      <span className="modal-discord-banner-sub">
+                        Server members receive automated @VIP role &amp; private key DM in &lt;1s.
                       </span>
                     </div>
                   </div>
@@ -1024,16 +985,7 @@ export default function Home() {
                     href="https://discord.gg/Whwxq9QAEN"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      background: "#5865F2",
-                      color: "#ffffff",
-                      fontSize: 11.5,
-                      fontWeight: 800,
-                      padding: "8px 14px",
-                      borderRadius: 8,
-                      textDecoration: "none",
-                      whiteSpace: "nowrap",
-                    }}
+                    className="modal-discord-banner-btn"
                   >
                     Join Server ↗
                   </a>
@@ -1062,10 +1014,9 @@ export default function Home() {
               // GCash QR Merchant Payment Form
               <div>
                 <div className="gcash-modal-header">
-                  <span className="gcash-brand-badge">InstaPay • QR Ph • GCash Merchant</span>
-                  <h3 className="gcash-modal-title">Scan to Pay (CCheats)</h3>
+                  <h3 className="gcash-modal-title">Scan to Pay via QR Ph</h3>
                   <p className="gcash-modal-sub">
-                    Scan with GCash, Maya, or any bank app supporting QR Ph / InstaPay.
+                    Scan with GCash, Maya, or any InstaPay-supported banking application.
                   </p>
                 </div>
 
@@ -1122,48 +1073,23 @@ export default function Home() {
                     <span>Key will be bound to Discord: <b>{discordUser?.username}#{discordUser?.tag}</b></span>
                   </div>
 
-                  <div
-                    style={{
-                      background: "rgba(88, 101, 242, 0.1)",
-                      border: "1px solid rgba(88, 101, 242, 0.28)",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      marginBottom: 16,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 10,
-                      textAlign: "left",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ color: "#5865F2", flexShrink: 0 }}>
-                        <IconDiscord size={18} />
-                      </div>
+                  <div className="modal-discord-banner">
+                    <div className="modal-discord-banner-info">
+                      <IconDiscord size={20} className="modal-discord-icon" />
                       <div>
-                        <div style={{ fontSize: 11.5, fontWeight: 700, color: "#ffffff" }}>
+                        <span className="modal-discord-banner-title">
                           Joined our Discord Server?
-                        </div>
-                        <div style={{ fontSize: 10.5, color: "#94a3b8" }}>
-                          Buyers in our server receive their @VIP role & private key DM in &lt;1s!
-                        </div>
+                        </span>
+                        <span className="modal-discord-banner-sub">
+                          Server members receive automated @VIP role &amp; private key DM in &lt;1s.
+                        </span>
                       </div>
                     </div>
                     <a
                       href="https://discord.gg/Whwxq9QAEN"
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{
-                        background: "#5865F2",
-                        color: "#ffffff",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: "6px 12px",
-                        borderRadius: 6,
-                        textDecoration: "none",
-                        whiteSpace: "nowrap",
-                        flexShrink: 0,
-                      }}
+                      className="modal-discord-banner-btn"
                     >
                       Join Server ↗
                     </a>
@@ -1321,7 +1247,7 @@ export default function Home() {
                   </span>
                 </div>
                 <p style={{ fontSize: 13, color: "#cbd5e1", lineHeight: 1.5, margin: "10px 0" }}>
-                  Your GCash payment (Ref: <b style={{ color: "#00d2ff", fontFamily: "var(--font-mono)" }}>{userOrder.reference_no}</b>) is being reviewed by the admin. Once approved, your subscription and license key will activate here automatically.
+                  Your GCash payment (Ref: <b style={{ color: "#00d2ff", fontVariantNumeric: "tabular-nums" }}>{userOrder.reference_no}</b>) is being reviewed by the admin. Once approved, your subscription and license key will activate here automatically.
                 </p>
                 <button
                   type="button"
