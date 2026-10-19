@@ -200,6 +200,7 @@ export default function Home() {
   const [gcashRefNo, setGcashRefNo] = useState("");
   const [senderName, setSenderName] = useState("");
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [isRefreshingOrder, setIsRefreshingOrder] = useState(false);
   const [orderError, setOrderError] = useState("");
 
   // License Key Modal State
@@ -284,6 +285,16 @@ export default function Home() {
       }
     } catch (e) {
       console.warn("Notice fetching user data:", e);
+    }
+  };
+
+  const handleRefreshStatus = async () => {
+    if (!discordUser) return;
+    setIsRefreshingOrder(true);
+    try {
+      await fetchUserOrder(discordUser);
+    } finally {
+      setTimeout(() => setIsRefreshingOrder(false), 500);
     }
   };
 
@@ -991,22 +1002,21 @@ export default function Home() {
                   </a>
                 </div>
 
-                <div style={{ display: "flex", gap: 10 }}>
+                <div className="modal-actions-duo">
                   <button
                     type="button"
-                    className="gcash-btn-submit"
-                    style={{ flex: 1 }}
-                    onClick={() => discordUser && fetchUserOrder(discordUser)}
+                    className="btn-modal-refresh"
+                    disabled={isRefreshingOrder}
+                    onClick={handleRefreshStatus}
                   >
-                    <span>↻ Refresh Status</span>
+                    <span>{isRefreshingOrder ? "↻ Refreshing..." : "↻ Refresh Status"}</span>
                   </button>
                   <button
                     type="button"
-                    className="admin-btn-secondary"
-                    style={{ padding: "12px 18px", borderRadius: 10 }}
+                    className="btn-modal-new-order"
                     onClick={() => setUserOrder(null)}
                   >
-                    New Order
+                    <span>+ New Order</span>
                   </button>
                 </div>
               </div>
