@@ -66,6 +66,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification: {
+    google: "nCZr_L9KnBbgzvQC8tODSj8xZnlOaZS2hKwyCkFwox0",
+  },
   icons: {
     icon: "/logo.png",
   },
@@ -133,6 +136,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="nCZr_L9KnBbgzvQC8tODSj8xZnlOaZS2hKwyCkFwox0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
