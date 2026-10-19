@@ -747,11 +747,8 @@ export default function ProfilePage() {
                   </div>
 
                   <a
-                    href="#download"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert("Downloading Chameleon Loader v2.6.4...\nEnsure your anti-virus adds an exclusion for game injector memory virtualization.");
-                    }}
+                    href="/downloads/Chameleon_VIP.zip"
+                    download="Chameleon_VIP.zip"
                     className="btn-download-loader"
                     id="download-loader-profile-btn"
                   >

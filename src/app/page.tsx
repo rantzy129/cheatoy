@@ -1220,15 +1220,16 @@ export default function Home() {
                   </ol>
                 </div>
 
-                <button
-                  type="button"
+                <a
+                  href="/downloads/Chameleon_VIP.zip"
+                  download="Chameleon_VIP.zip"
                   className="buy-key-btn"
-                  style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
-                  onClick={() => alert(`Downloading Chameleon_AFPH_Loader.exe for ${discordUser.username}...`)}
+                  style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
+                  id="download-loader-home-btn"
                 >
-                  <span>Download Loader (AF PH Build v2.4)</span>
+                  <span>Download Loader (AF PH Build v2.6.4)</span>
                   <IconArrowUpRight size={16} />
-                </button>
+                </a>
               </div>
             ) : userOrder && userOrder.status === "pending" ? (
               <div className="subscription-card">
