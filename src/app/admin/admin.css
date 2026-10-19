@@ -666,6 +666,12 @@
   box-shadow: 0 0 28px rgba(0, 210, 255, 0.35), inset 0 0 14px rgba(0, 210, 255, 0.15);
 }
 
+.admin-login-emblem img,
+.admin-loading-emblem img {
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.7));
+}
+
 .admin-chip-badge {
   display: inline-block;
   padding: 4px 12px;

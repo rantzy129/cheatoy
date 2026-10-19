@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import "./admin.css";
 
@@ -543,7 +544,13 @@ export default function AdminPage() {
         <div className="admin-bg-orb admin-bg-orb-emerald" />
         <div className="admin-loading-container">
           <div className="admin-loading-emblem">
-            <IconShieldLock size={32} />
+            <Image
+              src="/logo.png"
+              alt="Chameleon Logo"
+              width={46}
+              height={46}
+              priority
+            />
           </div>
           <div className="admin-loading-spinner-ring" />
           <p className="admin-loading-text">INITIALIZING SECURE ENCLAVE...</p>
@@ -566,12 +573,6 @@ export default function AdminPage() {
         <div className="admin-bg-orb admin-bg-orb-emerald" />
 
         <div className="admin-login-wrapper">
-          {/* Top Status Telemetry Pill */}
-          <div className="admin-login-top-badge">
-            <span className="admin-status-pulse" />
-            <span className="admin-status-text">SECURE ENCLAVE NODE &bull; RESTRICTED ENVIRONMENT</span>
-          </div>
-
           <div className="admin-login-box">
             {/* Tactical Corner Crosshairs */}
             <span className="card-corner corner-tl" />
@@ -579,11 +580,17 @@ export default function AdminPage() {
             <span className="card-corner corner-bl" />
             <span className="card-corner corner-br" />
 
-            {/* Emblem with Rotating Holographic Ring */}
+            {/* Emblem with Rotating Holographic Ring & Chameleon Brand Logo */}
             <div className="admin-emblem-wrapper">
               <div className="admin-emblem-ring" />
               <div className="admin-login-emblem">
-                <IconShieldLock size={30} />
+                <Image
+                  src="/logo.png"
+                  alt="Chameleon Cheats Logo"
+                  width={44}
+                  height={44}
+                  priority
+                />
               </div>
             </div>
 
@@ -652,32 +659,6 @@ export default function AdminPage() {
                   </span>
                 )}
               </button>
-
-              {/* Security Specs Checklist */}
-              <div className="admin-login-specs">
-                <div className="spec-item">
-                  <IconCheck size={12} />
-                  <span>HTTP-Only Cookie</span>
-                </div>
-                <div className="spec-dot" />
-                <div className="spec-item">
-                  <IconCheck size={12} />
-                  <span>Zero Local Storage</span>
-                </div>
-                <div className="spec-dot" />
-                <div className="spec-item">
-                  <IconCheck size={12} />
-                  <span>Hardware Bound</span>
-                </div>
-              </div>
-
-              {/* Navigation Back */}
-              <div className="admin-login-foot-links">
-                <Link href="/" className="admin-return-link">
-                  <span>&larr;</span> Return to Storefront
-                </Link>
-                <span className="admin-version-tag">CHAM-OS v4.2.0</span>
-              </div>
             </form>
           </div>
         </div>
