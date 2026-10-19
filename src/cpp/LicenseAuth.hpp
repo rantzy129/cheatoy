@@ -146,16 +146,23 @@ namespace ChameleonSec
                         CloseHandle(hSnapshot);
                         if (showMessage)
                         {
-                            // Trigger default Windows Critical Error sound
-                            MessageBeep(MB_ICONHAND);
-
-                            // Display native Windows error dialog with sound and red (X) icon
-                            MessageBoxA(
-                                NULL,
-                                "Close any dumper, reverse engineering tool before using Chameleon Cheats.",
-                                "Security Violation",
-                                MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND
-                            );
+                            HANDLE hAlertMutex = CreateMutexA(NULL, TRUE, "ChameleonSecurityAlertMutex");
+                            if (hAlertMutex && GetLastError() != ERROR_ALREADY_EXISTS)
+                            {
+                                MessageBeep(MB_ICONHAND);
+                                MessageBoxA(
+                                    NULL,
+                                    "Close any dumper, reverse engineering tool before using Chameleon Cheats.",
+                                    "Security Violation",
+                                    MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND
+                                );
+                                ReleaseMutex(hAlertMutex);
+                                CloseHandle(hAlertMutex);
+                            }
+                            else if (hAlertMutex)
+                            {
+                                CloseHandle(hAlertMutex);
+                            }
                         }
                         return true; // Blacklisted tool detected!
                     }
