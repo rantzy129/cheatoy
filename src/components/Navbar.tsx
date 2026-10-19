@@ -110,10 +110,16 @@ export default function Navbar() {
             Home
           </Link>
           <Link
-            href="/#features"
+            href="/#studio"
             className="site-nav-item"
           >
-            Features
+            Chams Studio
+          </Link>
+          <Link
+            href="/#architecture"
+            className="site-nav-item"
+          >
+            Architecture
           </Link>
           <Link
             href="/#pricing"

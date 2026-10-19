@@ -88,41 +88,10 @@ function IconClock({ size = 18, className = "" }: { size?: number; className?: s
   );
 }
 
-function IconPalette({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
-      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-    </svg>
-  );
-}
-
 function IconZap({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  );
-}
-
-function IconRocket({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-    </svg>
-  );
-}
-
-function IconMonitor({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
-      <rect width="20" height="14" x="2" y="3" rx="2" />
-      <line x1="8" x2="16" y1="21" y2="21" />
-      <line x1="12" x2="12" y1="17" y2="21" />
     </svg>
   );
 }
@@ -188,40 +157,6 @@ const TIERS = [
   },
 ];
 
-/* ─── Assault Fire PH Chams Features ──────────────────────── */
-const FEATURES = [
-  {
-    title: "Vibrant Color Chams",
-    desc: "Color-coded enemy silhouettes that glow through walls. Distinct visible vs. hidden colors so you always know when to shoot.",
-    icon: <IconPalette size={22} />,
-  },
-  {
-    title: "Full Map Wallhack",
-    desc: "Clean player visibility through every wall, crate, and door on all Assault Fire PH maps with player distance meters.",
-    icon: <IconEye size={22} />,
-  },
-  {
-    title: "100% Undetected & Safe",
-    desc: "Engineered specifically for Assault Fire PH anti-cheat protocols. Zero game file modifications and automated safety checks.",
-    icon: <IconShield size={22} />,
-  },
-  {
-    title: "Zero FPS Drop & Ultra Fast",
-    desc: "Optimized lightweight code that maintains high framerates (60 to 240+ FPS) even on budget and cyber cafe PCs.",
-    icon: <IconZap size={22} />,
-  },
-  {
-    title: "Easy 1-Click Launch",
-    desc: "No complicated installation or registry edits. Simply open the loader, enter your key, and launch Assault Fire PH.",
-    icon: <IconRocket size={22} />,
-  },
-  {
-    title: "Stream & Recording Safe",
-    desc: "Built-in OBS and Discord capture bypass so your screen shares, videos, and tournament streams stay completely clean.",
-    icon: <IconMonitor size={22} />,
-  },
-];
-
 /* ─── FAQs ────────────────────────────────────────────────── */
 const FAQS = [
   {
@@ -271,6 +206,13 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [generatedKey, setGeneratedKey] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+
+  // Interactive Chams Studio State (The One Live Thing from tasteskill v2)
+  const [chamsColor, setChamsColor] = useState<"cyan" | "red" | "green" | "gold">("cyan");
+  const [chamsOccluded, setChamsOccluded] = useState<boolean>(true);
+  const [chamsWireframe, setChamsWireframe] = useState<boolean>(false);
+  const [showSnapline, setShowSnapline] = useState<boolean>(true);
+  const [showDistanceMeter, setShowDistanceMeter] = useState<boolean>(true);
 
   // Real-time ticker for remaining time updates
   useEffect(() => {
@@ -552,58 +494,30 @@ export default function Home() {
       <Navbar />
 
       <main id="top">
-        {/* ─── Hero Section ─────────────────────────────────── */}
+        {/* ─── 1. Hero Section (Taste-Skill Anti-Slop Discipline) ─── */}
         <section className="hero">
           <div className="hero-content">
-            <div className="hero-badge">
-              <Image
-                src="/af-logo.png"
-                alt="Assault Fire Logo"
-                width={18}
-                height={18}
-                className="game-logo-tag"
-              />
-              <span>Assault Fire Cheat • Undetected VIP Wallhack</span>
-            </div>
-
             <h1 className="hero-title">
-              Assault Fire Cheat<br />
-              <span className="highlight">& Wallhack (AFPH)</span>
+              Assault Fire PH Chams & Wallhack
             </h1>
 
             <p className="hero-desc">
-              Dominate every match with the cleanest, 100% undetected Assault Fire cheat and wallhack.
-              Custom chams colors, zero FPS drop, and hardware-secured auto-bypass for Assault Fire Philippines.
+              Direct memory virtualization for Assault Fire Philippines. Undetected player silhouettes through every wall with zero frame-rate impact and instant Discord key delivery.
             </p>
-
-            <div className="hero-highlights-row">
-              <span className="hero-pill-item">
-                <IconCheck size={14} /> Player Chams (Color ESP)
-              </span>
-              <span className="hero-pill-item">
-                <IconCheck size={14} /> Full Wallhack
-              </span>
-              <span className="hero-pill-item">
-                <IconCheck size={14} /> Zero FPS Drop
-              </span>
-              <span className="hero-pill-item">
-                <IconCheck size={14} /> 1-Click Loader
-              </span>
-            </div>
 
             <div className="hero-buttons">
               <a href="#pricing" className="btn-primary" id="hero-get-access">
-                <span>Get Instant Access</span>
+                <span>Get VIP Pass</span>
                 <span>↗</span>
               </a>
-              <a href="#features" className="btn-secondary">
-                <span>View Features</span>
+              <a href="#studio" className="btn-secondary">
+                <span>Interactive Chams Studio</span>
                 <span>↓</span>
               </a>
             </div>
           </div>
 
-          {/* ─── Hero Showcase Box (Featuring proof.png with af-logo.png as game logo) ── */}
+          {/* ─── In-Game Verification Preview (Real Subject Asset) ── */}
           <div className="hero-preview-box">
             <div className="preview-header">
               <span className="preview-title">
@@ -617,7 +531,7 @@ export default function Home() {
                 <span>Assault Fire PH • In-Game Proof</span>
               </span>
               <span className="preview-status">
-                <span className="status-dot" /> Live Chams Verified
+                <span className="status-dot" /> Live Verified
               </span>
             </div>
 
@@ -630,96 +544,386 @@ export default function Home() {
                 className="showcase-img"
                 priority
               />
-              <div className="showcase-badge-overlay">
-                <Image
-                  src="/af-logo.png"
-                  alt="AF Logo"
-                  width={16}
-                  height={16}
-                  className="game-logo-tag"
-                />
-                <span>In-Game Chams Verified (AF PH Client)</span>
-              </div>
             </div>
 
             <div className="preview-meta-grid">
               <div className="preview-meta-item">
-                <div className="preview-meta-label">Game</div>
-                <div className="preview-meta-val" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <Image src="/af-logo.png" alt="AF" width={16} height={16} className="game-logo-tag" />
-                  <span>AF PH</span>
-                </div>
+                <div className="preview-meta-label">Game Engine</div>
+                <div className="preview-meta-val">DirectX 9 Hookless</div>
               </div>
               <div className="preview-meta-item">
-                <div className="preview-meta-label">Chams Type</div>
-                <div className="preview-meta-val">Glow Silhouette</div>
+                <div className="preview-meta-label">Render Mode</div>
+                <div className="preview-meta-val">Silhouette DWM</div>
               </div>
               <div className="preview-meta-item">
                 <div className="preview-meta-label">Status</div>
-                <div className="preview-meta-val">Undetected</div>
+                <div className="preview-meta-val" style={{ color: "#10b981" }}>Undetected ●</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ─── Trust Bar ────────────────────────────────────── */}
+        {/* ─── 2. Trust Metric Strip ────────────────────────────── */}
         <div className="trust-tape">
           <div className="trust-tape-inner">
             <div className="trust-item">
               <IconShield size={18} />
-              <span>100% Safe & Undetected</span>
+              <span>100% Kernel Memory Virtualization</span>
             </div>
             <div className="trust-item">
               <IconZap size={18} />
-              <span>Zero Lag & Max FPS</span>
+              <span>Zero Lag (60–240+ FPS Maintained)</span>
             </div>
             <div className="trust-item">
               <IconDiscord size={18} />
-              <span>Discord Linked Key Delivery</span>
+              <span>Instant Discord Bot Dispatch (&lt;1s)</span>
             </div>
             <div className="trust-item">
               <IconCrosshair size={18} />
-              <span>Built for Assault Fire PH</span>
+              <span>PlayPark Official Server Ready</span>
             </div>
           </div>
         </div>
 
-        {/* ─── Features Section ─────────────────────────────── */}
-        <section className="section" id="features">
-          <div className="section-header">
-            <span className="section-badge">Product Capabilities</span>
-            <h2 className="section-title">
-              Everything You Need to <span className="highlight">Win Every Match</span>
+        {/* ─── 3. The One Live Thing: Interactive Chams Studio ──── */}
+        <section className="section" id="studio">
+          <div className="section-header-clean">
+            <h2 className="section-heading">
+              Live Chams Engine Studio
             </h2>
-            <p className="section-desc">
-              Designed specifically for Assault Fire PH players. Clear visuals, simple hotkeys, and seamless performance.
+            <p className="section-subtext">
+              Test and tune the real-time player silhouette shader. Customize occluded cover colors, wireframe polygons, and tactical snaplines directly in this interactive simulator.
             </p>
           </div>
 
-          <div className="features-grid">
-            {FEATURES.map((item, index) => (
-              <div className="feature-card" key={index}>
-                <div className="feature-icon-circle" aria-hidden="true">
-                  {item.icon}
+          <div className="chams-studio-card">
+            <div className="studio-grid">
+              {/* Studio Viewport Screen */}
+              <div className="studio-viewport">
+                <div className="studio-viewport-grid" />
+                <div className="studio-crosshair" />
+
+                {/* Simulated Obstacle Wall */}
+                {chamsOccluded && (
+                  <div className="studio-obstacle-wall">
+                    <span className="studio-obstacle-label">Reinforced Concrete Cover</span>
+                  </div>
+                )}
+
+                {/* Simulated Tactical Player Silhouette */}
+                <div className="studio-player-target">
+                  {showDistanceMeter && (
+                    <div className="studio-distance-tag">
+                      TARGET_ESP // 24.5m // [CHEST LOCK]
+                    </div>
+                  )}
+
+                  {/* Operator Vector Silhouette */}
+                  <svg viewBox="0 0 100 180" className="studio-target-svg">
+                    {/* Head / Helmet */}
+                    <circle
+                      cx="50"
+                      cy="22"
+                      r="14"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+                    <line x1="42" y1="22" x2="58" y2="22" stroke="#070a12" strokeWidth="2.5" strokeLinecap="round" />
+
+                    {/* Torso / Tactical Armor Plate */}
+                    <path
+                      d="M30 42 L70 42 L78 68 L70 102 L30 102 L22 68 Z"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+
+                    {chamsWireframe && (
+                      <>
+                        <line x1="30" y1="42" x2="70" y2="102" stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"} strokeWidth="1" opacity="0.6" />
+                        <line x1="70" y1="42" x2="30" y2="102" stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"} strokeWidth="1" opacity="0.6" />
+                        <line x1="50" y1="42" x2="50" y2="102" stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"} strokeWidth="1" opacity="0.6" />
+                      </>
+                    )}
+
+                    {/* Left & Right Arms with Weapon */}
+                    <path
+                      d="M22 68 L8 108 L18 114 L28 80"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+                    <path
+                      d="M78 68 L92 98 L84 104 L72 82"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+                    <rect x="52" y="86" width="46" height="7" rx="1.5" fill={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"} opacity={chamsOccluded ? 0.8 : 1} />
+
+                    {/* Legs */}
+                    <path
+                      d="M30 102 L24 168 L38 168 L46 112"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+                    <path
+                      d="M70 102 L76 168 L62 168 L54 112"
+                      fill={chamsWireframe ? "none" : chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      stroke={chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800"}
+                      strokeWidth={chamsWireframe ? "2" : "1.5"}
+                      fillOpacity={chamsWireframe ? 0 : chamsOccluded ? 0.75 : 0.95}
+                    />
+
+                    {/* Tactical Joint Anchors */}
+                    <circle cx="50" cy="22" r="2.5" fill="#ffffff" />
+                    <circle cx="50" cy="55" r="2.5" fill="#ffffff" />
+                    <circle cx="30" cy="102" r="2" fill="#ffffff" />
+                    <circle cx="70" cy="102" r="2" fill="#ffffff" />
+                    <circle cx="31" cy="166" r="2" fill="#ffffff" />
+                    <circle cx="69" cy="166" r="2" fill="#ffffff" />
+                  </svg>
                 </div>
-                <h3 className="feature-title">{item.title}</h3>
-                <p className="feature-desc">{item.desc}</p>
+
+                {/* Laser Snapline */}
+                {showSnapline && (
+                  <div
+                    className="studio-snapline"
+                    style={{
+                      background: chamsColor === "cyan" ? "#00e5ff" : chamsColor === "red" ? "#ff3366" : chamsColor === "green" ? "#00ff87" : "#ffb800",
+                      height: "155px",
+                      transform: "rotate(-12deg)",
+                    }}
+                  />
+                )}
               </div>
-            ))}
+
+              {/* Studio Controls Panel */}
+              <div className="studio-controls">
+                <div>
+                  {/* Color Selector */}
+                  <div className="studio-control-group">
+                    <div className="studio-control-label">
+                      <span>Tactical Silhouette Color</span>
+                      <span style={{ color: "#38bdf8", textTransform: "capitalize" }}>{chamsColor}</span>
+                    </div>
+                    <div className="studio-palette-row">
+                      {(["cyan", "red", "green", "gold"] as const).map((colorKey) => (
+                        <button
+                          key={colorKey}
+                          type="button"
+                          className={`palette-btn ${chamsColor === colorKey ? "active" : ""}`}
+                          onClick={() => setChamsColor(colorKey)}
+                        >
+                          <span
+                            className="palette-swatch"
+                            style={{
+                              background: colorKey === "cyan" ? "#00e5ff" : colorKey === "red" ? "#ff3366" : colorKey === "green" ? "#00ff87" : "#ffb800",
+                            }}
+                          />
+                          <span style={{ textTransform: "capitalize" }}>{colorKey}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Target Occlusion Toggle */}
+                  <div className="studio-control-group">
+                    <div className="studio-control-label">
+                      <span>Cover Obstacle Penetration</span>
+                    </div>
+                    <div className="studio-toggle-pair">
+                      <button
+                        type="button"
+                        className={`studio-toggle-btn ${chamsOccluded ? "active" : ""}`}
+                        onClick={() => setChamsOccluded(true)}
+                      >
+                        Behind Wall (X-Ray)
+                      </button>
+                      <button
+                        type="button"
+                        className={`studio-toggle-btn ${!chamsOccluded ? "active" : ""}`}
+                        onClick={() => setChamsOccluded(false)}
+                      >
+                        Direct Line of Sight
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Render Shader Style */}
+                  <div className="studio-control-group">
+                    <div className="studio-control-label">
+                      <span>Mesh Render Mode</span>
+                    </div>
+                    <div className="studio-toggle-pair">
+                      <button
+                        type="button"
+                        className={`studio-toggle-btn ${!chamsWireframe ? "active" : ""}`}
+                        onClick={() => setChamsWireframe(false)}
+                      >
+                        Solid Shader
+                      </button>
+                      <button
+                        type="button"
+                        className={`studio-toggle-btn ${chamsWireframe ? "active" : ""}`}
+                        onClick={() => setChamsWireframe(true)}
+                      >
+                        Wireframe Polygons
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tactical Overlays */}
+                  <div className="studio-control-group" style={{ marginBottom: 0 }}>
+                    <div className="studio-control-label">
+                      <span>HUD Tactical Overlays</span>
+                    </div>
+                    <label className="studio-check-row">
+                      <span>Directional Laser Snapline</span>
+                      <input
+                        type="checkbox"
+                        checked={showSnapline}
+                        onChange={(e) => setShowSnapline(e.target.checked)}
+                      />
+                    </label>
+                    <label className="studio-check-row">
+                      <span>Distance ESP Tag (Meters)</span>
+                      <input
+                        type="checkbox"
+                        checked={showDistanceMeter}
+                        onChange={(e) => setShowDistanceMeter(e.target.checked)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Studio Hotkeys Banner */}
+            <div className="studio-hotkeys-strip">
+              <div className="studio-hotkey-item">
+                <kbd>F8</kbd>
+                <span>Toggle Chams On/Off</span>
+              </div>
+              <div className="studio-hotkey-item">
+                <kbd>F7</kbd>
+                <span>Cycle Color Palette</span>
+              </div>
+              <div className="studio-hotkey-item">
+                <kbd>INSERT</kbd>
+                <span>Open In-Game HUD Menu</span>
+              </div>
+              <div className="studio-hotkey-item">
+                <kbd>DEL</kbd>
+                <span>Instant Emergency Unload</span>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ─── Single Product Checkout ──────────────────────── */}
+        {/* ─── 4. Kernel Bypass Architecture (Substantive Blueprint) ─ */}
+        <section className="section" id="architecture" style={{ paddingTop: 0 }}>
+          <div className="section-header-clean">
+            <h2 className="section-heading">
+              Kernel Bypass Architecture
+            </h2>
+            <p className="section-subtext">
+              Conventional cheats hook game binaries directly and trigger detection within hours. Chameleon operates as an external, read-only memory virtualizer.
+            </p>
+          </div>
+
+          <div className="arch-grid">
+            {/* Column A: Conventional Detected Cheats */}
+            <div className="arch-col-detected">
+              <span className="arch-tag-danger">Conventional Injections (Detected)</span>
+              <h3 className="arch-title">Direct Process Modification</h3>
+              <p className="arch-desc">
+                Public tools inject untrusted DLL libraries into the Assault Fire game process, triggering automated anti-cheat signatures and server-side tripwires.
+              </p>
+
+              <ul className="arch-point-list">
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-danger" />
+                  <div>
+                    <strong>Process Memory Tampering</strong>: Writes to game memory space, instantly alerting client watchdog integrity scanners.
+                  </div>
+                </li>
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-danger" />
+                  <div>
+                    <strong>DirectX VTable Hooks</strong>: Overwrites graphics engine function pointers, causing detection by routine hash inspections.
+                  </div>
+                </li>
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-danger" />
+                  <div>
+                    <strong>File Modification</strong>: Replaces .rez archives and executable headers, failing launcher verification checks.
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column B: Chameleon Kernel Virtualization */}
+            <div className="arch-col-safe">
+              <span className="arch-tag-safe">Chameleon Virtualization (100% Undetected)</span>
+              <h3 className="arch-title">External Read-Only Pipeline</h3>
+              <p className="arch-desc">
+                Chameleon never modifies or writes to Assault Fire process memory. Entity matrices are decoded externally and projected onto Windows DWM.
+              </p>
+
+              <ul className="arch-point-list">
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-safe" />
+                  <div>
+                    <strong>Zero Process Writing</strong>: Game memory space remains bit-for-bit identical to an unmodded, official PlayPark installation.
+                  </div>
+                </li>
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-safe" />
+                  <div>
+                    <strong>Untouched Game Files</strong>: Zero alterations to original .rez archives, executables, or launcher registry keys.
+                  </div>
+                </li>
+                <li className="arch-point-item">
+                  <span className="arch-point-bullet arch-bullet-safe" />
+                  <div>
+                    <strong>Desktop Window Manager Blit</strong>: Overlays render onto Windows desktop composition, remaining invisible to anti-cheat screenshot buffers and OBS streams.
+                  </div>
+                </li>
+              </ul>
+
+              <div className="arch-metrics-bar">
+                <div>
+                  <div className="arch-metric-num">0</div>
+                  <div className="arch-metric-label">Account Bans</div>
+                </div>
+                <div>
+                  <div className="arch-metric-num">&lt;0.18ms</div>
+                  <div className="arch-metric-label">Frame Latency</div>
+                </div>
+                <div>
+                  <div className="arch-metric-num">0.0</div>
+                  <div className="arch-metric-label">FPS Drop</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── 5. VIP Access Passes (Single Product Suite) ───────── */}
         <section className="pricing-section" id="pricing">
           <div className="pricing-container">
             <div className="pricing-info-col">
-              <span className="section-badge">Simple Pricing</span>
-              <h2>
-                Assault Fire PH<br />
-                <span className="highlight">Chams / Wallhack Suite</span>
-              </h2>
+              <h2>VIP Access Passes</h2>
               <p>
-                Get full access to our private Assault Fire PH build. Login with Discord to tie your key to your account, receive instant updates, and access our VIP channel.
+                Get full access to the undetected Assault Fire PH build. Login with Discord to bind your license key to your account, receive instant automated role assignment, and access our VIP downloads.
               </p>
 
               <ul className="checklist">
@@ -863,7 +1067,7 @@ export default function Home() {
                     className="buy-key-btn"
                     onClick={() => setIsProfileOpen(true)}
                     id="purchase-key-button"
-                    style={{ background: "linear-gradient(135deg, #10b981, #00d2ff)" }}
+                    style={{ background: "#10b981", color: "#ffffff" }}
                   >
                     <IconKey size={18} />
                     <span>View Profile & Active Key</span>
@@ -875,7 +1079,7 @@ export default function Home() {
                     className="buy-key-btn"
                     onClick={() => setIsGcashModalOpen(true)}
                     id="purchase-key-button"
-                    style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}
+                    style={{ background: "#f59e0b", color: "#000000" }}
                   >
                     <IconClock size={16} />
                     <span>Order Pending Validation (Check Status)</span>
@@ -952,15 +1156,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ─── FAQs ─────────────────────────────────────────── */}
+        {/* ─── 6. Frequently Answered Questions ──────────────────── */}
         <section className="section" id="faq">
-          <div className="section-header">
-            <span className="section-badge">Common Questions</span>
-            <h2 className="section-title">
-              Frequently <span className="highlight">Answered</span>
+          <div className="section-header-clean">
+            <h2 className="section-heading">
+              Frequently Answered Questions
             </h2>
-            <p className="section-desc">
-              Have questions about Assault Fire PH Chams & Discord access? Here are the most common inquiries.
+            <p className="section-subtext">
+              Common questions regarding Assault Fire Philippines memory virtualization, anti-cheat detection safety, and installation.
             </p>
           </div>
 
