@@ -134,6 +134,43 @@ function IconDiscord({ size = 15 }: { size?: number }) {
   );
 }
 
+function IconEye({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IconEyeOff({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" x2="22" y1="2" y2="22" />
+    </svg>
+  );
+}
+
+function IconKey({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m21 2-2 2m-1.5 1.5L14 9l-1.5-1.5L11 9l-1.5-1.5L8 9l-1.5-1.5L5 9l-1.5-1.5L2 9l6 6c1.66 1.66 4.34 1.66 6 0l7-7-2-2z" />
+    </svg>
+  );
+}
+
+function IconArrowRight({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
+
 interface Order {
   id: string;
   order_id: string;
@@ -168,6 +205,7 @@ export default function AdminPage() {
 
   // Authentication State (100% HTTP-Only Cookie, Zero Frontend Storage)
   const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -494,16 +532,22 @@ export default function AdminPage() {
   /* ─────────────────────────────────────────────────────────────
      1. INITIAL LOADING SPLASH
      ───────────────────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     1. INITIAL LOADING SPLASH
+     ───────────────────────────────────────────────────────────── */
   if (isAuthenticated === null) {
     return (
       <div className="admin-login-fullscreen">
-        <div style={{ textAlign: "center", color: "#94a3b8" }}>
-          <div className="admin-login-emblem" style={{ margin: "0 auto 16px auto" }}>
-            <IconShieldLock size={26} />
+        <div className="admin-bg-grid" />
+        <div className="admin-bg-orb admin-bg-orb-cyan" />
+        <div className="admin-bg-orb admin-bg-orb-emerald" />
+        <div className="admin-loading-container">
+          <div className="admin-loading-emblem">
+            <IconShieldLock size={32} />
           </div>
-          <p style={{ fontSize: 13, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
-            Verifying Enclave Session...
-          </p>
+          <div className="admin-loading-spinner-ring" />
+          <p className="admin-loading-text">INITIALIZING SECURE ENCLAVE...</p>
+          <span className="admin-loading-sub">Zero-Knowledge Cryptographic Authentication</span>
         </div>
       </div>
     );
@@ -515,60 +559,127 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="admin-login-fullscreen">
-        <div className="admin-login-box">
-          <div className="admin-login-emblem">
-            <IconShieldLock size={28} />
+        {/* Ambient Atmosphere */}
+        <div className="admin-bg-grid" />
+        <div className="admin-bg-scanlines" />
+        <div className="admin-bg-orb admin-bg-orb-cyan" />
+        <div className="admin-bg-orb admin-bg-orb-emerald" />
+
+        <div className="admin-login-wrapper">
+          {/* Top Status Telemetry Pill */}
+          <div className="admin-login-top-badge">
+            <span className="admin-status-pulse" />
+            <span className="admin-status-text">SECURE ENCLAVE NODE &bull; RESTRICTED ENVIRONMENT</span>
           </div>
-          <h2>COMMAND CENTER</h2>
-          <p>Restricted Security Enclave • Chameleon Cheats Staff Only</p>
 
-          <form onSubmit={handleLogin}>
-            <input
-              type="password"
-              placeholder="••••••••••••"
-              value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
-                setErrorMessage(null);
-              }}
-              className="admin-pin-field"
-              autoFocus
-              disabled={isVerifying}
-            />
+          <div className="admin-login-box">
+            {/* Tactical Corner Crosshairs */}
+            <span className="card-corner corner-tl" />
+            <span className="card-corner corner-tr" />
+            <span className="card-corner corner-bl" />
+            <span className="card-corner corner-br" />
 
-            {errorMessage && (
-              <div
-                style={{
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.35)",
-                  color: "#fca5a5",
-                  fontSize: 12.5,
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  marginBottom: 16,
-                  textAlign: "left",
-                  lineHeight: 1.4,
-                }}
-              >
-                {errorMessage}
+            {/* Emblem with Rotating Holographic Ring */}
+            <div className="admin-emblem-wrapper">
+              <div className="admin-emblem-ring" />
+              <div className="admin-login-emblem">
+                <IconShieldLock size={30} />
               </div>
-            )}
-
-            <button
-              type="submit"
-              className="admin-btn-auth"
-              disabled={isVerifying || !pin.trim()}
-            >
-              {isVerifying ? "Verifying Access Key..." : "Unlock Console"}
-            </button>
-
-            <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11.5, color: "#64748b" }}>
-              <Link href="/" style={{ color: "#94a3b8", textDecoration: "none" }}>
-                ← Storefront
-              </Link>
-              <span>HTTP-Only • Zero Storage Footprint</span>
             </div>
-          </form>
+
+            <div className="admin-chip-badge">LEVEL 5 ACCESS GATEWAY</div>
+
+            <h2 className="admin-login-title">COMMAND CENTER</h2>
+            <p className="admin-login-desc">
+              Restricted Administrative Enclave &bull; Chameleon Cheats Staff Only
+            </p>
+
+            <form onSubmit={handleLogin} className="admin-login-form">
+              <div className="admin-input-group">
+                <label className="admin-input-label">MASTER SECURITY KEY</label>
+                <div className="admin-input-container">
+                  <div className="admin-input-lead-icon">
+                    <IconKey size={18} />
+                  </div>
+                  <input
+                    type={showPin ? "text" : "password"}
+                    placeholder="Enter security key..."
+                    value={pin}
+                    onChange={(e) => {
+                      setPin(e.target.value);
+                      setErrorMessage(null);
+                    }}
+                    className="admin-pin-field"
+                    autoFocus
+                    disabled={isVerifying}
+                    autoComplete="off"
+                    spellCheck="false"
+                  />
+                  <button
+                    type="button"
+                    className="admin-input-toggle-btn"
+                    onClick={() => setShowPin(!showPin)}
+                    tabIndex={-1}
+                    aria-label={showPin ? "Hide key" : "Show key"}
+                  >
+                    {showPin ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {errorMessage && (
+                <div className="admin-login-error">
+                  <span className="admin-error-icon">!</span>
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="admin-btn-auth"
+                disabled={isVerifying || !pin.trim()}
+              >
+                {isVerifying ? (
+                  <span className="admin-btn-content">
+                    <span className="admin-button-spinner" />
+                    <span>Verifying Cryptographic Credentials...</span>
+                  </span>
+                ) : (
+                  <span className="admin-btn-content">
+                    <IconShieldLock size={17} />
+                    <span>Authenticate & Unlock</span>
+                    <IconArrowRight size={16} />
+                  </span>
+                )}
+              </button>
+
+              {/* Security Specs Checklist */}
+              <div className="admin-login-specs">
+                <div className="spec-item">
+                  <IconCheck size={12} />
+                  <span>HTTP-Only Cookie</span>
+                </div>
+                <div className="spec-dot" />
+                <div className="spec-item">
+                  <IconCheck size={12} />
+                  <span>Zero Local Storage</span>
+                </div>
+                <div className="spec-dot" />
+                <div className="spec-item">
+                  <IconCheck size={12} />
+                  <span>Hardware Bound</span>
+                </div>
+              </div>
+
+              {/* Navigation Back */}
+              <div className="admin-login-foot-links">
+                <Link href="/" className="admin-return-link">
+                  <span>&larr;</span> Return to Storefront
+                </Link>
+                <span className="admin-version-tag">CHAM-OS v4.2.0</span>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     );
