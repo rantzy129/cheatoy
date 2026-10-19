@@ -357,80 +357,235 @@ export async function sendUserStatusChangeWebhook(data: UserStatusChangeData) {
 /**
  * Dispatches a formatted User List / VIP Roster summary to the dedicated USER LIST Discord Webhook
  */
-export async function sendUserListWebhook(licenses: any[]) {
-  const total = licenses.length;
+export interface UserListPayload {
+  licenses?: any[];
+  orders?: any[];
+  guildMembers?: any[];
+}
+
+/**
+ * Dispatches a comprehensive Registered & VIP Member Directory to the dedicated USER LIST Discord Webhook
+ */
+export async function sendUserListWebhook(
+  dataOrLicenses: any[] | UserListPayload
+) {
+  let licenses: any[] = [];
+  let orders: any[] = [];
+  let guildMembers: any[] = [];
+
+  if (Array.isArray(dataOrLicenses)) {
+    licenses = dataOrLicenses;
+  } else if (dataOrLicenses && typeof dataOrLicenses === "object") {
+    licenses = dataOrLicenses.licenses || [];
+    orders = dataOrLicenses.orders || [];
+    guildMembers = dataOrLicenses.guildMembers || [];
+  }
+
   const now = new Date();
   const nowUnix = Math.floor(now.getTime() / 1000);
-  
-  let activeBoundCount = 0; // Logged-in / HWID-bound
-  let pendingLaunchCount = 0; // Has license, not launched yet
-  let bannedCount = 0;
-  let expiredCount = 0;
+  const vipRoleId = process.env.DISCORD_VIP_ROLE_ID || "1561635140126515230";
 
-  const rosterLines: string[] = [];
+  interface DirectoryUser {
+    discord_id?: string;
+    discord_username?: string;
+    global_name?: string;
+    status: "vip" | "pending" | "rejected" | "registered" | "banned" | "expired";
+    tier?: string;
+    hwid?: string;
+    expires_at?: string | null;
+    is_banned?: boolean;
+    order_id?: string;
+    reference_no?: string;
+    price?: string;
+    joined_at?: string;
+    source: "license" | "order" | "discord";
+  }
 
-  licenses.forEach((lic, idx) => {
+  const userMap = new Map<string, DirectoryUser>();
+
+  const getCleanKey = (id?: string, name?: string) => {
+    if (id && String(id).trim() && !String(id).startsWith("CHAM-")) {
+      return `id_${String(id).trim().toLowerCase()}`;
+    }
+    if (name && String(name).trim()) {
+      return `name_${String(name).trim().toLowerCase().replace(/#0+$/, "")}`;
+    }
+    return null;
+  };
+
+  // 1. Ingest Licenses (Highest authority for VIP status)
+  licenses.forEach((lic) => {
+    const key = getCleanKey(lic.discord_id, lic.discord_username) || `lic_${lic.id || lic.license_key}`;
     const isBanned = Boolean(lic.is_banned);
     const isExpired = lic.expires_at && new Date(lic.expires_at) < now;
-    const isBound = Boolean(lic.hwid && lic.hwid.trim());
 
-    if (isBanned) {
-      bannedCount++;
-    } else if (isExpired) {
-      expiredCount++;
-    } else {
-      if (isBound) activeBoundCount++;
-      else pendingLaunchCount++;
-    }
+    let status: DirectoryUser["status"] = "vip";
+    if (isBanned) status = "banned";
+    else if (isExpired) status = "expired";
 
-    // Format roster item
-    const statusIcon = isBanned ? "🔴" : isExpired ? "🟡" : isBound ? "🟢" : "⚪";
-    const tag = lic.discord_id ? `<@${lic.discord_id}>` : `@${lic.discord_username || "Unknown"}`;
-    const usernameDisplay = lic.discord_username ? `(@${lic.discord_username})` : "";
-    const tier = lic.tier || "VIP Pass";
-    const hwidDisplay = isBound ? `🔒 Bound (\`${lic.hwid}\`)` : "🔓 *First Launch Pending*";
-    const expiryDisplay = lic.expires_at
-      ? `<t:${Math.floor(new Date(lic.expires_at).getTime() / 1000)}:R>`
-      : "♾️ Lifetime VIP";
-
-    rosterLines.push(
-      `${statusIcon} **${idx + 1}.** ${tag} ${usernameDisplay}\n> 🏷️ **Tier**: ${tier} • ⏳ **Expires**: ${expiryDisplay}\n> 💻 **Device**: ${hwidDisplay}`
-    );
+    userMap.set(key, {
+      discord_id: lic.discord_id || undefined,
+      discord_username: lic.discord_username || undefined,
+      status,
+      tier: lic.tier || "VIP Pass",
+      hwid: lic.hwid || undefined,
+      expires_at: lic.expires_at,
+      is_banned: isBanned,
+      source: "license",
+    });
   });
+
+  // 2. Ingest Orders (Customers & pending verification)
+  orders.forEach((ord) => {
+    const key = getCleanKey(ord.discord_id, ord.discord_username) || `ord_${ord.id || ord.order_id}`;
+    const existing = userMap.get(key);
+
+    if (existing) {
+      if (!existing.discord_id && ord.discord_id) existing.discord_id = ord.discord_id;
+      if (!existing.discord_username && ord.discord_username) existing.discord_username = ord.discord_username;
+      if (!existing.tier && ord.tier) existing.tier = ord.tier;
+      if (ord.order_id) existing.order_id = ord.order_id;
+      if (ord.reference_no) existing.reference_no = ord.reference_no;
+    } else {
+      let status: DirectoryUser["status"] = "registered";
+      if (ord.status === "approved") status = "vip";
+      else if (ord.status === "pending") status = "pending";
+      else if (ord.status === "rejected") status = "rejected";
+
+      userMap.set(key, {
+        discord_id: ord.discord_id || undefined,
+        discord_username: ord.discord_username || undefined,
+        status,
+        tier: ord.tier || "VIP Pass",
+        order_id: ord.order_id,
+        reference_no: ord.reference_no,
+        price: ord.price,
+        source: "order",
+      });
+    }
+  });
+
+  // 3. Ingest Discord Server Members (Signed-in & Community Members)
+  guildMembers.forEach((m) => {
+    if (m.user?.bot) return; // skip bots
+    const key = getCleanKey(m.user?.id, m.user?.username);
+    if (!key) return;
+
+    const existing = userMap.get(key);
+    const hasVipRole = Array.isArray(m.roles) && m.roles.includes(vipRoleId);
+
+    if (existing) {
+      if (!existing.discord_id && m.user?.id) existing.discord_id = m.user.id;
+      if (!existing.discord_username && m.user?.username) existing.discord_username = m.user.username;
+      existing.global_name = m.user?.global_name || m.user?.username;
+      existing.joined_at = m.joined_at;
+      if (hasVipRole && existing.status !== "banned") {
+        existing.status = "vip";
+      }
+    } else {
+      userMap.set(key, {
+        discord_id: m.user?.id,
+        discord_username: m.user?.username,
+        global_name: m.user?.global_name || m.user?.username,
+        status: hasVipRole ? "vip" : "registered",
+        joined_at: m.joined_at,
+        source: "discord",
+      });
+    }
+  });
+
+  // Calculate Aggregates
+  const allUsers = Array.from(userMap.values());
+  const totalRegistered = allUsers.length;
+  const activeVipCount = allUsers.filter((u) => u.status === "vip").length;
+  const hwidBoundCount = allUsers.filter((u) => u.hwid && u.hwid.trim()).length;
+  const pendingOrdersCount = allUsers.filter((u) => u.status === "pending").length;
+  const registeredCommunityCount = allUsers.filter((u) => u.status === "registered" || u.status === "rejected").length;
+  const bannedCount = allUsers.filter((u) => u.status === "banned" || u.is_banned).length;
+
+  // Format VIP Roster Lines
+  const vipUsers = allUsers.filter((u) => u.status === "vip");
+  const vipLines: string[] = vipUsers.map((u, idx) => {
+    const mention = u.discord_id ? `<@${u.discord_id}>` : `@${u.discord_username || "Unknown"}`;
+    const nameStr = u.discord_username ? `(\`@${u.discord_username}\`)` : (u.global_name ? `(\`${u.global_name}\`)` : "");
+    const tier = u.tier || "VIP Pass";
+    const hwid = u.hwid ? `🔒 Locked (\`${u.hwid.substring(0, 16)}...\`)` : "🔓 *First Launch Pending*";
+    const expiry = u.expires_at ? `<t:${Math.floor(new Date(u.expires_at).getTime() / 1000)}:R>` : "♾️ Permanent VIP";
+    return `🟢 **${idx + 1}.** ${mention} ${nameStr}\n> 🏷️ **Tier**: ${tier} • 💻 **Device**: ${hwid}\n> ⏳ **Expires**: ${expiry}`;
+  });
+
+  // Format Registered & Pending Community Users
+  const nonVipUsers = allUsers.filter((u) => u.status !== "vip");
+  const communityLines: string[] = nonVipUsers.map((u, idx) => {
+    const mention = u.discord_id ? `<@${u.discord_id}>` : `@${u.discord_username || "Unknown"}`;
+    const nameStr = u.discord_username ? `(\`@${u.discord_username}\`)` : (u.global_name ? `(\`${u.global_name}\`)` : "");
+    
+    if (u.status === "pending") {
+      return `🟡 **${idx + 1}.** ${mention} ${nameStr}\n> ⏳ **Payment Under Review** (Ref: \`${u.reference_no || "N/A"}\` • ${u.tier || "VIP"})\n> 🆔 Order: \`${u.order_id || "N/A"}\``;
+    }
+    if (u.status === "rejected") {
+      return `🔴 **${idx + 1}.** ${mention} ${nameStr}\n> ❌ **Unverified Payment Reference** (Ref: \`${u.reference_no || "N/A"}\`)`;
+    }
+    if (u.status === "banned") {
+      return `⛔ **${idx + 1}.** ${mention} ${nameStr}\n> 🚫 **Hardware / License Suspended**`;
+    }
+    const joinedStr = u.joined_at ? `<t:${Math.floor(new Date(u.joined_at).getTime() / 1000)}:R>` : "Signed In";
+    return `⚪ **${idx + 1}.** ${mention} ${nameStr}\n> 🌐 **Registered Discord Account** • Joined: ${joinedStr}`;
+  });
+
+  const embedFields = [
+    {
+      name: "📅 Snapshot Time (As of)",
+      value: `<t:${nowUnix}:F>\n(<t:${nowUnix}:R>)`,
+      inline: true,
+    },
+    {
+      name: "👥 Member Directory Overview",
+      value: `👤 **${totalRegistered} Total Registered Users**\n🟢 **${activeVipCount} Active VIP Members**\n🔒 **${hwidBoundCount} PC Devices Bound**`,
+      inline: true,
+    },
+    {
+      name: "📊 Accounts & Pipeline",
+      value: `🟡 **${pendingOrdersCount} Pending GCash Orders**\n⚪ **${registeredCommunityCount} Registered Community**${bannedCount > 0 ? `\n⛔ **${bannedCount} Suspended**` : ""}`,
+      inline: false,
+    },
+  ];
+
+  if (vipLines.length > 0) {
+    embedFields.push({
+      name: `👑 Active VIP Members (${vipLines.length})`,
+      value: vipLines.slice(0, 15).join("\n\n") + (vipLines.length > 15 ? `\n\n*...and ${vipLines.length - 15} more VIP members*` : ""),
+      inline: false,
+    });
+  } else {
+    embedFields.push({
+      name: "👑 Active VIP Members (0)",
+      value: "*No active VIP keys minted yet.*",
+      inline: false,
+    });
+  }
+
+  if (communityLines.length > 0) {
+    embedFields.push({
+      name: `📑 Registered Users & Community Roster (${communityLines.length})`,
+      value: communityLines.slice(0, 15).join("\n\n") + (communityLines.length > 15 ? `\n\n*...and ${communityLines.length - 15} more registered members*` : ""),
+      inline: false,
+    });
+  }
 
   const embed = {
     title: "📋 Chameleon Cheats — Registered VIP Member Directory",
-    description: `Official VIP Roster snapshot synchronized with database vault.`,
-    color: 0x6366f1, // Indigo
-    fields: [
-      {
-        name: "📅 Snapshot Time (As of)",
-        value: `<t:${nowUnix}:F>\n(<t:${nowUnix}:R>)`,
-        inline: true,
-      },
-      {
-        name: "👥 Logged-in / Bound Users",
-        value: `🟢 **${activeBoundCount} Active on Device**`,
-        inline: true,
-      },
-      {
-        name: "📊 Total Registered Keys",
-        value: `**${total} Keys** (${pendingLaunchCount} Pending | ${bannedCount} Banned | ${expiredCount} Expired)`,
-        inline: false,
-      },
-      {
-        name: "📜 VIP Members List",
-        value: rosterLines.length > 0 ? rosterLines.join("\n\n") : "*No users registered yet.*",
-        inline: false,
-      },
-    ],
+    description: `Official VIP & Registered Member Roster synchronized with database and Discord server.`,
+    color: 0x00d2ff, // Cyan
+    fields: embedFields,
     footer: {
-      text: "Chameleon Cheats Member Directory • User List Stream",
+      text: `Chameleon Cheats Member Directory • ${totalRegistered} Registered Users Tracked`,
     },
     timestamp: now.toISOString(),
   };
 
   await sendDiscordEmbed(USER_LIST_WEBHOOK_URL, embed, "Chameleon Member Directory");
 }
+
 
 
