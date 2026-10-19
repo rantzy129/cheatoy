@@ -33,9 +33,9 @@ function IconShield({ size = 16 }: { size?: number }) {
   );
 }
 
-function IconDocument({ size = 16 }: { size?: number }) {
+function IconDocument({ size = 16, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
@@ -44,10 +44,19 @@ function IconDocument({ size = 16 }: { size?: number }) {
   );
 }
 
-// Shield Check SVG Icon
-function IconShieldCheck({ size = 20 }: { size?: number }) {
+function IconLock({ size = 14, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+// Shield Check SVG Icon
+function IconShieldCheck({ size = 20, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       <path d="m9 12 2 2 4-4" />
     </svg>
@@ -86,9 +95,9 @@ function IconCopy({ size = 18 }: { size?: number }) {
 }
 
 // Download SVG Icon
-function IconDownload({ size = 18 }: { size?: number }) {
+function IconDownload({ size = 18, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />
       <line x1="12" y1="15" x2="12" y2="3" />
@@ -97,9 +106,9 @@ function IconDownload({ size = 18 }: { size?: number }) {
 }
 
 // Key SVG Icon
-function IconKey({ size = 18 }: { size?: number }) {
+function IconKey({ size = 18, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <circle cx="7.5" cy="15.5" r="5.5" />
       <path d="m21 2-9.6 9.6" />
       <path d="m15.5 7.5 3 3L22 7l-3-3" />
@@ -315,6 +324,41 @@ export default function ProfilePage() {
     }
   }, []);
 
+  // Real-time listener for pending orders on Profile page
+  useEffect(() => {
+    const hasPending = userOrders.some((o) => o.status === "pending");
+    if (!discordUser || !hasPending) return;
+
+    let channel: any = null;
+    if (supabase) {
+      channel = supabase
+        .channel(`profile-orders-${discordUser.id || discordUser.username}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "orders",
+          },
+          () => {
+            fetchUserData(discordUser);
+          }
+        )
+        .subscribe();
+    }
+
+    const interval = setInterval(() => {
+      fetchUserData(discordUser);
+    }, 4000);
+
+    return () => {
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+      clearInterval(interval);
+    };
+  }, [userOrders, discordUser]);
+
   const handleCopyKey = (key: string) => {
     if (!key) return;
     navigator.clipboard.writeText(key);
@@ -398,23 +442,70 @@ export default function ProfilePage() {
         {!discordUser ? (
           /* ================= GUEST / LOGIN PROMPT SCREEN ================= */
           <div className="vault-guest-station">
+            <div className="vault-guest-badge">
+              <span style={{ color: "#00d2ff" }}>●</span>
+              <span>Hardware Enclave • Single Sign-On</span>
+            </div>
+
             <h1>Member Vault &amp; License Access</h1>
-            <p>
+            <p className="vault-guest-subtext">
               Sign in with your verified Discord account to view active VIP subscriptions,
-              retrieve your private Assault Fire PH license keys, and download the latest loader.
+              retrieve private Assault Fire PH license keys, and download the latest loader.
             </p>
 
+            {/* Feature Value Matrix (Substance) */}
+            <div className="vault-guest-features">
+              <div className="vault-feature-item">
+                <span className="vault-feature-icon">
+                  <IconKey size={16} />
+                </span>
+                <div>
+                  <span className="vault-feature-title">Private License Key</span>
+                  <span className="vault-feature-desc">Bound to Discord Snowflake ID with single-click reveal &amp; copy</span>
+                </div>
+              </div>
+              <div className="vault-feature-item">
+                <span className="vault-feature-icon">
+                  <IconShieldCheck size={16} />
+                </span>
+                <div>
+                  <span className="vault-feature-title">Hardware Telemetry</span>
+                  <span className="vault-feature-desc">Single-PC motherboard lock with automated first-launch binding</span>
+                </div>
+              </div>
+              <div className="vault-feature-item">
+                <span className="vault-feature-icon">
+                  <IconDownload size={16} />
+                </span>
+                <div>
+                  <span className="vault-feature-title">Direct Loader ZIP</span>
+                  <span className="vault-feature-desc">Encrypted build with 2026.10 PlayPark patch compatibility</span>
+                </div>
+              </div>
+              <div className="vault-feature-item">
+                <span className="vault-feature-icon">
+                  <IconDocument size={16} />
+                </span>
+                <div>
+                  <span className="vault-feature-title">Real-Time Orders</span>
+                  <span className="vault-feature-desc">Live GCash payment validation and automated @VIP server role</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Authoritative Discord Login Button */}
             <button
               type="button"
-              className="btn-discord-login-large"
+              className="btn-discord-login-prominent"
               onClick={() => signInWithDiscord()}
               id="profile-discord-login-btn"
             >
               <IconDiscord size={20} />
-              <span>Sign in with Discord</span>
+              <span>Continue with Discord</span>
             </button>
 
-            <div className="modal-discord-banner" style={{ maxWidth: 440, margin: "20px auto 0" }}>
+            {/* Discord Server Notice Banner */}
+            <div className="modal-discord-banner" style={{ margin: 0 }}>
               <div className="modal-discord-banner-info">
                 <IconDiscord size={20} className="modal-discord-icon" />
                 <div>
@@ -436,19 +527,20 @@ export default function ProfilePage() {
               </a>
             </div>
 
-            <div className="guest-card-footer">
-              <div className="guest-secondary-actions">
-                <Link href="/" className="btn-vault-subtle">
-                  Return to Storefront
-                </Link>
-                <Link href="/#pricing" className="btn-vault-subtle">
-                  View VIP Pricing
-                </Link>
-              </div>
+            {/* Navigation Actions */}
+            <div className="vault-guest-actions-bar">
+              <Link href="/" className="btn-vault-action-secondary">
+                <span>← Return to Storefront</span>
+              </Link>
+              <Link href="/#pricing" className="btn-vault-action-secondary">
+                <span>View VIP Passes (₱500+) →</span>
+              </Link>
+            </div>
 
-              <div className="guest-security-note">
-                Encrypted Discord OAuth2 authentication &bull; Instant license binding
-              </div>
+            {/* Security Guarantee Note */}
+            <div className="vault-guest-security-note">
+              <IconLock size={13} />
+              <span>Protected by Discord OAuth2 • Zero plain-text credentials stored • Hardware-locked</span>
             </div>
           </div>
         ) : (

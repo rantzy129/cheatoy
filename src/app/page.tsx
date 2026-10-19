@@ -125,6 +125,15 @@ function IconLock({ size = 14, className = "" }: { size?: number; className?: st
   );
 }
 
+function IconCopy({ size = 15, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </svg>
+  );
+}
+
 /* ─── Product Tiers (Assault Fire PH Chams) ───────────────── */
 const TIERS = [
   {
@@ -208,11 +217,83 @@ export default function Home() {
   const [generatedKey, setGeneratedKey] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
+  // Real-Time Approval Modal Key State
+  const [isModalKeyRevealed, setIsModalKeyRevealed] = useState(false);
+  const [isModalKeyCopied, setIsModalKeyCopied] = useState(false);
+
+  const getMaskedKey = (key?: string) => {
+    if (!key) return "••••-••••-••••-••••";
+    const parts = key.split("-");
+    if (parts.length >= 4) {
+      return `${parts[0]}-••••-••••-••••`;
+    }
+    return "CHAM-••••-••••-••••";
+  };
+
+  const handleCopyModalKey = (key?: string) => {
+    if (!key) return;
+    navigator.clipboard.writeText(key);
+    setIsModalKeyCopied(true);
+    setTimeout(() => setIsModalKeyCopied(false), 2200);
+  };
+
   // Real-time ticker for remaining time updates
   useEffect(() => {
     const timer = setInterval(() => setTicker((t) => t + 1), 5000);
     return () => clearInterval(timer);
   }, []);
+
+  // Real-time automatic listener & heartbeat for pending order approval
+  useEffect(() => {
+    if (!userOrder || userOrder.status !== "pending") return;
+
+    // 1. Supabase Postgres Changes Channel for instant approval detection (<100ms)
+    let channel: any = null;
+    if (supabase) {
+      channel = supabase
+        .channel(`order-channel-${userOrder.order_id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "orders",
+            filter: `order_id=eq.${userOrder.order_id}`,
+          },
+          (payload: any) => {
+            if (payload.new) {
+              setUserOrder(payload.new);
+              if (payload.new.status === "approved" && payload.new.license_key) {
+                setGeneratedKey(payload.new.license_key);
+                setActiveLicense({
+                  license_key: payload.new.license_key,
+                  tier: payload.new.tier,
+                  expires_at: payload.new.expires_at || null,
+                });
+                if (discordUser) {
+                  fetchUserOrder(discordUser);
+                }
+              }
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    // 2. Resilient Auto-Polling Fallback every 3 seconds
+    const pollTimer = setInterval(async () => {
+      if (discordUser) {
+        await fetchUserOrder(discordUser);
+      }
+    }, 3000);
+
+    return () => {
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+      clearInterval(pollTimer);
+    };
+  }, [userOrder?.order_id, userOrder?.status, discordUser]);
 
   // Fetch latest order and active license for this user from Supabase
   const fetchUserOrder = async (user: DiscordUser) => {
@@ -937,13 +1018,146 @@ export default function Home() {
               ×
             </button>
 
-            {userOrder && userOrder.status === "pending" ? (
-              // Order Pending State
+            {userOrder && userOrder.status === "approved" && (userOrder.license_key || activeLicense?.license_key) ? (
+              // ─── STATE 1: APPROVED & ACTIVE KEY ──────────────────────────
               <div>
                 <div className="gcash-modal-header">
+                  <span className="modal-status-badge-approved">● Payment Approved &amp; VIP Active</span>
+                  <h3 className="gcash-modal-title">VIP License Key Ready</h3>
+                  <p className="gcash-modal-sub">
+                    Your payment reference has been validated by an administrator. Your loader license is active.
+                  </p>
+                </div>
+
+                {/* Key Box with Mask/Unmask and Copy */}
+                <div className="modal-approved-key-card">
+                  <div className="modal-approved-key-header">
+                    <span>{userOrder.tier || "VIP Pass"} • Private License Key</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsModalKeyRevealed(!isModalKeyRevealed)}
+                      style={{ background: "none", border: "none", color: "#38bdf8", cursor: "pointer", fontSize: 11.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}
+                    >
+                      {isModalKeyRevealed ? <IconEyeOff size={13} /> : <IconEye size={13} />}
+                      <span>{isModalKeyRevealed ? "Hide" : "Reveal"}</span>
+                    </button>
+                  </div>
+
+                  <div className="modal-approved-key-row">
+                    <span className={isModalKeyRevealed ? "modal-approved-key-text" : "modal-approved-key-masked"}>
+                      {isModalKeyRevealed
+                        ? (userOrder.license_key || activeLicense?.license_key)
+                        : getMaskedKey(userOrder.license_key || activeLicense?.license_key)}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn-modal-copy-key"
+                      onClick={() => handleCopyModalKey(userOrder.license_key || activeLicense?.license_key)}
+                      title="Copy key to clipboard"
+                    >
+                      <IconCopy size={13} />
+                      <span>{isModalKeyCopied ? "Copied!" : "Copy Key"}</span>
+                    </button>
+                  </div>
+
+                  <div style={{ fontSize: 11, color: "#94a3b8", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4 }}>
+                    <span>Bound to Discord: <b>@{discordUser?.username}</b></span>
+                    <span style={{ color: "#10b981", fontVariantNumeric: "tabular-nums" }}>1-PC HWID Auto-Bind</span>
+                  </div>
+                </div>
+
+                {/* Order Details Confirmation */}
+                <div className="order-status-card" style={{ marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
+                    <span style={{ color: "#94a3b8" }}>Order ID:</span>
+                    <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#00d2ff" }}>{userOrder.order_id}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
+                    <span style={{ color: "#94a3b8" }}>Plan:</span>
+                    <span style={{ fontWeight: 700, color: "#f8fafc" }}>{userOrder.tier}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
+                    <span style={{ color: "#94a3b8" }}>GCash Ref No:</span>
+                    <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#f8fafc" }}>{userOrder.reference_no}</span>
+                  </div>
+                </div>
+
+                {/* Direct Actions: Member Vault & Loader or Dismiss */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <Link
+                    href="/profile"
+                    className="btn-modal-vault-primary"
+                    onClick={() => setIsGcashModalOpen(false)}
+                    id="modal-to-profile-btn"
+                  >
+                    <span>Open VIP Vault &amp; Download Loader</span>
+                    <IconArrowUpRight size={16} />
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn-modal-new-order"
+                    onClick={() => setIsGcashModalOpen(false)}
+                  >
+                    <span>Close</span>
+                  </button>
+                </div>
+              </div>
+            ) : userOrder && userOrder.status === "rejected" ? (
+              // ─── STATE 2: REJECTED STATE ────────────────────────────────
+              <div>
+                <div className="gcash-modal-header">
+                  <span className="modal-status-badge-rejected">● Verification Failed</span>
+                  <h3 className="gcash-modal-title">Payment Not Validated</h3>
+                  <p className="gcash-modal-sub">
+                    The transaction reference could not be matched with our merchant account records.
+                  </p>
+                </div>
+
+                <div className="order-status-card" style={{ borderLeft: "3px solid #ef4444" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: "#94a3b8" }}>Submitted Ref:</span>
+                    <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#f87171" }}>{userOrder.reference_no}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: "#94a3b8" }}>Plan:</span>
+                    <span style={{ fontWeight: 700, color: "#f8fafc" }}>{userOrder.tier}</span>
+                  </div>
+                </div>
+
+                <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5, textAlign: "center", marginBottom: 14 }}>
+                  Please verify your GCash receipt SMS or confirmation screen. If you mistyped the reference number, you can submit a new order.
+                </p>
+
+                <div className="modal-actions-duo">
+                  <button
+                    type="button"
+                    className="btn-modal-refresh"
+                    onClick={() => setUserOrder(null)}
+                  >
+                    <span>+ Submit New Order</span>
+                  </button>
+                  <a
+                    href="https://discord.gg/Whwxq9QAEN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-modal-new-order"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>Discord Support ↗</span>
+                  </a>
+                </div>
+              </div>
+            ) : userOrder && userOrder.status === "pending" ? (
+              // ─── STATE 3: PENDING VALIDATION (LIVE REAL-TIME) ─────────────
+              <div>
+                <div className="gcash-modal-header">
+                  <span className="modal-status-badge-pending">
+                    <span className="live-pulse-dot" />
+                    <span>Live Verification Active</span>
+                  </span>
                   <h3 className="gcash-modal-title">Payment Under Review</h3>
                   <p className="gcash-modal-sub">
-                    Your GCash transaction reference is awaiting administrator validation.
+                    Awaiting admin validation. Once approved, this window updates automatically in real-time.
                   </p>
                 </div>
 

@@ -1593,6 +1593,175 @@ a {
   }
 }
 
+/* ─── Real-Time Order Approval & Status Badges ─────────────── */
+.modal-status-badge-approved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.modal-status-badge-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.modal-status-badge-rejected {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+  animation: modalPulseRadar 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes modalPulseRadar {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+.modal-approved-key-card {
+  background: #070c18;
+  border: 1px solid #142338;
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.modal-approved-key-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.modal-approved-key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #090f1d;
+  border: 1px solid #1c2e4a;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+.modal-approved-key-text {
+  font-family: monospace, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #00d2ff;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.modal-approved-key-masked {
+  font-family: monospace, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-modal-copy-key {
+  background: rgba(0, 210, 255, 0.12);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: #00d2ff;
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-modal-copy-key:hover {
+  background: #00d2ff;
+  color: #04070e;
+}
+
+.btn-modal-vault-primary {
+  width: 100%;
+  height: 44px;
+  background: #00d2ff;
+  color: #04070e;
+  border: 1px solid #00d2ff;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-modal-vault-primary:hover {
+  background: #38bdf8;
+  border-color: #38bdf8;
+}
+
 
 /* ─── Admin Dashboard ──────────────────────────────────────── */
 .admin-page-wrap {
@@ -2761,30 +2930,178 @@ a {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Guest / Login Station */
+/* Guest / Login Station — Premium Anti-Slop Enclave Terminal */
 .vault-guest-station {
-  max-width: 520px;
-  margin: 60px auto;
-  background: var(--bg-surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 36px 32px;
+  max-width: 620px;
+  margin: 50px auto 80px auto;
+  background: #070c18;
+  border: 1px solid #142136;
+  border-radius: 10px;
+  padding: 40px 36px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
   text-align: center;
 }
 
-.vault-guest-station h1 {
-  font-size: 22px;
+.vault-guest-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: -0.015em;
-  color: #ffffff;
-  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #00d2ff;
+  background: rgba(0, 210, 255, 0.08);
+  border: 1px solid rgba(0, 210, 255, 0.22);
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin: 0 auto 12px auto;
+  width: fit-content;
 }
 
-.vault-guest-station p {
+.vault-guest-station h1 {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.vault-guest-station p.vault-guest-subtext {
   font-size: 13.5px;
   color: #94a3b8;
   line-height: 1.6;
-  margin-bottom: 24px;
+  max-width: 480px;
+  margin: 0 auto 4px auto;
+}
+
+/* 2x2 Feature Value Matrix inside Guest Card */
+.vault-guest-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: #050811;
+  border: 1px solid #101a2b;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 4px 0;
+}
+
+.vault-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+
+.vault-feature-icon {
+  color: #00d2ff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vault-feature-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  display: block;
+}
+
+.vault-feature-desc {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Prominent Full-Width Discord Login Button */
+.btn-discord-login-prominent {
+  width: 100%;
+  height: 48px;
+  background: #5865f2;
+  color: #ffffff;
+  border: 1px solid #5865f2;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-discord-login-prominent:hover {
+  background: #4752c4;
+  border-color: #4752c4;
+  transform: translateY(-1px);
+}
+
+.btn-discord-login-prominent:active {
+  transform: translateY(0);
+}
+
+/* Secondary Actions Bar */
+.vault-guest-actions-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-vault-action-secondary {
+  height: 40px;
+  background: #090e1a;
+  color: #cbd5e1;
+  border: 1px solid #1c2b42;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-vault-action-secondary:hover {
+  background: #121c32;
+  border-color: #2b3e5e;
+  color: #ffffff;
+}
+
+/* Security Guarantee Footer Note */
+.vault-guest-security-note {
+  font-size: 11.5px;
+  color: #64748b;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #0f1726;
+}
+
+@media (max-width: 540px) {
+  .vault-guest-station {
+    padding: 28px 20px;
+    margin: 30px 16px;
+  }
+  .vault-guest-features {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .vault-guest-actions-bar {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ==========================================================================
