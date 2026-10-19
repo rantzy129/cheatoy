@@ -223,8 +223,8 @@ namespace ChameleonAuth
     inline uintptr_t g_authKey = 0;
 
     // Obfuscated configuration endpoints (invisible to string search)
-    inline std::wstring GetServerHost() { return _XOR_W(L"cheatoy.vercel.app"); }
-    inline INTERNET_PORT GetServerPort() { return 443; } // Production HTTPS (cheatoy.vercel.app)
+    inline std::wstring GetServerHost() { return _XOR_W(L"chameleon-cheats.vercel.app"); }
+    inline INTERNET_PORT GetServerPort() { return 443; } // Production HTTPS (chameleon-cheats.vercel.app)
     inline std::wstring GetVerifyPath() { return _XOR_W(L"/api/license/verify"); }
 
     // Shared cryptographic secret with backend (ADMIN_SECRET_KEY / LICENSE_SIGNING_SECRET)

@@ -222,26 +222,9 @@ export default function ProfilePage() {
 
   // Auth Initialization on Mount
   useEffect(() => {
-    // 1. Check URL parameters for OAuth return or Demo mode
+    // 1. Check URL parameters for OAuth return
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
-      const demoParam = searchParams.get("demo") || searchParams.get("user") || searchParams.get("preview");
-
-      if (demoParam) {
-        const demoUser: DiscordUser = {
-          id: "417244901234567890",
-          username: demoParam === "1" ? "somaris1" : demoParam,
-          global_name: demoParam === "1" ? "Somaris" : demoParam,
-          tag: "Discord",
-          avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-          email: `${demoParam === "1" ? "somaris1" : demoParam}@gmail.com`,
-        };
-        setDiscordUser(demoUser);
-        storeUser(demoUser);
-        fetchUserData(demoUser);
-        return;
-      }
-
       const code = searchParams.get("code");
 
       if (code && supabase) {
@@ -422,12 +405,12 @@ export default function ProfilePage() {
         {!discordUser ? (
           /* ================= GUEST / LOGIN PROMPT SCREEN ================= */
           <div className="profile-guest-card">
-            <div className="guest-discord-icon-large">
-              <IconDiscord size={44} />
+            <div className="guest-portal-badge">
+              RESTRICTED VIP ACCESS
             </div>
             <h2>Member Profile & License Vault</h2>
             <p>
-              Sign in with your Discord account to view your active VIP subscriptions,
+              Sign in with your verified Discord account to view your active VIP subscriptions,
               retrieve your undetected Assault Fire PH license keys, and download the latest loader.
             </p>
 
@@ -437,33 +420,21 @@ export default function ProfilePage() {
               onClick={() => signInWithDiscord()}
               id="profile-discord-login-btn"
             >
-              <IconDiscord size={22} />
-              <span>Continue with Discord</span>
+              <span>Sign In with Discord</span>
             </button>
 
-            <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+            <div className="guest-card-footer">
+              <div className="guest-secondary-actions">
                 <Link href="/" className="btn-profile-secondary">
-                  ← Back to Home
+                  Return to Storefront
                 </Link>
                 <Link href="/#pricing" className="btn-profile-secondary">
                   View VIP Pricing
                 </Link>
               </div>
 
-              <div>
-                <Link
-                  href="/profile?demo=somaris1"
-                  style={{
-                    fontSize: 12,
-                    color: "#94a3b8",
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                  id="preview-vip-demo-link"
-                >
-                  Preview VIP Profile for somaris1 (1 Month Pass) →
-                </Link>
+              <div className="guest-security-note">
+                Encrypted Discord OAuth2 Authentication &bull; Instant License Binding
               </div>
             </div>
           </div>

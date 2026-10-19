@@ -2699,37 +2699,48 @@ a {
 
 /* Guest / Login Callout Screen */
 .profile-guest-card {
-  max-width: 580px;
-  margin: 60px auto;
-  background: rgba(9, 14, 25, 0.85);
+  max-width: 540px;
+  margin: 70px auto;
+  background: radial-gradient(120% 120% at 50% 0%, rgba(20, 29, 50, 0.95) 0%, rgba(8, 12, 22, 0.98) 100%);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(88, 101, 242, 0.3);
-  border-radius: 28px;
-  padding: 48px 36px;
+  border: 1px solid rgba(88, 101, 242, 0.28);
+  border-radius: 24px;
+  padding: 44px 38px;
   text-align: center;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(88, 101, 242, 0.15);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 60px rgba(88, 101, 242, 0.12);
   position: relative;
   overflow: hidden;
 }
 
-.guest-discord-icon-large {
-  width: 80px;
-  height: 80px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px auto;
-  box-shadow: 0 0 40px rgba(88, 101, 242, 0.5);
-  color: #ffffff;
+.profile-guest-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #5865f2 50%, transparent 100%);
+}
+
+.guest-portal-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #818cf8;
+  background: rgba(88, 101, 242, 0.12);
+  border: 1px solid rgba(88, 101, 242, 0.3);
+  border-radius: 9999px;
+  margin-bottom: 20px;
 }
 
 .profile-guest-card h2 {
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: #ffffff;
   margin-bottom: 12px;
 }
@@ -2737,32 +2748,58 @@ a {
 .profile-guest-card p {
   font-size: 14px;
   color: #94a3b8;
-  line-height: 1.6;
+  line-height: 1.65;
   margin-bottom: 28px;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .btn-discord-login-large {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  background: #5865f2;
+  background: linear-gradient(135deg, #5865f2 0%, #4338ca 100%);
   color: #ffffff;
   font-size: 15px;
-  font-weight: 800;
-  padding: 16px 32px;
-  border-radius: 14px;
-  border: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 16px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 0 30px rgba(88, 101, 242, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 25px rgba(88, 101, 242, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   width: 100%;
 }
 
 .btn-discord-login-large:hover {
-  background: #4752c4;
+  background: linear-gradient(135deg, #6875f5 0%, #4f46e5 100%);
   transform: translateY(-2px);
-  box-shadow: 0 0 40px rgba(88, 101, 242, 0.6);
+  box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-discord-login-large:active {
+  transform: translateY(0);
+}
+
+.guest-card-footer {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guest-secondary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.guest-security-note {
+  font-size: 11.5px;
+  color: #64748b;
+  letter-spacing: 0.02em;
 }
 
 .user-avatar-img {
