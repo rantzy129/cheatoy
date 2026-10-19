@@ -18,9 +18,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 // Discord SVG Icon
-function IconDiscord({ size = 20 }: { size?: number }) {
+function IconDiscord({ size = 20, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
       <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
     </svg>
   );
@@ -405,13 +405,10 @@ export default function ProfilePage() {
         {!discordUser ? (
           /* ================= GUEST / LOGIN PROMPT SCREEN ================= */
           <div className="profile-guest-card">
-            <div className="guest-portal-badge">
-              RESTRICTED VIP ACCESS
-            </div>
-            <h2>Member Profile & License Vault</h2>
+            <h2>Member Profile &amp; License Vault</h2>
             <p>
-              Sign in with your verified Discord account to view your active VIP subscriptions,
-              retrieve your undetected Assault Fire PH license keys, and download the latest loader.
+              Sign in with your verified Discord account to view active VIP subscriptions,
+              retrieve your private Assault Fire PH license keys, and download the latest loader.
             </p>
 
             <button
@@ -420,54 +417,27 @@ export default function ProfilePage() {
               onClick={() => signInWithDiscord()}
               id="profile-discord-login-btn"
             >
+              <IconDiscord size={20} />
               <span>Sign In with Discord</span>
             </button>
 
-            <div
-              style={{
-                marginTop: 16,
-                background: "rgba(88, 101, 242, 0.1)",
-                border: "1px solid rgba(88, 101, 242, 0.25)",
-                borderRadius: 12,
-                padding: "12px 16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-                textAlign: "left",
-                maxWidth: 420,
-                width: "100%",
-                margin: "16px auto 0 auto",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ color: "#5865F2", flexShrink: 0 }}>
-                  <IconDiscord size={22} />
-                </div>
+            <div className="modal-discord-banner" style={{ maxWidth: 440, margin: "20px auto 0" }}>
+              <div className="modal-discord-banner-info">
+                <IconDiscord size={20} className="modal-discord-icon" />
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#ffffff" }}>
-                    Join Official Discord Server
-                  </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                    Be in the server for instant @VIP role & DM dispatch upon approval!
-                  </div>
+                  <span className="modal-discord-banner-title">
+                    Official Discord Community
+                  </span>
+                  <span className="modal-discord-banner-sub">
+                    Join our server for instant @VIP role and automated key delivery.
+                  </span>
                 </div>
               </div>
               <a
                 href="https://discord.gg/Whwxq9QAEN"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  background: "#5865F2",
-                  color: "#ffffff",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  padding: "7px 12px",
-                  borderRadius: 8,
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
+                className="modal-discord-banner-btn"
               >
                 Join Server ↗
               </a>
@@ -484,7 +454,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="guest-security-note">
-                Encrypted Discord OAuth2 Authentication &bull; Instant License Binding
+                Encrypted Discord OAuth2 authentication &bull; Instant license binding
               </div>
             </div>
           </div>
@@ -584,11 +554,11 @@ export default function ProfilePage() {
 
                   {activeLicense ? (
                     <span className="subscription-status-badge status-active-pill">
-                      ● {remaining?.isExpired ? "EXPIRED" : "ACTIVE VIP"}
+                      ● {remaining?.isExpired ? "Expired" : "Active VIP"}
                     </span>
                   ) : (
                     <span className="subscription-status-badge status-none-pill">
-                      ● INACTIVE
+                      ● Inactive
                     </span>
                   )}
                 </div>
@@ -598,7 +568,7 @@ export default function ProfilePage() {
                     {/* Live Remaining Time Box */}
                     <div className="vip-countdown-display">
                       <div className="vip-countdown-label">
-                        {activeLicense.tier || "VIP PASS"} • REMAINING TIME
+                        {activeLicense.tier || "VIP Pass"} • Remaining duration
                       </div>
                       <div className="vip-countdown-timer">
                         {remaining ? remaining.text : "Calculating..."}
@@ -684,9 +654,9 @@ export default function ProfilePage() {
                     {/* Machine HWID Lock Status */}
                     <div
                       style={{
-                        background: "rgba(15, 23, 42, 0.5)",
-                        border: "1px solid rgba(255, 255, 255, 0.06)",
-                        borderRadius: 14,
+                        background: "#080e18",
+                        border: "1px solid #162438",
+                        borderRadius: 10,
                         padding: "16px 20px",
                         display: "flex",
                         alignItems: "center",
@@ -696,12 +666,12 @@ export default function ProfilePage() {
                       }}
                     >
                       <div>
-                        <div style={{ fontSize: 11, color: "#94a3b8", textTransform: "uppercase", fontWeight: 700 }}>
+                        <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700 }}>
                           Machine HWID Binding
                         </div>
                         <div style={{ fontSize: 13, color: "#ffffff", fontWeight: 600, marginTop: 2 }}>
                           {activeLicense.hwid ? (
-                            <span style={{ color: "#38bdf8", fontFamily: "var(--font-mono)" }}>
+                            <span style={{ color: "#38bdf8", fontVariantNumeric: "tabular-nums" }}>
                               Locked: {activeLicense.hwid.substring(0, 16)}...
                             </span>
                           ) : (
@@ -785,8 +755,8 @@ export default function ProfilePage() {
                     <span>Download Loader (ZIP)</span>
                   </a>
 
-                  <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 800, color: "#94a3b8", letterSpacing: "0.06em", marginBottom: 12 }}>
-                    Quick Setup Guide
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#cbd5e1", marginBottom: 12 }}>
+                    Quick setup guide
                   </div>
 
                   <div className="step-guide-list">
@@ -844,21 +814,21 @@ export default function ProfilePage() {
                         <th>Order ID</th>
                         <th>Tier</th>
                         <th>Amount</th>
-                        <th>Payment Method</th>
+                        <th>Payment method</th>
                         <th>Reference / TXN</th>
                         <th>Date</th>
                         <th>Status</th>
-                        <th>License Key</th>
+                        <th>License key</th>
                       </tr>
                     </thead>
                     <tbody>
                       {userOrders.map((order) => (
                         <tr key={order.id || order.order_id}>
-                          <td style={{ fontFamily: "var(--font-mono)", color: "#00d2ff" }}>
+                          <td style={{ fontVariantNumeric: "tabular-nums", color: "#00d2ff", fontWeight: 600 }}>
                             {order.order_id}
                           </td>
                           <td style={{ fontWeight: 700 }}>{order.tier}</td>
-                          <td>
+                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
                             ₱{order.amount_php || order.amount}
                             {order.amount_usd ? ` ($${order.amount_usd})` : ""}
                           </td>
@@ -867,10 +837,10 @@ export default function ProfilePage() {
                               {order.payment_method || "GCash"}
                             </span>
                           </td>
-                          <td style={{ fontFamily: "var(--font-mono)", color: "#94a3b8" }}>
+                          <td style={{ fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>
                             {order.gcash_ref_no || "N/A"}
                           </td>
-                          <td style={{ color: "#94a3b8", fontSize: 12 }}>
+                          <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
                             {new Date(order.created_at).toLocaleDateString()}
                           </td>
                           <td>
@@ -887,11 +857,11 @@ export default function ProfilePage() {
                               </span>
                             ) : (
                               <span className="subscription-status-badge status-pending-pill">
-                                Pending Approval
+                                Pending approval
                               </span>
                             )}
                           </td>
-                          <td style={{ fontFamily: "var(--font-mono)" }}>
+                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
                             {order.license_key ? (
                               <button
                                 type="button"
@@ -906,7 +876,7 @@ export default function ProfilePage() {
                                 }}
                                 title="Click to copy key"
                               >
-                                Copy Key
+                                Copy key
                               </button>
                             ) : (
                               <span style={{ color: "#64748b" }}>—</span>
