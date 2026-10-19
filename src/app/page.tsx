@@ -563,17 +563,17 @@ export default function Home() {
                 height={18}
                 className="game-logo-tag"
               />
-              <span>Assault Fire PH • Undetected Chams</span>
+              <span>Assault Fire Cheat • Undetected VIP Wallhack</span>
             </div>
 
             <h1 className="hero-title">
-              Assault Fire PH<br />
-              <span className="highlight">Chams & Wallhack</span>
+              Assault Fire Cheat<br />
+              <span className="highlight">& Wallhack (AFPH)</span>
             </h1>
 
             <p className="hero-desc">
-              See every enemy clearly through any wall with smooth customizable colors.
-              Engineered with zero FPS drop and 100% undetected security for Assault Fire Philippines.
+              Dominate every match with the cleanest, 100% undetected Assault Fire cheat and wallhack.
+              Custom chams colors, zero FPS drop, and hardware-secured auto-bypass for Assault Fire Philippines.
             </p>
 
             <div className="hero-highlights-row">
