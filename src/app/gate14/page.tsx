@@ -172,6 +172,38 @@ function IconArrowRight({ size = 16 }: { size?: number }) {
   );
 }
 
+function IconReceipt({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+      <path d="M16 8h-8" />
+      <path d="M16 12h-8" />
+      <path d="M13 16h-5" />
+    </svg>
+  );
+}
+
+function IconZoomIn({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <line x1="11" y1="8" x2="11" y2="14" />
+      <line x1="8" y1="11" x2="14" y2="11" />
+    </svg>
+  );
+}
+
+function IconZoomOut({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <line x1="8" y1="11" x2="14" y2="11" />
+    </svg>
+  );
+}
+
 interface Order {
   id: string;
   order_id: string;
@@ -186,6 +218,7 @@ interface Order {
   license_key?: string;
   created_at: string;
   approved_at?: string;
+  receipt_url?: string | null;
 }
 
 interface License {
@@ -221,6 +254,20 @@ export default function AdminPage() {
   const [orderFilter, setOrderFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Receipt Inspection Lightbox State
+  const [selectedReceiptOrder, setSelectedReceiptOrder] = useState<Order | null>(null);
+  const [receiptZoom, setReceiptZoom] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedReceiptOrder(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Key Generator State
   const [genTier, setGenTier] = useState("1 Month Pass");
@@ -379,6 +426,11 @@ export default function AdminPage() {
               : o
           )
         );
+        setSelectedReceiptOrder((prev) =>
+          prev?.id === order.id
+            ? { ...prev, status: "approved", license_key: data.license_key, approved_at: new Date().toISOString() }
+            : prev
+        );
         fetchLicenses();
 
         if (data.discord_bot) {
@@ -419,6 +471,9 @@ export default function AdminPage() {
       } else {
         setOrders((prev) =>
           prev.map((o) => (o.id === order.id ? { ...o, status: "rejected" } : o))
+        );
+        setSelectedReceiptOrder((prev) =>
+          prev?.id === order.id ? { ...prev, status: "rejected" } : prev
         );
       }
     } catch (err: any) {
@@ -958,17 +1013,35 @@ export default function AdminPage() {
                             </td>
 
                             <td>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontFamily: "monospace", color: "#00d2ff", fontWeight: 700 }}>
-                                  {order.reference_no}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopy(order.reference_no)}
-                                  className="admin-btn-copy-inline"
-                                >
-                                  {copiedKey === order.reference_no ? "Copied" : "Copy"}
-                                </button>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <span style={{ fontFamily: "monospace", color: "#00d2ff", fontWeight: 700 }}>
+                                    {order.reference_no}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopy(order.reference_no)}
+                                    className="admin-btn-copy-inline"
+                                  >
+                                    {copiedKey === order.reference_no ? "Copied" : "Copy"}
+                                  </button>
+                                </div>
+                                {order.receipt_url ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedReceiptOrder(order);
+                                      setReceiptZoom(false);
+                                    }}
+                                    className="admin-btn-view-receipt"
+                                    title="View GCash Payment Screenshot"
+                                  >
+                                    <IconReceipt size={12} />
+                                    <span>View Slip</span>
+                                  </button>
+                                ) : (
+                                  <span className="admin-no-receipt-label">No slip (Manual ref)</span>
+                                )}
                               </div>
                             </td>
 
@@ -1332,6 +1405,198 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* ─── ADMIN RECEIPT INSPECTION LIGHTBOX MODAL ─── */}
+      {selectedReceiptOrder && selectedReceiptOrder.receipt_url && (
+        <div
+          className="admin-receipt-lightbox-overlay"
+          onClick={() => setSelectedReceiptOrder(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="admin-receipt-lightbox-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="admin-receipt-lightbox-header">
+              <div className="admin-receipt-lightbox-header-left">
+                <IconReceipt size={16} />
+                <h3 className="admin-receipt-lightbox-title">GCash Payment Verification Slip</h3>
+                <span className="admin-receipt-id-pill">
+                  {selectedReceiptOrder.order_id}
+                </span>
+                <span className={`admin-status-badge admin-status-badge-${selectedReceiptOrder.status}`}>
+                  {selectedReceiptOrder.status}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="admin-receipt-lightbox-close"
+                onClick={() => setSelectedReceiptOrder(null)}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Lightbox Body */}
+            <div className="admin-receipt-lightbox-body">
+              {/* Image Viewport */}
+              <div className="admin-receipt-viewport-container">
+                <div className="admin-receipt-viewport-toolbar">
+                  <span>Customer Transaction Screenshot</span>
+                  <div className="admin-receipt-toolbar-actions">
+                    <button
+                      type="button"
+                      className="admin-receipt-toolbar-btn"
+                      onClick={() => setReceiptZoom(!receiptZoom)}
+                    >
+                      {receiptZoom ? <IconZoomOut size={12} /> : <IconZoomIn size={12} />}
+                      <span>{receiptZoom ? "Fit View" : "Zoom 100%"}</span>
+                    </button>
+                    <a
+                      href={selectedReceiptOrder.receipt_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="admin-receipt-toolbar-btn"
+                    >
+                      <IconExternalLink size={12} />
+                      <span>Open Original ↗</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div
+                  className="admin-receipt-image-stage"
+                  onClick={() => setReceiptZoom(!receiptZoom)}
+                  title="Click to toggle zoom"
+                >
+                  <img
+                    src={selectedReceiptOrder.receipt_url}
+                    alt={`GCash Slip ${selectedReceiptOrder.order_id}`}
+                    className={receiptZoom ? "zoomed" : ""}
+                  />
+                </div>
+              </div>
+
+              {/* Sidebar Details & Quick Actions */}
+              <div className="admin-receipt-sidebar">
+                <div className="admin-receipt-details-list">
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">Product Plan</span>
+                    <span className="admin-receipt-detail-value" style={{ color: "#00d2ff" }}>
+                      {selectedReceiptOrder.tier}
+                    </span>
+                  </div>
+
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">Amount Due / Sent</span>
+                    <span className="admin-receipt-detail-value" style={{ color: "#ffffff", fontSize: 16 }}>
+                      {selectedReceiptOrder.price}
+                    </span>
+                  </div>
+
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">GCash Reference No</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                      <span style={{ fontFamily: "monospace", fontSize: 14, color: "#38bdf8", fontWeight: 700 }}>
+                        {selectedReceiptOrder.reference_no}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(selectedReceiptOrder.reference_no)}
+                        className="admin-btn-copy-inline"
+                      >
+                        {copiedKey === selectedReceiptOrder.reference_no ? "Copied" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">Sender Name</span>
+                    <span className="admin-receipt-detail-value" style={{ color: selectedReceiptOrder.sender_name ? "#f1f5f9" : "#64748b" }}>
+                      {selectedReceiptOrder.sender_name || "Not specified"}
+                    </span>
+                  </div>
+
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">Customer Discord</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                      <span style={{ fontWeight: 700, color: "#f1f5f9" }}>
+                        @{selectedReceiptOrder.discord_username}
+                      </span>
+                      <span style={{ fontFamily: "monospace", fontSize: 11, color: "#556882" }}>
+                        ({selectedReceiptOrder.discord_id})
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="admin-receipt-detail-item">
+                    <span className="admin-receipt-detail-label">Submitted At</span>
+                    <span className="admin-receipt-detail-value" style={{ fontSize: 12, color: "#94a3b8" }}>
+                      {new Date(selectedReceiptOrder.created_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  {selectedReceiptOrder.license_key && (
+                    <div className="admin-receipt-detail-item" style={{ background: "rgba(16, 185, 129, 0.08)", padding: "10px", borderRadius: 6, border: "1px solid #065f46" }}>
+                      <span className="admin-receipt-detail-label" style={{ color: "#34d399" }}>Issued License Key</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                        <span style={{ fontFamily: "monospace", fontSize: 13, color: "#ffffff", fontWeight: 700 }}>
+                          {selectedReceiptOrder.license_key}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(selectedReceiptOrder.license_key!)}
+                          className="admin-btn-copy-inline"
+                        >
+                          {copiedKey === selectedReceiptOrder.license_key ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Quick Actions */}
+                <div className="admin-receipt-actions-footer">
+                  {selectedReceiptOrder.status === "pending" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveOrder(selectedReceiptOrder)}
+                        disabled={actionLoading === selectedReceiptOrder.id}
+                        className="admin-btn-lightbox-approve"
+                      >
+                        <IconCheck size={14} />
+                        <span>{actionLoading === selectedReceiptOrder.id ? "Issuing Key..." : "Approve & Issue Key"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRejectOrder(selectedReceiptOrder)}
+                        disabled={actionLoading === selectedReceiptOrder.id}
+                        className="admin-btn-lightbox-reject"
+                      >
+                        <span>✕ Reject Order</span>
+                      </button>
+                    </>
+                  )}
+                  {selectedReceiptOrder.status !== "pending" && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedReceiptOrder(null)}
+                      className="admin-btn-mint-secondary"
+                      style={{ width: "100%", justifyContent: "center" }}
+                    >
+                      Close Window (Esc)
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

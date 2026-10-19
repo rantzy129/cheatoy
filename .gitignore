@@ -7,3 +7,7 @@ npm-debug.log*
 scratch/
 *.tmp
 *.log
+*.txt
+run_server.bat
+public/receipts/*
+!public/receipts/.gitkeep

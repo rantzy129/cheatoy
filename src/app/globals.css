@@ -3490,5 +3490,299 @@ a {
   color: #475569;
 }
 
+/* ─── GCASH RECEIPT UPLOAD & PREVIEW (CHECKOUT MODAL) ──────────────── */
+.gcash-receipt-dropzone {
+  border: 1px dashed #1e293b;
+  border-radius: var(--radius-sm, 8px);
+  background: #070c18;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gcash-receipt-dropzone:hover {
+  border-color: #38bdf8;
+  background: #091224;
+}
+
+.gcash-receipt-dropzone.active {
+  border-color: #00d2ff;
+  background: rgba(0, 210, 255, 0.05);
+}
+
+.gcash-receipt-icon {
+  color: #38bdf8;
+  margin-bottom: 2px;
+}
+
+.gcash-receipt-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.gcash-receipt-sub {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.gcash-receipt-preview-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #091120;
+  border: 1px solid #142136;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+}
+
+.gcash-receipt-preview-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.gcash-receipt-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #1e355b;
+  background: #04070e;
+  flex-shrink: 0;
+}
+
+.gcash-receipt-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.gcash-receipt-filename {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gcash-receipt-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.gcash-receipt-badge {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.gcash-receipt-filesize {
+  color: #64748b;
+  font-family: monospace;
+}
+
+.btn-remove-receipt {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-remove-receipt:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* ─── VIP FEATURE ARSENAL (WALLHACK, CHAMS, HEALTH, 2D BOX) ────────── */
+.features-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.hotkey-control-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #070c18;
+  border: 1px solid #142136;
+  border-radius: var(--radius-md, 12px);
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.hotkey-control-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hotkey-key-box {
+  background: #0f1c30;
+  border: 1px solid #223c63;
+  border-bottom: 3px solid #38bdf8;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.hotkey-control-text h3 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.hotkey-control-text p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.hotkey-control-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.features-grid-quad {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .features-grid-quad {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-quad-card {
+  background: #070c18;
+  border: 1px solid #142136;
+  border-radius: var(--radius-md, 12px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.feature-quad-card:hover {
+  border-color: #223854;
+  background: #091020;
+}
+
+.feature-quad-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.feature-quad-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #0d1729;
+  border: 1px solid #1c2e4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+}
+
+.feature-quad-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.feature-quad-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 8px 0;
+}
+
+.feature-quad-desc {
+  font-size: 13.5px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+}
+
+.feature-quad-specs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #101a2c;
+  font-size: 11.5px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.feature-quad-spec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #cbd5e1;
+}
+
+.feature-quad-spec-pill::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #38bdf8;
+}
+
+
+
 
 

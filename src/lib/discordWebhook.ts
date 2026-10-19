@@ -49,6 +49,9 @@ interface UserStatusChangeData {
   details?: string;
 }
 
+import fs from "fs";
+import path from "path";
+
 /**
  * Sends a Discord Embed message via Webhook
  */
@@ -72,14 +75,67 @@ async function sendDiscordEmbed(targetWebhookUrl: string, embed: any, botName = 
   }
 }
 
+/**
+ * Sends a Discord Embed message with a local file attachment via multipart/form-data
+ */
+async function sendDiscordEmbedWithFile(
+  targetWebhookUrl: string,
+  embed: any,
+  filePath: string,
+  fileName = "receipt.png",
+  botName = "Chameleon Vault"
+) {
+  if (!targetWebhookUrl) return;
+
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const mime =
+      fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")
+        ? "image/jpeg"
+        : fileName.endsWith(".webp")
+        ? "image/webp"
+        : "image/png";
+
+    const formData = new FormData();
+    const payload = {
+      username: botName,
+      avatar_url: "https://chameleoncheats.com/favicon.ico",
+      embeds: [
+        {
+          ...embed,
+          image: {
+            url: `attachment://${fileName}`,
+          },
+        },
+      ],
+    };
+
+    formData.append("payload_json", JSON.stringify(payload));
+    const blob = new Blob([fileBuffer], { type: mime });
+    formData.append("files[0]", blob, fileName);
+
+    await fetch(targetWebhookUrl, {
+      method: "POST",
+      body: formData,
+    });
+  } catch (err) {
+    console.warn("Notice: Failed to dispatch Discord Webhook with attachment, falling back to json:", err);
+    await sendDiscordEmbed(targetWebhookUrl, embed, botName);
+  }
+}
 
 /**
  * Dispatches a rich embed when a new customer order is submitted
  */
-export async function sendOrderCreatedWebhook(order: OrderWebhookData) {
+export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFilePath?: string | null) {
+  // Clean payment method display if it contains receipt tag
+  const displayPaymentMethod = (order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "");
+
   const embed = {
     title: "📦 New VIP Order Submitted (Pending Verification)",
-    description: `A customer has submitted a new payment for verification.`,
+    description: `A customer has submitted a new payment for verification.${
+      receiptFilePath ? "\n📎 **Official GCash payment receipt attached below.**" : ""
+    }`,
     color: 0x00d2ff, // Neon Cyan
     fields: [
       {
@@ -114,12 +170,17 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData) {
       },
       {
         name: "Payment Gateway",
-        value: order.payment_method || "InstaPay / GCash",
+        value: displayPaymentMethod,
         inline: true,
       },
       {
         name: "Status",
         value: "🟡 **Pending Admin Review**",
+        inline: true,
+      },
+      {
+        name: "Proof of Payment",
+        value: receiptFilePath ? "✅ **Screenshot Slip Attached**" : "⚠️ *No screenshot uploaded (Manual Ref)*",
         inline: true,
       },
     ],
@@ -129,7 +190,12 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData) {
     timestamp: new Date().toISOString(),
   };
 
-  await sendDiscordEmbed(ORDER_WEBHOOK_URL, embed, "Chameleon Order Vault");
+  if (receiptFilePath && fs.existsSync(receiptFilePath)) {
+    const fileName = path.basename(receiptFilePath);
+    await sendDiscordEmbedWithFile(ORDER_WEBHOOK_URL, embed, receiptFilePath, fileName, "Chameleon Order Vault");
+  } else {
+    await sendDiscordEmbed(ORDER_WEBHOOK_URL, embed, "Chameleon Order Vault");
+  }
 }
 
 /**

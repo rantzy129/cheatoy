@@ -134,6 +134,61 @@ function IconCopy({ size = 15, className = "" }: { size?: number; className?: st
   );
 }
 
+function IconUpload({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function IconReceipt({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+      <path d="M16 8h-8" />
+      <path d="M16 12h-8" />
+      <path d="M13 16h-5" />
+    </svg>
+  );
+}
+
+function IconBox({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="m3.3 7 8.7 5 8.7-5" />
+      <path d="M12 22V12" />
+    </svg>
+  );
+}
+
+function IconHeart({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+    </svg>
+  );
+}
+
+function IconSliders({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <line x1="4" y1="21" x2="4" y2="14" />
+      <line x1="4" y1="10" x2="4" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="3" />
+      <line x1="20" y1="21" x2="20" y2="16" />
+      <line x1="20" y1="12" x2="20" y2="3" />
+      <line x1="1" y1="14" x2="7" y2="14" />
+      <line x1="9" y1="8" x2="15" y2="8" />
+      <line x1="17" y1="16" x2="23" y2="16" />
+    </svg>
+  );
+}
+
 /* ─── Product Tiers (Assault Fire PH Chams) ───────────────── */
 const TIERS = [
   {
@@ -169,24 +224,28 @@ const TIERS = [
 /* ─── FAQs ────────────────────────────────────────────────── */
 const FAQS = [
   {
+    q: "How do I control the features in-game?",
+    a: "Full control is accessed by pressing the [INSERT] key at any time while playing Assault Fire PH. This toggles the live VIP menu overlay, giving you instant on-the-fly toggles for Wallhack, Chams, Health bars, and 2D Box ESP.",
+  },
+  {
+    q: "What features are included in Chameleon VIP?",
+    a: "Chameleon VIP includes 4 primary modules: Direct Wallhack (silhouettes through all map terrain), Player Chams (dual-tone shading for visible vs. hidden enemies), Real-Time Health ESP (exact remaining HP bars), and Dynamic 2D Box ESP (precision target framing).",
+  },
+  {
     q: "Why do I need to log in with Discord before purchasing?",
     a: "Your license key and VIP role are securely attached to your Discord account. This ensures you can always recover your key and get automated update notifications.",
   },
   {
     q: "Does this work on the official Assault Fire PH client?",
-    a: "Yes. Our Chams and Wallhack are fully updated and tested on the official PlayPark Assault Fire PH server.",
-  },
-  {
-    q: "How do Chams work in Assault Fire PH?",
-    a: "Chams (chameleon textures) render player models in bright solid colors visible through walls. You can distinguish enemies behind cover (blue) versus in line-of-sight (red).",
+    a: "Yes. Our build is fully updated and verified for the official PlayPark Assault Fire PH server (Patch 2026.10).",
   },
   {
     q: "Will my Assault Fire account be banned?",
-    a: "Our build uses external memory virtualization that does not modify game files, keeping it 100% undetected by the game's security system.",
+    a: "Our build uses external memory virtualization that never writes to or modifies game process memory, keeping your PlayPark account 100% safe and undetected.",
   },
   {
     q: "What are the PC system requirements?",
-    a: "Works on Windows 10 and Windows 11 (64-bit). Compatible with all Intel and AMD processors and all graphics cards.",
+    a: "Works on Windows 10 and Windows 11 (64-bit). Fully compatible with Intel and AMD processors and all modern graphics cards with zero FPS impact.",
   },
 ];
 
@@ -211,6 +270,11 @@ export default function Home() {
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [isRefreshingOrder, setIsRefreshingOrder] = useState(false);
   const [orderError, setOrderError] = useState("");
+
+  // GCash Receipt Screenshot State
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [isDraggingReceipt, setIsDraggingReceipt] = useState(false);
 
   // License Key Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -517,6 +581,33 @@ export default function Home() {
     setIsGcashModalOpen(true);
   };
 
+  const handleReceiptFileChange = (file?: File | null) => {
+    if (!file) return;
+    const allowed = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!allowed.includes(file.type.toLowerCase())) {
+      setOrderError("Unsupported image format. Please upload PNG, JPG, or WEBP.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setOrderError("Receipt file exceeds 8MB limit. Please attach a compressed screenshot.");
+      return;
+    }
+
+    setOrderError("");
+    setReceiptFile(file);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setReceiptPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveReceipt = () => {
+    setReceiptFile(null);
+    setReceiptPreview(null);
+  };
+
   const handleSubmitGcashOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!discordUser) {
@@ -542,6 +633,8 @@ export default function Home() {
           reference_no: gcashRefNo.trim(),
           sender_name: senderName.trim(),
           currency: currency,
+          receipt_image: receiptPreview || undefined,
+          receipt_name: receiptFile ? receiptFile.name : undefined,
         }),
       });
 
@@ -555,6 +648,8 @@ export default function Home() {
         }
         setGcashRefNo("");
         setSenderName("");
+        setReceiptFile(null);
+        setReceiptPreview(null);
       }
     } catch (err: any) {
       setOrderError("Submission failed: " + err.message);
@@ -583,21 +678,21 @@ export default function Home() {
         <section className="hero">
           <div className="hero-content">
             <h1 className="hero-title">
-              Assault Fire PH Chams & Wallhack
+              Assault Fire PH VIP — Wallhack, Chams, Health &amp; 2D Box
             </h1>
 
             <p className="hero-desc">
-              Direct memory virtualization for Assault Fire Philippines. Undetected player silhouettes through every wall with zero frame-rate impact and instant Discord key delivery.
+              Direct memory virtualization for Assault Fire Philippines. Full in-game control via [INSERT] menu: Wallhack, dual-tone Chams, real-time Health ESP, and 2D Box tracking with zero frame-rate impact and instant Discord key delivery.
             </p>
 
             <div className="hero-buttons">
-              <a href="#pricing" className="btn-primary" id="hero-get-access">
-                <span>Get VIP Pass</span>
-                <span>↗</span>
-              </a>
-              <a href="#architecture" className="btn-secondary">
-                <span>Kernel Architecture</span>
+              <a href="#features" className="btn-primary" id="hero-get-access">
+                <span>View Features</span>
                 <span>↓</span>
+              </a>
+              <a href="#pricing" className="btn-secondary">
+                <span>VIP Pricing (₱500+)</span>
+                <span>↗</span>
               </a>
             </div>
           </div>
@@ -637,8 +732,10 @@ export default function Home() {
                 <div className="preview-meta-val">DirectX 9 Hookless</div>
               </div>
               <div className="preview-meta-item">
-                <div className="preview-meta-label">Render Mode</div>
-                <div className="preview-meta-val">Silhouette DWM</div>
+                <div className="preview-meta-label">In-Game Menu</div>
+                <div className="preview-meta-val">
+                  <kbd style={{ background: "#0f1c30", color: "#38bdf8", padding: "2px 7px", borderRadius: 4, border: "1px solid #1e355b", fontFamily: "monospace", fontSize: 11, fontWeight: 700 }}>INSERT</kbd>
+                </div>
               </div>
               <div className="preview-meta-item">
                 <div className="preview-meta-label">Status</div>
@@ -660,8 +757,8 @@ export default function Home() {
               <span>Zero Lag (60–240+ FPS Maintained)</span>
             </div>
             <div className="trust-item">
-              <IconDiscord size={18} />
-              <span>Instant Discord Bot Dispatch (&lt;1s)</span>
+              <IconSliders size={18} />
+              <span>Menu Controlled via [INSERT] Key</span>
             </div>
             <div className="trust-item">
               <IconCrosshair size={18} />
@@ -669,6 +766,126 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* ─── 2.5 Feature Arsenal: Wallhack, Chams, Health & 2D Box ─ */}
+        <section className="section" id="features">
+          <div className="features-container">
+            <div className="section-header-clean">
+              <h2 className="section-heading">
+                VIP Feature Arsenal
+              </h2>
+              <p className="section-subtext">
+                Four precision direct-memory modules engineered specifically for Assault Fire Philippines. Complete live control inside the game via interactive overlay.
+              </p>
+            </div>
+
+            {/* In-Game Menu Hotkey Banner */}
+            <div className="hotkey-control-banner">
+              <div className="hotkey-control-left">
+                <div className="hotkey-key-box">
+                  KEY: [INSERT]
+                </div>
+                <div className="hotkey-control-text">
+                  <h3>Full In-Game Menu Control — Press INSERT</h3>
+                  <p>
+                    Toggle the live configuration menu at any second during combat. Turn modules on/off, switch color schemes, and calibrate ESP visual parameters on the fly.
+                  </p>
+                </div>
+              </div>
+              <div className="hotkey-control-status">
+                <span className="live-pulse-dot" />
+                <span>Live Menu Hook Ready</span>
+              </div>
+            </div>
+
+            {/* 4 Feature Quad Cards */}
+            <div className="features-grid-quad">
+              {/* Card 1: Wallhack */}
+              <div className="feature-quad-card">
+                <div>
+                  <div className="feature-quad-top">
+                    <div className="feature-quad-icon-wrap">
+                      <IconEye size={22} />
+                    </div>
+                    <span className="feature-quad-badge">Memory Hookless</span>
+                  </div>
+                  <h3 className="feature-quad-title">Direct-Memory Wallhack</h3>
+                  <p className="feature-quad-desc">
+                    Reveals crystal-clear enemy player silhouettes through every solid wall, container, crate, and terrain barrier across all official Assault Fire maps with zero screen tear.
+                  </p>
+                </div>
+                <div className="feature-quad-specs">
+                  <span className="feature-quad-spec-pill">Full Map Penetration</span>
+                  <span className="feature-quad-spec-pill">Zero Visual Latency</span>
+                  <span className="feature-quad-spec-pill">OBS / Stream Proof</span>
+                </div>
+              </div>
+
+              {/* Card 2: Chams */}
+              <div className="feature-quad-card">
+                <div>
+                  <div className="feature-quad-top">
+                    <div className="feature-quad-icon-wrap">
+                      <IconCrosshair size={22} />
+                    </div>
+                    <span className="feature-quad-badge">Dual Shading</span>
+                  </div>
+                  <h3 className="feature-quad-title">Customizable Player Chams</h3>
+                  <p className="feature-quad-desc">
+                    High-contrast solid colored textures applied directly to enemy player models. Dynamically differentiates between enemies hidden behind cover and targets in direct line of fire.
+                  </p>
+                </div>
+                <div className="feature-quad-specs">
+                  <span className="feature-quad-spec-pill">Visible vs. Occluded</span>
+                  <span className="feature-quad-spec-pill">Team Identification</span>
+                  <span className="feature-quad-spec-pill">High-Contrast Glow</span>
+                </div>
+              </div>
+
+              {/* Card 3: Health ESP */}
+              <div className="feature-quad-card">
+                <div>
+                  <div className="feature-quad-top">
+                    <div className="feature-quad-icon-wrap">
+                      <IconHeart size={22} />
+                    </div>
+                    <span className="feature-quad-badge">Telemetry ESP</span>
+                  </div>
+                  <h3 className="feature-quad-title">Real-Time Health ESP</h3>
+                  <p className="feature-quad-desc">
+                    Live dynamic health indicators displayed alongside every enemy player. Accurately reveals exact enemy HP bars and damage readiness so you never walk into an ambush blind.
+                  </p>
+                </div>
+                <div className="feature-quad-specs">
+                  <span className="feature-quad-spec-pill">Live HP Bar Overlay</span>
+                  <span className="feature-quad-spec-pill">Armor Status Readout</span>
+                  <span className="feature-quad-spec-pill">Real-Time Sync</span>
+                </div>
+              </div>
+
+              {/* Card 4: 2D Box ESP */}
+              <div className="feature-quad-card">
+                <div>
+                  <div className="feature-quad-top">
+                    <div className="feature-quad-icon-wrap">
+                      <IconBox size={22} />
+                    </div>
+                    <span className="feature-quad-badge">Precision Framing</span>
+                  </div>
+                  <h3 className="feature-quad-title">Dynamic 2D Box ESP</h3>
+                  <p className="feature-quad-desc">
+                    Clean 2D bounding boxes dynamically calculated from target player matrices. Accurately frames enemy hitboxes and scales smoothly across any distance for lightning-fast crosshair placement.
+                  </p>
+                </div>
+                <div className="feature-quad-specs">
+                  <span className="feature-quad-spec-pill">Distance Auto-Scale</span>
+                  <span className="feature-quad-spec-pill">Hitbox Alignment</span>
+                  <span className="feature-quad-spec-pill">Anti-Clutter Filter</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ─── 3. Kernel Bypass Architecture (Substantive Blueprint) ─ */}
         <section className="section" id="architecture">
@@ -1290,6 +1507,84 @@ export default function Home() {
                       value={senderName}
                       onChange={(e) => setSenderName(e.target.value)}
                     />
+                  </div>
+
+                  {/* Proof of Payment / GCash Slip Upload */}
+                  <div className="gcash-form-group">
+                    <label className="gcash-form-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span>
+                        Proof of Payment Slip <span style={{ color: "#38bdf8", fontSize: 11, fontWeight: 500 }}>(Recommended)</span>
+                      </span>
+                      <span style={{ fontSize: 11, color: "#64748b" }}>PNG, JPG, WEBP</span>
+                    </label>
+
+                    {!receiptPreview ? (
+                      <div
+                        className={`gcash-receipt-dropzone ${isDraggingReceipt ? "active" : ""}`}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setIsDraggingReceipt(true);
+                        }}
+                        onDragLeave={() => setIsDraggingReceipt(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setIsDraggingReceipt(false);
+                          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            handleReceiptFileChange(e.dataTransfer.files[0]);
+                          }
+                        }}
+                        onClick={() => {
+                          const fileInput = document.getElementById("gcash-receipt-input");
+                          fileInput?.click();
+                        }}
+                      >
+                        <input
+                          id="gcash-receipt-input"
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          style={{ display: "none" }}
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              handleReceiptFileChange(e.target.files[0]);
+                            }
+                          }}
+                        />
+                        <IconUpload size={22} className="gcash-receipt-icon" />
+                        <span className="gcash-receipt-text">Click or drag &amp; drop GCash receipt slip</span>
+                        <span className="gcash-receipt-sub">Screenshot from your GCash or banking app</span>
+                      </div>
+                    ) : (
+                      <div className="gcash-receipt-preview-card">
+                        <div className="gcash-receipt-preview-left">
+                          <img
+                            src={receiptPreview}
+                            alt="Receipt preview"
+                            className="gcash-receipt-thumb"
+                          />
+                          <div className="gcash-receipt-info">
+                            <span className="gcash-receipt-filename">
+                              {receiptFile?.name || "gcash_slip.png"}
+                            </span>
+                            <div className="gcash-receipt-meta">
+                              <span className="gcash-receipt-badge">● Slip Attached</span>
+                              {receiptFile && (
+                                <span className="gcash-receipt-filesize">
+                                  ({(receiptFile.size / 1024).toFixed(0)} KB)
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-remove-receipt"
+                          onClick={handleRemoveReceipt}
+                          title="Remove receipt screenshot"
+                        >
+                          Remove ✕
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ fontSize: 11, color: "#64748b", margin: "10px 0 12px", display: "flex", alignItems: "center", gap: 6 }}>

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
@@ -14,7 +16,16 @@ const VALID_TIERS: Record<string, { duration: string; pricePhp: string; priceUsd
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { tier_id, discord_id, discord_username, reference_no, sender_name, currency = "PHP" } = body;
+    const {
+      tier_id,
+      discord_id,
+      discord_username,
+      reference_no,
+      sender_name,
+      currency = "PHP",
+      receipt_image,
+      receipt_name,
+    } = body;
 
     if (!discord_id || !discord_username) {
       return NextResponse.json({ success: false, error: "Discord authentication required" }, { status: 401 });
@@ -56,13 +67,66 @@ export async function POST(request: Request) {
     const order_token = `tok_${crypto.randomBytes(24).toString("hex")}`;
     const price = currency === "USD" ? tier.priceUsd : tier.pricePhp;
 
+    // Handle Optional Receipt Screenshot Upload
+    let receiptRelativeUrl: string | null = null;
+    let absoluteReceiptPath: string | null = null;
+
+    if (receipt_image && typeof receipt_image === "string") {
+      try {
+        const matches = receipt_image.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+        const mimeType = matches ? matches[1].toLowerCase() : "png";
+        const base64Data = matches ? matches[2] : receipt_image;
+        const buffer = Buffer.from(base64Data, "base64");
+
+        // Validate max 10MB
+        if (buffer.length <= 10 * 1024 * 1024) {
+          const ext = mimeType === "jpeg" || mimeType === "jpg" ? "jpg" : mimeType === "webp" ? "webp" : "png";
+          const receiptsDir = path.join(process.cwd(), "public", "receipts");
+          if (!fs.existsSync(receiptsDir)) {
+            fs.mkdirSync(receiptsDir, { recursive: true });
+          }
+
+          const fileName = `receipt_${order_id}.${ext}`;
+          absoluteReceiptPath = path.join(receiptsDir, fileName);
+          fs.writeFileSync(absoluteReceiptPath, buffer);
+          receiptRelativeUrl = `/receipts/${fileName}`;
+
+          // Update local manifest
+          try {
+            const manifestPath = path.join(receiptsDir, "manifest.json");
+            let manifest: Record<string, any> = {};
+            if (fs.existsSync(manifestPath)) {
+              manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+            }
+            manifest[order_id] = {
+              url: receiptRelativeUrl,
+              fileName,
+              originalName: receipt_name || null,
+              size: buffer.length,
+              createdAt: new Date().toISOString(),
+            };
+            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+          } catch (mErr) {
+            console.warn("Notice updating receipts manifest:", mErr);
+          }
+        }
+      } catch (uploadErr) {
+        console.warn("Notice processing receipt screenshot upload:", uploadErr);
+      }
+    }
+
+    const basePaymentMethod = "InstaPay / GCash (CCheats)";
+    const paymentMethodWithReceipt = receiptRelativeUrl
+      ? `${basePaymentMethod} [receipt:${receiptRelativeUrl}]`
+      : basePaymentMethod;
+
     const orderRecord = {
       order_id,
       discord_id: discord_id.trim(),
       discord_username: discord_username.trim(),
       tier: tier.duration,
       price: price,
-      payment_method: "InstaPay / GCash (CCheats)",
+      payment_method: paymentMethodWithReceipt,
       reference_no: cleanRef,
       sender_name: sender_name ? sender_name.trim() : null,
       status: "pending",
@@ -77,14 +141,17 @@ export async function POST(request: Request) {
 
     const finalOrder = data || orderRecord;
 
-    // Dispatch Discord Webhook Notification
-    sendOrderCreatedWebhook(finalOrder).catch((e) =>
+    // Dispatch Discord Webhook Notification (with receipt attachment if present)
+    sendOrderCreatedWebhook(finalOrder, absoluteReceiptPath).catch((e) =>
       console.warn("Order webhook notice:", e)
     );
 
     return NextResponse.json({
       success: true,
-      order: finalOrder,
+      order: {
+        ...finalOrder,
+        receipt_url: receiptRelativeUrl,
+      },
       order_token,
       message: "Order created and secured successfully",
     });
