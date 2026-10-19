@@ -1510,7 +1510,9 @@ export default function AdminPage() {
                       <span>{receiptZoom ? "Fit View" : "Zoom 100%"}</span>
                     </button>
                     <a
-                      href={selectedReceiptOrder.receipt_url}
+                      href={selectedReceiptOrder.receipt_url?.startsWith("data:image/")
+                        ? `/api/order/receipt-image?order_id=${selectedReceiptOrder.order_id}`
+                        : selectedReceiptOrder.receipt_url || "#"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="admin-receipt-toolbar-btn"
@@ -1527,9 +1529,16 @@ export default function AdminPage() {
                   title="Click to toggle zoom"
                 >
                   <img
-                    src={selectedReceiptOrder.receipt_url}
+                    src={selectedReceiptOrder.receipt_url || `/api/order/receipt-image?order_id=${selectedReceiptOrder.order_id}`}
                     alt={`GCash Slip ${selectedReceiptOrder.order_id}`}
                     className={receiptZoom ? "zoomed" : ""}
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      const fallback = `/api/order/receipt-image?order_id=${selectedReceiptOrder.order_id}`;
+                      if (!img.src.includes(fallback)) {
+                        img.src = fallback;
+                      }
+                    }}
                   />
                 </div>
               </div>

@@ -52,38 +52,25 @@ export async function POST(request: Request) {
     }
 
     const ext = mimeType === "jpeg" || mimeType === "jpg" ? "jpg" : mimeType === "webp" ? "webp" : "png";
-    const receiptsDir = path.join(process.cwd(), "public", "receipts");
-    if (!fs.existsSync(receiptsDir)) {
-      fs.mkdirSync(receiptsDir, { recursive: true });
-    }
+    const receiptDataUrl = receipt_image.startsWith("data:image/")
+      ? receipt_image
+      : `data:image/${mimeType};base64,${base64Clean}`;
 
-    const fileName = `receipt_${order_id}.${ext}`;
-    const absoluteReceiptPath = path.join(receiptsDir, fileName);
-    fs.writeFileSync(absoluteReceiptPath, buffer);
-    const receiptRelativeUrl = `/receipts/${fileName}`;
-
-    // Update manifest.json
+    // Write local copy if available
     try {
-      const manifestPath = path.join(receiptsDir, "manifest.json");
-      let manifest: Record<string, any> = {};
-      if (fs.existsSync(manifestPath)) {
-        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+      const fileName = `receipt_${order_id}.${ext}`;
+      const targetDir = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "public", "receipts");
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
       }
-      manifest[order_id] = {
-        url: receiptRelativeUrl,
-        fileName,
-        originalName: receipt_name || null,
-        size: buffer.length,
-        createdAt: new Date().toISOString(),
-      };
-      fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
-    } catch (mErr) {
-      console.warn("Notice updating manifest:", mErr);
+      fs.writeFileSync(path.join(targetDir, fileName), buffer);
+    } catch (fErr) {
+      console.warn("Notice writing receipt temp copy:", fErr);
     }
 
-    // Update database order payment_method tag
+    // Update database order payment_method tag with data URL
     const currentMethod = (orderData.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "");
-    const updatedMethod = `${currentMethod} [receipt:${receiptRelativeUrl}]`;
+    const updatedMethod = `${currentMethod} [receipt:${receiptDataUrl}]`;
 
     await supabase
       .from("orders")
@@ -93,7 +80,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: "Receipt attached successfully",
-      receipt_url: receiptRelativeUrl,
+      receipt_url: receiptDataUrl,
       order_id,
     });
   } catch (err: any) {

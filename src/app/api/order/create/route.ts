@@ -88,33 +88,23 @@ export async function POST(request: Request) {
         // Validate max 15MB
         if (buffer.length > 0 && buffer.length <= 15 * 1024 * 1024) {
           const ext = mimeType === "jpeg" || mimeType === "jpg" ? "jpg" : mimeType === "webp" ? "webp" : "png";
-          const receiptsDir = path.join(process.cwd(), "public", "receipts");
-          if (!fs.existsSync(receiptsDir)) {
-            fs.mkdirSync(receiptsDir, { recursive: true });
-          }
+          const receiptDataUrl = receipt_image.startsWith("data:image/")
+            ? receipt_image
+            : `data:image/${mimeType};base64,${base64Clean}`;
 
-          const fileName = `receipt_${order_id}.${ext}`;
-          absoluteReceiptPath = path.join(receiptsDir, fileName);
-          fs.writeFileSync(absoluteReceiptPath, buffer);
-          receiptRelativeUrl = `/receipts/${fileName}`;
+          receiptRelativeUrl = receiptDataUrl;
 
-          // Update local manifest
+          // Write local copy for Discord Webhook attachment (use /tmp on Vercel)
           try {
-            const manifestPath = path.join(receiptsDir, "manifest.json");
-            let manifest: Record<string, any> = {};
-            if (fs.existsSync(manifestPath)) {
-              manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+            const fileName = `receipt_${order_id}.${ext}`;
+            const targetDir = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "public", "receipts");
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
             }
-            manifest[order_id] = {
-              url: receiptRelativeUrl,
-              fileName,
-              originalName: receipt_name || null,
-              size: buffer.length,
-              createdAt: new Date().toISOString(),
-            };
-            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
-          } catch (mErr) {
-            console.warn("Notice updating receipts manifest:", mErr);
+            absoluteReceiptPath = path.join(targetDir, fileName);
+            fs.writeFileSync(absoluteReceiptPath, buffer);
+          } catch (fErr) {
+            console.warn("Notice writing receipt temp file:", fErr);
           }
         }
       } catch (uploadErr) {

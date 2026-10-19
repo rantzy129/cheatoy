@@ -1030,7 +1030,7 @@ export default function ProfilePage() {
                                       }}
                                     />
                                   </label>
-                                  {attachStatus?.id === order.order_id && (
+                                  {attachStatus && attachStatus.id === order.order_id && (
                                     <span style={{ display: "block", fontSize: 10, color: attachStatus.isError ? "#ef4444" : "#38bdf8", marginTop: 2 }}>
                                       {attachStatus.msg}
                                     </span>

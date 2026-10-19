@@ -49,7 +49,12 @@ export async function GET(request: Request) {
       // 1. Check embedded tag in payment_method
       const match = (order.payment_method || "").match(/\[receipt:(.*?)\]/);
       if (match && match[1]) {
-        receiptUrl = match[1];
+        const rawUrl = match[1];
+        if (rawUrl.startsWith("/receipts/") && !fs.existsSync(path.join(receiptsDir, path.basename(rawUrl)))) {
+          receiptUrl = `/api/order/receipt-image?order_id=${order.order_id}`;
+        } else {
+          receiptUrl = rawUrl;
+        }
       }
 
       // 2. Check manifest
