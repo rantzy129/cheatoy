@@ -133,6 +133,13 @@ export default function ProfilePage() {
 
   // Referral State
   const [isRefCopied, setIsRefCopied] = useState(false);
+  const [referralHistory, setReferralHistory] = useState<any[]>([]);
+  const [referralStats, setReferralStats] = useState({
+    total_referrals: 0,
+    approved_referrals: 0,
+    total_reward_days_earned: 0,
+  });
+  const [isLoadingReferrals, setIsLoadingReferrals] = useState(false);
 
   const getReferralUrl = () => {
     if (typeof window === "undefined" || !discordUser) return "";
@@ -146,6 +153,26 @@ export default function ProfilePage() {
       navigator.clipboard.writeText(url);
       setIsRefCopied(true);
       setTimeout(() => setIsRefCopied(false), 2500);
+    }
+  };
+
+  const fetchReferralHistory = async (user: DiscordUser) => {
+    setIsLoadingReferrals(true);
+    try {
+      const res = await fetch(
+        `/api/profile/referrals?username=${encodeURIComponent(user.username)}&id=${encodeURIComponent(user.id || "")}`
+      );
+      const data = await res.json();
+      if (data.success && Array.isArray(data.referrals)) {
+        setReferralHistory(data.referrals);
+        if (data.stats) {
+          setReferralStats(data.stats);
+        }
+      }
+    } catch (e) {
+      console.warn("Notice fetching referral history:", e);
+    } finally {
+      setIsLoadingReferrals(false);
     }
   };
 
@@ -311,6 +338,8 @@ export default function ProfilePage() {
           });
         }
       }
+      // Also fetch user's referral history
+      fetchReferralHistory(user);
     } catch (err) {
       console.warn("Notice fetching profile data:", err);
     } finally {
@@ -1052,6 +1081,141 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+
+            {/* 2.6 REFERRAL HISTORY & INVITED CLANMATES */}
+            <section className="vault-orders-card" aria-label="Referral History" style={{ borderTop: "2px solid #ec4899", marginBottom: 28 }}>
+              <div className="vault-card-head">
+                <div className="vault-card-title">
+                  <span style={{ fontSize: 16 }}>🎁</span>
+                  <span>Clanmates Invited &amp; Referral Rewards</span>
+                </div>
+                <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12, color: "#94a3b8" }}>
+                    Total Invited: <strong style={{ color: "#ffffff" }}>{referralStats.total_referrals}</strong>
+                  </span>
+                  <span style={{ fontSize: 12, color: "#ec4899", fontWeight: 700 }}>
+                    Earned: +{referralStats.total_reward_days_earned} Free VIP Days
+                  </span>
+                </div>
+              </div>
+
+              {isLoadingReferrals ? (
+                <div style={{ textAlign: "center", padding: "24px", color: "#64748b", fontSize: 13 }}>
+                  Loading referral history...
+                </div>
+              ) : referralHistory.length > 0 ? (
+                <div className="vault-orders-table-wrapper">
+                  <table className="vault-table">
+                    <thead>
+                      <tr>
+                        <th>Clanmate</th>
+                        <th>VIP Pass Tier</th>
+                        <th>Amount</th>
+                        <th>Purchase Date</th>
+                        <th>Verification Status</th>
+                        <th style={{ textAlign: "right" }}>Your Reward</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {referralHistory.map((item) => (
+                        <tr key={item.id || item.order_id}>
+                          <td>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <div style={{
+                                width: 24,
+                                height: 24,
+                                borderRadius: "50%",
+                                background: "rgba(236, 72, 153, 0.2)",
+                                color: "#f472b6",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: 800,
+                                fontSize: 11
+                              }}>
+                                {item.clanmate_username?.charAt(0).toUpperCase()}
+                              </div>
+                              <span style={{ fontWeight: 700, color: "#f1f5f9" }}>
+                                @{item.clanmate_username}
+                              </span>
+                            </div>
+                          </td>
+                          <td style={{ fontWeight: 600, color: "#cbd5e1" }}>
+                            {item.tier}
+                          </td>
+                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                            {formatOrderPrice(item.price, item.tier)}
+                          </td>
+                          <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
+                            {new Date(item.created_at).toLocaleDateString()}
+                          </td>
+                          <td>
+                            {item.status === "approved" ? (
+                              <span className="subscription-status-badge status-active-pill" style={{ fontSize: 11, padding: "3px 8px" }}>
+                                ● Verified &amp; Credited
+                              </span>
+                            ) : item.status === "pending" ? (
+                              <span style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                background: "rgba(245, 158, 11, 0.12)",
+                                border: "1px solid rgba(245, 158, 11, 0.3)",
+                                color: "#f59e0b",
+                                padding: "3px 8px",
+                                borderRadius: 9999,
+                                fontSize: 11,
+                                fontWeight: 600
+                              }}>
+                                ● Pending Review
+                              </span>
+                            ) : (
+                              <span style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                background: "rgba(239, 68, 68, 0.12)",
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                color: "#ef4444",
+                                padding: "3px 8px",
+                                borderRadius: 9999,
+                                fontSize: 11,
+                                fontWeight: 600
+                              }}>
+                                ● Rejected
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            {item.status === "approved" ? (
+                              <span style={{ color: "#10b981", fontWeight: 800, fontSize: 13 }}>
+                                +{item.reward_days} Free Day{item.reward_days !== 1 ? "s" : ""}
+                              </span>
+                            ) : item.status === "pending" ? (
+                              <span style={{ color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>
+                                +{item.potential_reward_days} Days (Pending)
+                              </span>
+                            ) : (
+                              <span style={{ color: "#64748b", fontSize: 12 }}>—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "28px 16px", color: "#64748b", fontSize: 13 }}>
+                  <div style={{ fontSize: 24, marginBottom: 8 }}>🎁</div>
+                  <div style={{ color: "#94a3b8", fontWeight: 600, marginBottom: 4 }}>
+                    No clanmate referral purchases yet
+                  </div>
+                  <div>
+                    Share your unique referral link above in clan chats &amp; Facebook groups to earn free VIP days!
+                  </div>
+                </div>
+              )}
+            </section>
 
             {/* 3. ORDER & PAYMENT HISTORY */}
             <section className="vault-orders-card" aria-label="Order History">
