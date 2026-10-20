@@ -251,9 +251,50 @@ const FAQS = [
   },
 ];
 
+/* ─── Real In-Game Proofs & Showcase Assets ─────────────── */
+const PROOFS = [
+  {
+    id: "combat",
+    title: "In-Game Combat ESP & Wallhack",
+    badge: "Live Match Capture",
+    src: "/proofs/proof-1.png",
+    alt: "Assault Fire PH live in-game combat showing Cham Wallhack, Snaplines, and 2D Box ESP",
+    desc: "Unfiltered combat capture on official container ship map. Shows enemy player chams, directional snaplines, 2D boxes, and player name/weapon tags.",
+    specs: ["Enemy Wallhack Chams", "Live HP & Weapon Tags", "Directional Snaplines", "Minimap Radar Sync"],
+    engine: "DirectX 9 Hookless",
+    hud: "Ranger HP 100 • Ammo 15/30",
+  },
+  {
+    id: "menu",
+    title: "Live In-Game VIP Menu Overlay",
+    badge: "Hotkey: [INSERT]",
+    src: "/proofs/proof2.png",
+    alt: "Chameleon VIP live in-game DirectX menu overlay for Assault Fire PH",
+    desc: "DirectX ImGui menu overlay toggled instantly during combat with the [INSERT] key. Full live control for chams colors, 2D boxes, health bars, and snaplines.",
+    specs: ["Instant [INSERT] Toggle", "Skyblue Chams Shading", "Customizable Snaplines", "Zero FPS Drop"],
+    engine: "Overlay Hookless",
+    hud: "Live Visual Menu",
+  },
+  {
+    id: "lobby",
+    title: "Lobby Chams Shader Verification",
+    badge: "PlayPark Client",
+    src: "/proof.png",
+    alt: "PlayPark Assault Fire PH lobby character screen with active Chameleon chams",
+    desc: "High-contrast character chams shader running cleanly on official PlayPark Assault Fire PH client with zero file modifications.",
+    specs: ["Dual-Tone Shading", "Zero File Modification", "PlayPark 2026.10 Ready", "Undetected Virtualizer"],
+    engine: "PlayPark Verified",
+    hud: "Lobby Silhouette",
+  },
+];
+
 export default function Home() {
   const [selectedTier, setSelectedTier] = useState(TIERS[0]); // 3 Days default (₱150)
   const currency = "PHP";
+
+  // Proofs Showcase State
+  const [activeHeroProof, setActiveHeroProof] = useState(0);
+  const [lightboxProof, setLightboxProof] = useState<typeof PROOFS[0] | null>(null);
 
   // Discord Auth State
   const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
@@ -787,7 +828,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ─── In-Game Verification Preview (Real Subject Asset) ── */}
+          {/* ─── In-Game Verification Preview (Real Subject Asset Switcher) ── */}
           <div className="hero-preview-box">
             <div className="preview-header">
               <span className="preview-title">
@@ -798,28 +839,49 @@ export default function Home() {
                   height={20}
                   className="game-logo-tag"
                 />
-                <span>Assault Fire PH • In-Game Proof</span>
+                <span>Assault Fire PH • In-Game Proofs</span>
               </span>
               <span className="preview-status">
                 <span className="status-dot" /> Live Verified
               </span>
             </div>
 
-            <div className="showcase-frame">
+            {/* Proof Selector Tabs */}
+            <div className="hero-proof-selector" role="tablist" aria-label="Proof Switcher">
+              {PROOFS.map((p, idx) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`hero-proof-tab-btn ${activeHeroProof === idx ? "active" : ""}`}
+                  onClick={() => setActiveHeroProof(idx)}
+                >
+                  <span>{idx === 0 ? "1. Combat ESP & Chams" : idx === 1 ? "2. VIP Menu [INSERT]" : "3. Lobby Chams"}</span>
+                </button>
+              ))}
+            </div>
+
+            <div
+              className="showcase-frame clickable-showcase-frame"
+              onClick={() => setLightboxProof(PROOFS[activeHeroProof])}
+              title="Click to inspect full resolution image"
+            >
               <Image
-                src="/proof.png"
-                alt="Assault Fire PH Chams in-game proof showcase showing glowing character model"
+                src={PROOFS[activeHeroProof].src}
+                alt={PROOFS[activeHeroProof].alt}
                 width={640}
                 height={360}
                 className="showcase-img"
                 priority
               />
+              <div className="showcase-zoom-overlay">
+                <span>🔍 Click to inspect Full HD</span>
+              </div>
             </div>
 
             <div className="preview-meta-grid">
               <div className="preview-meta-item">
-                <div className="preview-meta-label">Game Engine</div>
-                <div className="preview-meta-val">DirectX 9 Hookless</div>
+                <div className="preview-meta-label">Module Mode</div>
+                <div className="preview-meta-val">{PROOFS[activeHeroProof].engine}</div>
               </div>
               <div className="preview-meta-item">
                 <div className="preview-meta-label">In-Game Menu</div>
@@ -828,8 +890,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="preview-meta-item">
-                <div className="preview-meta-label">Status</div>
-                <div className="preview-meta-val" style={{ color: "#10b981" }}>Undetected ●</div>
+                <div className="preview-meta-label">Telemetry</div>
+                <div className="preview-meta-val" style={{ color: "#10b981" }}>{PROOFS[activeHeroProof].hud}</div>
               </div>
             </div>
           </div>
@@ -974,6 +1036,55 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ─── 2.8 In-Game Proofs & Live Capture Showcase ─────── */}
+        <section className="section" id="proofs">
+          <div className="section-header-clean">
+            <h2 className="section-heading">
+              In-Game Combat Proofs &amp; Live Capture
+            </h2>
+            <p className="section-subtext">
+              Unfiltered screenshots captured live on official PlayPark Assault Fire Philippines servers. Click any capture to inspect high-resolution HUD telemetry and in-game VIP menu overlays.
+            </p>
+          </div>
+
+          <div className="proofs-gallery-grid">
+            {PROOFS.map((proof) => (
+              <div key={proof.id} className="proof-card">
+                <div
+                  className="proof-card-media"
+                  onClick={() => setLightboxProof(proof)}
+                  title="Click to view full resolution"
+                >
+                  <Image
+                    src={proof.src}
+                    alt={proof.alt}
+                    width={560}
+                    height={315}
+                    className="proof-card-img"
+                  />
+                  <div className="proof-card-zoom-badge">
+                    <span>🔍 Full HD</span>
+                  </div>
+                  <span className="proof-card-badge">{proof.badge}</span>
+                </div>
+
+                <div className="proof-card-body">
+                  <h3 className="proof-card-title">{proof.title}</h3>
+                  <p className="proof-card-desc">{proof.desc}</p>
+
+                  <div className="proof-card-specs">
+                    {proof.specs.map((spec, sIdx) => (
+                      <span key={sIdx} className="proof-spec-pill">
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -1971,6 +2082,53 @@ export default function Home() {
               >
                 Log Out
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Lightbox Modal for Full Resolution Proof Inspection ── */}
+      {lightboxProof && (
+        <div
+          className="lightbox-overlay"
+          onClick={() => setLightboxProof(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightboxProof.title}
+        >
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <div className="lightbox-header">
+              <div className="lightbox-title-wrap">
+                <span className="lightbox-title">{lightboxProof.title}</span>
+                <span className="lightbox-badge">{lightboxProof.badge}</span>
+              </div>
+              <button
+                type="button"
+                className="lightbox-close-btn"
+                onClick={() => setLightboxProof(null)}
+                aria-label="Close image viewer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="lightbox-image-wrap">
+              <img
+                src={lightboxProof.src}
+                alt={lightboxProof.alt}
+                className="lightbox-full-img"
+              />
+            </div>
+
+            <div className="lightbox-footer">
+              <p className="lightbox-desc">{lightboxProof.desc}</p>
+              <div className="lightbox-specs">
+                {lightboxProof.specs.map((spec, idx) => (
+                  <span key={idx} className="proof-spec-pill">
+                    {spec}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

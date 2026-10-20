@@ -894,6 +894,20 @@ export default function ProfilePage() {
                       <div className="vault-keybinds-row">
                         <span>Menu keybind:</span>
                         <kbd>INSERT</kbd>
+                        <span style={{ color: "#94a3b8", marginLeft: "auto", fontSize: 11 }}>
+                          Toggles In-Game VIP Overlay
+                        </span>
+                      </div>
+
+                      {/* Real In-Game Menu Capture */}
+                      <div style={{ marginTop: 12, borderRadius: 6, overflow: "hidden", border: "1px solid var(--border-subtle)", background: "#000000" }}>
+                        <Image
+                          src="/proofs/proof2.png"
+                          alt="Chameleon VIP in-game menu overlay preview"
+                          width={480}
+                          height={270}
+                          style={{ width: "100%", height: "auto", display: "block" }}
+                        />
                       </div>
                     </div>
                   </div>
