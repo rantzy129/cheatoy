@@ -448,7 +448,7 @@ export default function Home() {
             .from("licenses")
             .update({ discord_id: user.id })
             .eq("id", licData[0].id)
-            .then(() => {});
+            .then(() => { });
         }
       }
 
@@ -1876,8 +1876,8 @@ export default function Home() {
                       {isSubmittingOrder
                         ? "Submitting Order..."
                         : isProcessingReceipt
-                        ? "Optimizing Slip..."
-                        : "Submit Payment for Admin Approval"}
+                          ? "Optimizing Slip..."
+                          : "Submit Payment for Admin Approval"}
                     </span>
                     <IconArrowUpRight size={15} />
                   </button>
@@ -2005,7 +2005,7 @@ export default function Home() {
                   style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
                   id="download-loader-home-btn"
                 >
-                  <span>Download Loader v1.0.1</span>
+                  <span>Download Loader v1.0.2</span>
                   <IconArrowUpRight size={16} />
                 </a>
               </div>
