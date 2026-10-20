@@ -131,6 +131,24 @@ export default function ProfilePage() {
   const [attachingOrderId, setAttachingOrderId] = useState<string | null>(null);
   const [attachStatus, setAttachStatus] = useState<{ id: string; msg: string; isError?: boolean } | null>(null);
 
+  // Referral State
+  const [isRefCopied, setIsRefCopied] = useState(false);
+
+  const getReferralUrl = () => {
+    if (typeof window === "undefined" || !discordUser) return "";
+    const handle = discordUser.username || discordUser.id || "";
+    return `${window.location.origin}/?ref=${encodeURIComponent(handle)}`;
+  };
+
+  const handleCopyReferralUrl = () => {
+    const url = getReferralUrl();
+    if (url) {
+      navigator.clipboard.writeText(url);
+      setIsRefCopied(true);
+      setTimeout(() => setIsRefCopied(false), 2500);
+    }
+  };
+
 
   const formatOrderPrice = (price?: string | null, tier?: string) => {
     if (!price) {
@@ -949,6 +967,83 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+
+            {/* 2.5 CLANMATE REFERRAL & AFFILIATE REWARDS */}
+            <div className="vault-referral-card">
+              <div className="vault-referral-badge">
+                <span>🎁 Referral &amp; Affiliate Program</span>
+              </div>
+
+              <div className="vault-referral-grid">
+                <div>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
+                    Invite Clanmates &amp; Earn +3 Free VIP Days
+                  </h3>
+                  <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, margin: 0 }}>
+                    Share your unique referral link in clan chats, Discord servers, and Facebook groups.
+                    Every time a player buys any pass through your link, both of you get rewarded!
+                  </p>
+
+                  <div className="vault-referral-perks">
+                    <div className="vault-referral-perk-row">
+                      <div className="vault-referral-perk-icon">1</div>
+                      <div>
+                        <strong style={{ color: "#38bdf8" }}>Buyer gets +1 Bonus Day:</strong>
+                        <span style={{ color: "#94a3b8", marginLeft: 4 }}>
+                          Extra 24 hours added onto any pass they purchase (3D, 7D, 15D, 1M).
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="vault-referral-perk-row">
+                      <div className="vault-referral-perk-icon">3</div>
+                      <div>
+                        <strong style={{ color: "#f472b6" }}>You earn +3 Free VIP Days:</strong>
+                        <span style={{ color: "#94a3b8", marginLeft: 4 }}>
+                          Automatically extended onto your active license upon order approval.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="vault-referral-link-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#f1f5f9" }}>
+                      Your Unique Referral Link
+                    </span>
+                    <span style={{ fontSize: 11, color: "#ec4899", fontWeight: 600 }}>
+                      @{discordUser.username}
+                    </span>
+                  </div>
+
+                  <div className="vault-referral-input-group">
+                    <input
+                      type="text"
+                      readOnly
+                      value={getReferralUrl()}
+                      className="vault-referral-input"
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                      aria-label="Your Referral Link"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCopyReferralUrl}
+                      className="btn-vault-copy-ref"
+                      title="Copy referral link to clipboard"
+                    >
+                      <IconCopy size={13} />
+                      <span>{isRefCopied ? "Copied!" : "Copy Link"}</span>
+                    </button>
+                  </div>
+
+                  <div className="vault-referral-hint">
+                    <span>💡 Unlimited rewards</span>
+                    <span style={{ color: "#cbd5e1" }}>Share in AF clan GC &amp; FB groups</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* 3. ORDER & PAYMENT HISTORY */}
             <section className="vault-orders-card" aria-label="Order History">

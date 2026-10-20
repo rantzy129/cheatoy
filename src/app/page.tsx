@@ -287,6 +287,9 @@ export default function Home() {
   const [isModalKeyRevealed, setIsModalKeyRevealed] = useState(false);
   const [isModalKeyCopied, setIsModalKeyCopied] = useState(false);
 
+  // Referral / Affiliate State
+  const [referrerCode, setReferrerCode] = useState<string | null>(null);
+
   const getMaskedKey = (key?: string) => {
     if (!key) return "••••-••••-••••-••••";
     const parts = key.split("-");
@@ -472,6 +475,21 @@ export default function Home() {
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get("code");
+
+      // Detect and persist referral affiliate code (?ref=username)
+      const refParam = searchParams.get("ref");
+      if (refParam) {
+        const clean = refParam.trim().replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 32);
+        if (clean) {
+          localStorage.setItem("af_referrer", clean);
+          setReferrerCode(clean);
+        }
+      } else {
+        const savedRef = localStorage.getItem("af_referrer");
+        if (savedRef) {
+          setReferrerCode(savedRef);
+        }
+      }
 
       if (code && supabase) {
         supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
@@ -706,6 +724,7 @@ export default function Home() {
           currency: currency,
           receipt_image: receiptPreview || undefined,
           receipt_name: receiptFile ? receiptFile.name : undefined,
+          referred_by: referrerCode || undefined,
         }),
       });
 
@@ -1100,6 +1119,29 @@ export default function Home() {
 
             {/* Single Product Checkout Box */}
             <div className="checkout-box">
+              {referrerCode && (
+                <div style={{
+                  background: "rgba(16, 185, 129, 0.12)",
+                  border: "1px solid rgba(16, 185, 129, 0.35)",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  marginBottom: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}>
+                  <span style={{ fontSize: 18 }}>🎁</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#34d399" }}>
+                      Referral Perk Active: Invited by @{referrerCode}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                      You will receive <strong style={{ color: "#34d399" }}>+1 Extra Bonus Day</strong> added to your VIP pass at checkout!
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="checkout-box-top">
                 <div className="checkout-header-left">
                   <Image
@@ -1541,6 +1583,27 @@ export default function Home() {
                   </div>
                   <span className="gcash-amount-val">{currentPrice}</span>
                 </div>
+
+                {referrerCode && (
+                  <div style={{
+                    background: "rgba(16, 185, 129, 0.1)",
+                    border: "1px solid rgba(16, 185, 129, 0.3)",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    marginTop: 8,
+                    marginBottom: 12,
+                    fontSize: 12,
+                    color: "#34d399",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}>
+                    <span>🎁</span>
+                    <span>
+                      <strong>Referral Applied:</strong> +1 Bonus Day included (Invited by <b>@{referrerCode}</b>)
+                    </span>
+                  </div>
+                )}
 
                 <div className="gcash-qr-box">
                   <Image

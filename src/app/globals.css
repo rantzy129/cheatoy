@@ -2891,6 +2891,147 @@ a {
   font-size: 11px;
 }
 
+/* Referral & Affiliate Rewards Card */
+.vault-referral-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(168, 85, 247, 0.06) 50%, rgba(6, 11, 25, 0.95) 100%), var(--bg-surface-1);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(236, 72, 153, 0.2);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.vault-referral-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ec4899, #a855f7, #3b82f6);
+}
+
+.vault-referral-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f472b6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.vault-referral-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .vault-referral-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.vault-referral-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.vault-referral-perk-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.vault-referral-perk-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vault-referral-link-box {
+  background: rgba(10, 16, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vault-referral-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  border-radius: 6px;
+  padding: 5px 6px 5px 12px;
+}
+
+.vault-referral-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 12.5px;
+  width: 100%;
+}
+
+.btn-vault-copy-ref {
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-vault-copy-ref:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.vault-referral-hint {
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* Orders History Section */
 .vault-orders-card {
   background: var(--bg-surface-1);

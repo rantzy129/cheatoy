@@ -73,10 +73,17 @@ export async function GET(request: Request) {
         }
       }
 
+      const refMatch = (order.payment_method || "").match(/\[ref:(.*?)\]/);
+      const referredBy = refMatch && refMatch[1] ? refMatch[1].trim() : null;
+
       return {
         ...order,
         receipt_url: receiptUrl,
-        payment_method: (order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, ""),
+        referred_by: referredBy,
+        payment_method: (order.payment_method || "InstaPay / GCash")
+          .replace(/\s*\[receipt:.*?\]/, "")
+          .replace(/\s*\[ref:.*?\]/, "")
+          .trim(),
       };
     });
 

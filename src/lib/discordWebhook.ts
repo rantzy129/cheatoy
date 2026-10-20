@@ -183,6 +183,12 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFi
         value: receiptFilePath ? "✅ **Screenshot Slip Attached**" : "⚠️ *No screenshot uploaded (Manual Ref)*",
         inline: true,
       },
+      ...((() => {
+        const refMatch = (order.payment_method || "").match(/\[ref:(.*?)\]/);
+        return refMatch && refMatch[1]
+          ? [{ name: "Referral Affiliate", value: `🎁 Invited by **@${refMatch[1]}** *(+1 Day applied to pass)*`, inline: true }]
+          : [];
+      })()),
     ],
     footer: {
       text: "Chameleon Cheats Order Vault • Assault Fire PH VIP",
@@ -204,53 +210,64 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFi
 export async function sendOrderApprovedWebhook(
   order: OrderWebhookData,
   licenseKey: string,
-  expiresAt: string | null
+  expiresAt: string | null,
+  referralReward?: { rewarded: boolean; referrer?: string; daysAdded?: number } | null
 ) {
   const expiryDisplay = expiresAt
     ? `<t:${Math.floor(new Date(expiresAt).getTime() / 1000)}:R> (${new Date(expiresAt).toLocaleDateString()})`
     : "♾️ **Permanent Lifetime Access**";
 
+  const fields: any[] = [
+    {
+      name: "Order ID",
+      value: `\`${order.order_id}\``,
+      inline: true,
+    },
+    {
+      name: "VIP Tier",
+      value: `**${order.tier}**`,
+      inline: true,
+    },
+    {
+      name: "Customer",
+      value: `<@${order.discord_id}> (@${order.discord_username})`,
+      inline: true,
+    },
+    {
+      name: "Generated License Key",
+      value: `\`\`\`${licenseKey}\`\`\``,
+      inline: false,
+    },
+    {
+      name: "Reference No.",
+      value: `\`${order.reference_no}\``,
+      inline: true,
+    },
+    {
+      name: "Subscription Validity",
+      value: expiryDisplay,
+      inline: true,
+    },
+    {
+      name: "Account Status",
+      value: "🟢 **VIP Active**",
+      inline: true,
+    },
+  ];
+
+  if (referralReward?.referrer) {
+    fields.push({
+      name: "🎁 Referral Bonus Credited",
+      value: `• **Buyer (@${order.discord_username})**: +1 Bonus Day added to license\n• **Referrer (@${referralReward.referrer})**: +3 Free Days extended on license!`,
+      inline: false,
+    });
+  }
+
   const embed = {
     title: "✅ Order Approved & License Key Minted",
     description: `Payment confirmed. VIP license key has been bound to customer's Discord account.`,
     color: 0x10b981, // Emerald Green
-    fields: [
-      {
-        name: "Order ID",
-        value: `\`${order.order_id}\``,
-        inline: true,
-      },
-      {
-        name: "VIP Tier",
-        value: `**${order.tier}**`,
-        inline: true,
-      },
-      {
-        name: "Customer",
-        value: `<@${order.discord_id}> (@${order.discord_username})`,
-        inline: true,
-      },
-      {
-        name: "Generated License Key",
-        value: `\`\`\`${licenseKey}\`\`\``,
-        inline: false,
-      },
-      {
-        name: "Reference No.",
-        value: `\`${order.reference_no}\``,
-        inline: true,
-      },
-      {
-        name: "Subscription Validity",
-        value: expiryDisplay,
-        inline: true,
-      },
-      {
-        name: "Account Status",
-        value: "🟢 **VIP Active**",
-        inline: true,
-      },
-    ],
+    fields,
     footer: {
       text: "Chameleon Cheats Security Gateway • Key Mint Log",
     },

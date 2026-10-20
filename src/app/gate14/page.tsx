@@ -219,6 +219,7 @@ interface Order {
   created_at: string;
   approved_at?: string;
   receipt_url?: string | null;
+  referred_by?: string | null;
 }
 
 interface License {
@@ -432,6 +433,10 @@ export default function AdminPage() {
             : prev
         );
         fetchLicenses();
+
+        if (data.referral_reward?.referrer) {
+          alert(`🎉 Order Approved!\nLicense Key: ${data.license_key}\n\n🎁 Clanmate Referral Credited:\nReferrer: @${data.referral_reward.referrer} earned +3 Free VIP Days!\nBuyer: @${order.discord_username} received +1 Bonus Day.`);
+        }
 
         if (data.discord_bot) {
           const { roleAssigned, dmSent, roleError, dmError } = data.discord_bot;
@@ -1043,6 +1048,11 @@ export default function AdminPage() {
                               <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 13 }}>
                                 {order.price}
                               </div>
+                              {order.referred_by && (
+                                <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 11, color: "#ec4899", background: "rgba(236, 72, 153, 0.12)", border: "1px solid rgba(236, 72, 153, 0.3)", borderRadius: 4, padding: "2px 6px", fontWeight: 600 }}>
+                                  <span>🎁 Ref: @{order.referred_by}</span>
+                                </div>
+                              )}
                             </td>
 
                             <td>
@@ -1553,6 +1563,18 @@ export default function AdminPage() {
                       {selectedReceiptOrder.tier}
                     </span>
                   </div>
+
+                  {selectedReceiptOrder.referred_by && (
+                    <div className="admin-receipt-detail-item" style={{ background: "rgba(236, 72, 153, 0.08)", padding: "10px", borderRadius: 6, border: "1px solid rgba(236, 72, 153, 0.25)" }}>
+                      <span className="admin-receipt-detail-label" style={{ color: "#f472b6" }}>🎁 Clanmate Referral</span>
+                      <div style={{ marginTop: 3, fontSize: 13, color: "#ffffff", fontWeight: 600 }}>
+                        Referred by: @{selectedReceiptOrder.referred_by}
+                      </div>
+                      <div style={{ fontSize: 11, color: "#cbd5e1", marginTop: 2 }}>
+                        Perk: Buyer gets +1 Bonus Day. Upon approval, Referrer (@{selectedReceiptOrder.referred_by}) earns +3 Free VIP Days.
+                      </div>
+                    </div>
+                  )}
 
                   <div className="admin-receipt-detail-item">
                     <span className="admin-receipt-detail-label">Amount Due / Sent</span>

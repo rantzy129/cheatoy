@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       currency = "PHP",
       receipt_image,
       receipt_name,
+      referred_by,
     } = body;
 
     if (!discord_id || !discord_username) {
@@ -114,9 +115,20 @@ export async function POST(request: Request) {
     }
 
     const basePaymentMethod = "InstaPay / GCash (CCheats)";
-    const paymentMethodWithReceipt = receiptRelativeUrl
+    let paymentMethodWithReceipt = receiptRelativeUrl
       ? `${basePaymentMethod} [receipt:${receiptRelativeUrl}]`
       : basePaymentMethod;
+
+    // Attach referral credit tag if buyer was invited by another member
+    let cleanReferrer: string | null = null;
+    if (referred_by && typeof referred_by === "string") {
+      const sanitized = referred_by.trim().replace(/[\[\]]/g, "").slice(0, 32);
+      const buyerHandle = discord_username.toLowerCase().trim();
+      if (sanitized && sanitized.toLowerCase() !== buyerHandle && sanitized.toLowerCase() !== discord_id.toLowerCase().trim()) {
+        cleanReferrer = sanitized;
+        paymentMethodWithReceipt = `${paymentMethodWithReceipt} [ref:${cleanReferrer}]`;
+      }
+    }
 
     const orderRecord = {
       order_id,
