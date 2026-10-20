@@ -194,36 +194,31 @@ const TIERS = [
   {
     id: "3days",
     duration: "3 Days Pass",
-    priceUsd: "$2.99",
     pricePhp: "₱150",
     desc: "Quick weekend trial to test out undetected chams",
   },
   {
     id: "7days",
     duration: "7 Days Pass",
-    priceUsd: "$5.99",
     pricePhp: "₱300",
     desc: "Starter access for weekly matches & ranked climbing",
   },
   {
     id: "15days",
     duration: "15 Days Pass",
-    priceUsd: "$10.99",
     pricePhp: "₱550",
     desc: "Popular mid-tier pass for competitive play",
   },
   {
     id: "month",
     duration: "1 Month Pass",
-    priceUsd: "$16.99",
     pricePhp: "₱850",
     desc: "Best monthly value with priority updates",
   },
   {
     id: "lifetime",
     duration: "Lifetime VIP",
-    priceUsd: "$34.99",
-    pricePhp: "₱1,800",
+    pricePhp: "₱1,000",
     desc: "Permanent loader access & all future updates",
   },
 ];
@@ -257,8 +252,8 @@ const FAQS = [
 ];
 
 export default function Home() {
-  const [selectedTier, setSelectedTier] = useState(TIERS[0]); // 7 Days default (₱500)
-  const [currency, setCurrency] = useState<"PHP" | "USD">("PHP");
+  const [selectedTier, setSelectedTier] = useState(TIERS[0]); // 3 Days default (₱150)
+  const currency = "PHP";
 
   // Discord Auth State
   const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
@@ -742,7 +737,7 @@ export default function Home() {
     }
   };
 
-  const currentPrice = currency === "PHP" ? selectedTier.pricePhp : selectedTier.priceUsd;
+  const currentPrice = selectedTier.pricePhp;
 
   return (
     <>
@@ -1123,18 +1118,11 @@ export default function Home() {
 
               <div className="selector-heading">
                 <span>Select access duration</span>
-                <button
-                  type="button"
-                  className="currency-toggle"
-                  onClick={() => setCurrency(currency === "PHP" ? "USD" : "PHP")}
-                >
-                  Switch to {currency === "PHP" ? "USD ($)" : "PHP (₱)"}
-                </button>
               </div>
 
               {/* Tiers Grid */}
               <div className="duration-grid">
-                {TIERS.slice(0, 3).map((tier) => (
+                {TIERS.filter((tier) => tier.id !== "lifetime").map((tier) => (
                   <button
                     key={tier.id}
                     type="button"
@@ -1142,31 +1130,34 @@ export default function Home() {
                     onClick={() => setSelectedTier(tier)}
                   >
                     <span className="btn-duration-name">{tier.duration}</span>
-                    <span className="btn-duration-price">
-                      {currency === "PHP" ? tier.pricePhp : tier.priceUsd}
-                    </span>
+                    <span className="btn-duration-price">{tier.pricePhp}</span>
                   </button>
                 ))}
               </div>
 
               {/* Lifetime Pass Button */}
-              <button
-                type="button"
-                className={`lifetime-btn ${selectedTier.id === "lifetime" ? "active" : ""}`}
-                onClick={() => setSelectedTier(TIERS[3])}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text-title)" }}>
-                    Lifetime VIP Pass
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-                    One-time payment • All future patches included
-                  </div>
-                </div>
-                <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 17, color: "var(--blue-bright)" }}>
-                  {currency === "PHP" ? TIERS[3].pricePhp : TIERS[3].priceUsd}
-                </span>
-              </button>
+              {(() => {
+                const lifetimeTier = TIERS.find((t) => t.id === "lifetime") || TIERS[TIERS.length - 1];
+                return (
+                  <button
+                    type="button"
+                    className={`lifetime-btn ${selectedTier.id === "lifetime" ? "active" : ""}`}
+                    onClick={() => setSelectedTier(lifetimeTier)}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text-title)" }}>
+                        Lifetime VIP Pass
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+                        One-time payment • All future patches included
+                      </div>
+                    </div>
+                    <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 17, color: "var(--blue-bright)" }}>
+                      {lifetimeTier.pricePhp}
+                    </span>
+                  </button>
+                );
+              })()}
 
               {/* Price Summary */}
               <div className="price-summary-box">
@@ -1176,7 +1167,7 @@ export default function Home() {
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <span className="price-tag-big">{currentPrice}</span>
-                  <span className="price-tag-sub">{currency}</span>
+                  <span className="price-tag-sub">PHP</span>
                 </div>
               </div>
 

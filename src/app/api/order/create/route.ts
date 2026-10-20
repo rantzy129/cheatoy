@@ -6,12 +6,12 @@ import path from "path";
 import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
-const VALID_TIERS: Record<string, { duration: string; pricePhp: string; priceUsd: string }> = {
-  "3days": { duration: "3 Days Pass", pricePhp: "₱150", priceUsd: "$2.99" },
-  "7days": { duration: "7 Days Pass", pricePhp: "₱300", priceUsd: "$5.99" },
-  "15days": { duration: "15 Days Pass", pricePhp: "₱550", priceUsd: "$10.99" },
-  "month": { duration: "1 Month Pass", pricePhp: "₱850", priceUsd: "$16.99" },
-  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱1,800", priceUsd: "$34.99" },
+const VALID_TIERS: Record<string, { duration: string; pricePhp: string }> = {
+  "3days": { duration: "3 Days Pass", pricePhp: "₱150" },
+  "7days": { duration: "7 Days Pass", pricePhp: "₱300" },
+  "15days": { duration: "15 Days Pass", pricePhp: "₱550" },
+  "month": { duration: "1 Month Pass", pricePhp: "₱850" },
+  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱1,000" },
 };
 
 export async function POST(request: Request) {
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const randomHex = () => crypto.randomBytes(3).toString("hex").toUpperCase();
     const order_id = `ORD-AF-${randomHex()}-${randomHex()}`;
     const order_token = `tok_${crypto.randomBytes(24).toString("hex")}`;
-    const price = currency === "USD" ? tier.priceUsd : tier.pricePhp;
+    const price = tier.pricePhp;
 
     // Handle Optional Receipt Screenshot Upload
     let receiptRelativeUrl: string | null = null;

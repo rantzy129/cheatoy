@@ -1338,11 +1338,11 @@ export default function AdminPage() {
                       onChange={(e) => setGenTier(e.target.value)}
                       className="admin-form-select"
                     >
-                      <option value="3 Days Pass">3 Days Pass (₱150 / $2.99)</option>
-                      <option value="7 Days Pass">7 Days Pass (₱300 / $5.99)</option>
-                      <option value="15 Days Pass">15 Days Pass (₱550 / $10.99)</option>
-                      <option value="1 Month Pass">1 Month Pass (₱850 / $16.99)</option>
-                      <option value="Lifetime VIP">Lifetime VIP (₱1,800 / $34.99)</option>
+                      <option value="3 Days Pass">3 Days Pass (₱150)</option>
+                      <option value="7 Days Pass">7 Days Pass (₱300)</option>
+                      <option value="15 Days Pass">15 Days Pass (₱550)</option>
+                      <option value="1 Month Pass">1 Month Pass (₱850)</option>
+                      <option value="Lifetime VIP">Lifetime VIP (₱1,000)</option>
                     </select>
                   </div>
 
