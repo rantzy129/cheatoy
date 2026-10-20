@@ -977,30 +977,38 @@ export default function ProfilePage() {
               <div className="vault-referral-grid">
                 <div>
                   <h3 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
-                    Invite Clanmates &amp; Earn +3 Free VIP Days
+                    Invite Clanmates &amp; Earn Free VIP Days
                   </h3>
                   <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, margin: 0 }}>
                     Share your unique referral link in clan chats, Discord servers, and Facebook groups.
-                    Every time a player buys any pass through your link, both of you get rewarded!
+                    When a clanmate buys at least a 3-Day pass through your link, both of you earn rewards!
                   </p>
 
                   <div className="vault-referral-perks">
                     <div className="vault-referral-perk-row">
-                      <div className="vault-referral-perk-icon">1</div>
+                      <div className="vault-referral-perk-icon" style={{ background: "rgba(56, 189, 248, 0.2)", color: "#38bdf8" }}>+1</div>
                       <div>
-                        <strong style={{ color: "#38bdf8" }}>Buyer gets +1 Bonus Day:</strong>
-                        <span style={{ color: "#94a3b8", marginLeft: 4 }}>
-                          Extra 24 hours added onto any pass they purchase (3D, 7D, 15D, 1M).
+                        <strong style={{ color: "#38bdf8" }}>Buyer Perk:</strong>
+                        <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
+                          Gets <strong>+1 Extra Bonus Day</strong> added onto their VIP pass automatically.
                         </span>
                       </div>
                     </div>
 
                     <div className="vault-referral-perk-row">
-                      <div className="vault-referral-perk-icon">3</div>
+                      <div className="vault-referral-perk-icon" style={{ background: "rgba(236, 72, 153, 0.2)", color: "#f472b6" }}>VIP</div>
                       <div>
-                        <strong style={{ color: "#f472b6" }}>You earn +3 Free VIP Days:</strong>
-                        <span style={{ color: "#94a3b8", marginLeft: 4 }}>
-                          Automatically extended onto your active license upon order approval.
+                        <strong style={{ color: "#f472b6" }}>Your Reward:</strong>
+                        <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
+                          {isVip ? (
+                            <>
+                              As an active VIP, you earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral!
+                            </>
+                          ) : (
+                            <>
+                              Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> pass per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> once you have an active VIP pass)!
+                            </>
+                          )}
                         </span>
                       </div>
                     </div>

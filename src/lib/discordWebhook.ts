@@ -211,7 +211,7 @@ export async function sendOrderApprovedWebhook(
   order: OrderWebhookData,
   licenseKey: string,
   expiresAt: string | null,
-  referralReward?: { rewarded: boolean; referrer?: string; daysAdded?: number } | null
+  referralReward?: { rewarded: boolean; referrer?: string; daysAdded?: number; isExistingVip?: boolean } | null
 ) {
   const expiryDisplay = expiresAt
     ? `<t:${Math.floor(new Date(expiresAt).getTime() / 1000)}:R> (${new Date(expiresAt).toLocaleDateString()})`
@@ -256,9 +256,14 @@ export async function sendOrderApprovedWebhook(
   ];
 
   if (referralReward?.referrer) {
+    const days = referralReward.daysAdded || 1;
+    const referrerPerk = referralReward.isExistingVip
+      ? `+${days} Free VIP Days extended onto their active pass`
+      : `+${days} Free VIP Day pass awarded (Free/Non-VIP Member)`;
+
     fields.push({
       name: "🎁 Referral Bonus Credited",
-      value: `• **Buyer (@${order.discord_username})**: +1 Bonus Day added to license\n• **Referrer (@${referralReward.referrer})**: +3 Free Days extended on license!`,
+      value: `• **Buyer (@${order.discord_username})**: +1 Bonus Day added to pass\n• **Referrer (@${referralReward.referrer})**: ${referrerPerk}!`,
       inline: false,
     });
   }

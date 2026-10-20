@@ -435,7 +435,11 @@ export default function AdminPage() {
         fetchLicenses();
 
         if (data.referral_reward?.referrer) {
-          alert(`🎉 Order Approved!\nLicense Key: ${data.license_key}\n\n🎁 Clanmate Referral Credited:\nReferrer: @${data.referral_reward.referrer} earned +3 Free VIP Days!\nBuyer: @${order.discord_username} received +1 Bonus Day.`);
+          const rewardDays = data.referral_reward.daysAdded || 1;
+          const statusDesc = data.referral_reward.isExistingVip
+            ? `Active VIP: +${rewardDays} Free VIP Days extended onto pass`
+            : `Non-VIP / Unbought: +${rewardDays} Free VIP Day pass awarded`;
+          alert(`🎉 Order Approved!\nLicense Key: ${data.license_key}\n\n🎁 Clanmate Referral Credited:\n• Buyer (@${order.discord_username}): +1 Bonus Day\n• Referrer (@${data.referral_reward.referrer}): ${statusDesc}`);
         }
 
         if (data.discord_bot) {
@@ -1571,7 +1575,7 @@ export default function AdminPage() {
                         Referred by: @{selectedReceiptOrder.referred_by}
                       </div>
                       <div style={{ fontSize: 11, color: "#cbd5e1", marginTop: 2 }}>
-                        Perk: Buyer gets +1 Bonus Day. Upon approval, Referrer (@{selectedReceiptOrder.referred_by}) earns +3 Free VIP Days.
+                        Perk: Buyer gets +1 Bonus Day. Referrer earns +3 Days if active VIP, or +1 Day if non-VIP / unbought (on 3+ day purchase).
                       </div>
                     </div>
                   )}
