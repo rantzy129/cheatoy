@@ -131,6 +131,10 @@ export default function ProfilePage() {
   const [attachingOrderId, setAttachingOrderId] = useState<string | null>(null);
   const [attachStatus, setAttachStatus] = useState<{ id: string; msg: string; isError?: boolean } | null>(null);
 
+  // Active Vault Tab: "license" | "referrals" | "orders"
+  const [activeTab, setActiveTab] = useState<"license" | "referrals" | "orders">("license");
+  const [isClanPitchCopied, setIsClanPitchCopied] = useState(false);
+
   // Referral State
   const [isRefCopied, setIsRefCopied] = useState(false);
   const [referralHistory, setReferralHistory] = useState<any[]>([]);
@@ -153,6 +157,16 @@ export default function ProfilePage() {
       navigator.clipboard.writeText(url);
       setIsRefCopied(true);
       setTimeout(() => setIsRefCopied(false), 2500);
+    }
+  };
+
+  const handleCopyClanPitch = () => {
+    const url = getReferralUrl();
+    if (url) {
+      const pitch = `Laro tayo Assault Fire PH! Gamitin mo VIP referral link ko para may +1 Extra Bonus Day ka agad sa pass mo: ${url}`;
+      navigator.clipboard.writeText(pitch);
+      setIsClanPitchCopied(true);
+      setTimeout(() => setIsClanPitchCopied(false), 2500);
     }
   };
 
@@ -349,10 +363,19 @@ export default function ProfilePage() {
 
   // Auth Initialization on Mount
   useEffect(() => {
-    // 1. Check URL parameters for OAuth return
     if (typeof window !== "undefined") {
+      // 1. Check URL parameters for OAuth return or direct tab link (?tab=referrals)
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get("code");
+      const tabParam = searchParams.get("tab");
+
+      if (tabParam === "referrals" || tabParam === "orders" || tabParam === "license") {
+        setActiveTab(tabParam as any);
+      } else if (window.location.hash === "#referrals") {
+        setActiveTab("referrals");
+      } else if (window.location.hash === "#orders") {
+        setActiveTab("orders");
+      }
 
       if (code && supabase) {
         supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
@@ -727,10 +750,58 @@ export default function ProfilePage() {
               </div>
             </header>
 
-            {/* 2. OPERATIONAL WORKSPACE: VIP COMMAND DESK vs NON-VIP ACTIVATION */}
-            {isVip && activeLicense ? (
-              /* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */
-              <div className="vault-grid">
+            {/* Vault Workspace Segmented Tabs */}
+            <div className="vault-tabs-nav" role="tablist" aria-label="Vault Sections">
+              <button
+                type="button"
+                className={`vault-tab-btn ${activeTab === "license" ? "active" : ""}`}
+                onClick={() => setActiveTab("license")}
+                id="vault-tab-license-btn"
+                role="tab"
+                aria-selected={activeTab === "license"}
+              >
+                <IconShieldCheck size={16} />
+                <span>License &amp; Loader</span>
+              </button>
+
+              <button
+                type="button"
+                className={`vault-tab-btn vault-tab-btn-referral ${activeTab === "referrals" ? "active" : ""}`}
+                onClick={() => setActiveTab("referrals")}
+                id="vault-tab-referrals-btn"
+                role="tab"
+                aria-selected={activeTab === "referrals"}
+              >
+                <span>🎁</span>
+                <span>Referral Program</span>
+                {referralStats.total_reward_days_earned > 0 ? (
+                  <span className="vault-tab-badge">+{referralStats.total_reward_days_earned}D Earned</span>
+                ) : (
+                  <span className="vault-tab-badge-subtle">Earn Free VIP</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className={`vault-tab-btn ${activeTab === "orders" ? "active" : ""}`}
+                onClick={() => setActiveTab("orders")}
+                id="vault-tab-orders-btn"
+                role="tab"
+                aria-selected={activeTab === "orders"}
+              >
+                <IconDocument size={16} />
+                <span>Order History</span>
+                {userOrders.length > 0 && (
+                  <span className="vault-tab-badge-subtle">{userOrders.length}</span>
+                )}
+              </button>
+            </div>
+
+            {/* TAB 1: VIP COMMAND DESK (LICENSE & LOADER) */}
+            {activeTab === "license" && (
+              isVip && activeLicense ? (
+                /* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */
+                <div className="vault-grid">
                 {/* Left Column: Subscription Telemetry, Private Key, HWID */}
                 <div className="vault-card">
                   <div className="vault-card-head">
@@ -995,230 +1066,270 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
+            )
+          )}
+
+            {/* TAB 2: CLANMATE REFERRAL & AFFILIATE REWARDS */}
+            {activeTab === "referrals" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                {/* Top KPI Cards Row */}
+                <div className="vault-referral-kpi-grid">
+                  <div className="vault-referral-kpi-card">
+                    <span className="vault-referral-kpi-label">Total Clanmates Invited</span>
+                    <span className="vault-referral-kpi-value">{referralStats.total_referrals}</span>
+                    <span className="vault-referral-kpi-sub">{referralStats.approved_referrals} approved &amp; verified</span>
+                  </div>
+
+                  <div className="vault-referral-kpi-card vault-referral-kpi-card-highlight">
+                    <span className="vault-referral-kpi-label" style={{ color: "#f472b6" }}>Free VIP Days Earned</span>
+                    <span className="vault-referral-kpi-value" style={{ color: "#f472b6" }}>+{referralStats.total_reward_days_earned} Days</span>
+                    <span className="vault-referral-kpi-sub">Added to your license duration</span>
+                  </div>
+
+                  <div className="vault-referral-kpi-card">
+                    <span className="vault-referral-kpi-label">Your Current Reward Rate</span>
+                    <span className="vault-referral-kpi-value" style={{ fontSize: 18, color: isVip ? "#10b981" : "#38bdf8" }}>
+                      {isVip ? "+3 Days / Sale" : "+1 Day / Sale"}
+                    </span>
+                    <span className="vault-referral-kpi-sub">
+                      {isVip ? "Active VIP rate (Maximum)" : "Upgrade to VIP for +3 days/sale"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Main Referral Card */}
+                <div className="vault-referral-card" style={{ margin: 0 }}>
+                  <div className="vault-referral-badge">
+                    <span>🎁 Viral Clanmate Referral Program</span>
+                  </div>
+
+                  <div className="vault-referral-grid">
+                    <div>
+                      <h2 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
+                        Invite Clanmates &amp; Earn Free VIP Days
+                      </h2>
+                      <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, margin: 0 }}>
+                        Share your unique referral link in clan chats, Discord servers, and Facebook groups.
+                        When a friend buys any pass with your link, both of you get rewarded!
+                      </p>
+
+                      <div className="vault-referral-perks">
+                        <div className="vault-referral-perk-row">
+                          <div className="vault-referral-perk-icon" style={{ background: "rgba(56, 189, 248, 0.2)", color: "#38bdf8" }}>+1</div>
+                          <div>
+                            <strong style={{ color: "#38bdf8" }}>Buyer Perk:</strong>
+                            <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
+                              Gets <strong>+1 Extra Bonus Day</strong> added onto their VIP pass automatically.
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="vault-referral-perk-row">
+                          <div className="vault-referral-perk-icon" style={{ background: "rgba(236, 72, 153, 0.2)", color: "#f472b6" }}>VIP</div>
+                          <div>
+                            <strong style={{ color: "#f472b6" }}>Your Reward:</strong>
+                            <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
+                              {isVip ? (
+                                <>
+                                  As an active VIP, you earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral!
+                                </>
+                              ) : (
+                                <>
+                                  Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> pass per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> once you have an active VIP pass)!
+                                </>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="vault-referral-link-box">
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#f1f5f9" }}>
+                          Your Unique Referral Link
+                        </span>
+                        <span style={{ fontSize: 11, color: "#ec4899", fontWeight: 600 }}>
+                          @{discordUser.username}
+                        </span>
+                      </div>
+
+                      <div className="vault-referral-input-group">
+                        <input
+                          type="text"
+                          readOnly
+                          value={getReferralUrl()}
+                          className="vault-referral-input"
+                          onClick={(e) => (e.target as HTMLInputElement).select()}
+                          aria-label="Your Referral Link"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCopyReferralUrl}
+                          className="btn-vault-copy-ref"
+                          title="Copy referral link to clipboard"
+                        >
+                          <IconCopy size={13} />
+                          <span>{isRefCopied ? "Copied!" : "Copy Link"}</span>
+                        </button>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                        <button
+                          type="button"
+                          onClick={handleCopyClanPitch}
+                          className="btn-vault-copy-secondary"
+                          style={{ width: "100%", justifyContent: "center" }}
+                          title="Copy ready-to-paste message for clan chat"
+                        >
+                          <span>💬</span>
+                          <span>{isClanPitchCopied ? "Clan Pitch Copied!" : "Copy Clan Chat Message"}</span>
+                        </button>
+                      </div>
+
+                      <div className="vault-referral-hint">
+                        <span>💡 Unlimited rewards</span>
+                        <span style={{ color: "#cbd5e1" }}>Share in AF clan GC &amp; FB groups</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Clanmates Invited & Referral History Table */}
+                <div className="vault-orders-card" style={{ margin: 0 }}>
+                  <div className="vault-card-head">
+                    <div className="vault-card-title">
+                      <IconDocument size={16} />
+                      <span>Clanmates Invited &amp; Referral History</span>
+                    </div>
+                    <span style={{ fontSize: 12, color: "#94a3b8" }}>
+                      {referralHistory.length} referral{referralHistory.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+
+                  {isLoadingReferrals ? (
+                    <div style={{ textAlign: "center", padding: "28px", color: "#64748b", fontSize: 13 }}>
+                      Loading referral history...
+                    </div>
+                  ) : referralHistory.length > 0 ? (
+                    <div className="vault-orders-table-wrapper">
+                      <table className="vault-table">
+                        <thead>
+                          <tr>
+                            <th>Clanmate</th>
+                            <th>VIP Pass Tier</th>
+                            <th>Amount</th>
+                            <th>Purchase Date</th>
+                            <th>Verification Status</th>
+                            <th style={{ textAlign: "right" }}>Your Reward</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {referralHistory.map((item) => (
+                            <tr key={item.id || item.order_id}>
+                              <td>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <div style={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: "50%",
+                                    background: "rgba(236, 72, 153, 0.2)",
+                                    color: "#f472b6",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontWeight: 800,
+                                    fontSize: 11
+                                  }}>
+                                    {item.clanmate_username?.charAt(0).toUpperCase()}
+                                  </div>
+                                  <span style={{ fontWeight: 700, color: "#f1f5f9" }}>
+                                    @{item.clanmate_username}
+                                  </span>
+                                </div>
+                              </td>
+                              <td style={{ fontWeight: 600, color: "#cbd5e1" }}>
+                                {item.tier}
+                              </td>
+                              <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                                {formatOrderPrice(item.price, item.tier)}
+                              </td>
+                              <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
+                                {new Date(item.created_at).toLocaleDateString()}
+                              </td>
+                              <td>
+                                {item.status === "approved" ? (
+                                  <span className="subscription-status-badge status-active-pill" style={{ fontSize: 11, padding: "3px 8px" }}>
+                                    ● Verified &amp; Credited
+                                  </span>
+                                ) : item.status === "pending" ? (
+                                  <span style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 4,
+                                    background: "rgba(245, 158, 11, 0.12)",
+                                    border: "1px solid rgba(245, 158, 11, 0.3)",
+                                    color: "#f59e0b",
+                                    padding: "3px 8px",
+                                    borderRadius: 9999,
+                                    fontSize: 11,
+                                    fontWeight: 600
+                                  }}>
+                                    ● Pending Review
+                                  </span>
+                                ) : (
+                                  <span style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 4,
+                                    background: "rgba(239, 68, 68, 0.12)",
+                                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                                    color: "#ef4444",
+                                    padding: "3px 8px",
+                                    borderRadius: 9999,
+                                    fontSize: 11,
+                                    fontWeight: 600
+                                  }}>
+                                    ● Rejected
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ textAlign: "right" }}>
+                                {item.status === "approved" ? (
+                                  <span style={{ color: "#10b981", fontWeight: 800, fontSize: 13 }}>
+                                    +{item.reward_days} Free Day{item.reward_days !== 1 ? "s" : ""}
+                                  </span>
+                                ) : item.status === "pending" ? (
+                                  <span style={{ color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>
+                                    +{item.potential_reward_days} Days (Pending)
+                                  </span>
+                                ) : (
+                                  <span style={{ color: "#64748b", fontSize: 12 }}>—</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "32px 16px", color: "#64748b", fontSize: 13 }}>
+                      <div style={{ fontSize: 24, marginBottom: 8 }}>🎁</div>
+                      <div style={{ color: "#94a3b8", fontWeight: 600, marginBottom: 4 }}>
+                        No clanmate referral purchases yet
+                      </div>
+                      <div>
+                        Share your unique referral link above in clan chats &amp; Facebook groups to earn free VIP days!
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
-            {/* 2.5 CLANMATE REFERRAL & AFFILIATE REWARDS */}
-            <div className="vault-referral-card">
-              <div className="vault-referral-badge">
-                <span>🎁 Referral &amp; Affiliate Program</span>
-              </div>
-
-              <div className="vault-referral-grid">
-                <div>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
-                    Invite Clanmates &amp; Earn Free VIP Days
-                  </h3>
-                  <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, margin: 0 }}>
-                    Share your unique referral link in clan chats, Discord servers, and Facebook groups.
-                    When a clanmate buys at least a 3-Day pass through your link, both of you earn rewards!
-                  </p>
-
-                  <div className="vault-referral-perks">
-                    <div className="vault-referral-perk-row">
-                      <div className="vault-referral-perk-icon" style={{ background: "rgba(56, 189, 248, 0.2)", color: "#38bdf8" }}>+1</div>
-                      <div>
-                        <strong style={{ color: "#38bdf8" }}>Buyer Perk:</strong>
-                        <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
-                          Gets <strong>+1 Extra Bonus Day</strong> added onto their VIP pass automatically.
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="vault-referral-perk-row">
-                      <div className="vault-referral-perk-icon" style={{ background: "rgba(236, 72, 153, 0.2)", color: "#f472b6" }}>VIP</div>
-                      <div>
-                        <strong style={{ color: "#f472b6" }}>Your Reward:</strong>
-                        <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
-                          {isVip ? (
-                            <>
-                              As an active VIP, you earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral!
-                            </>
-                          ) : (
-                            <>
-                              Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> pass per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> once you have an active VIP pass)!
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="vault-referral-link-box">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#f1f5f9" }}>
-                      Your Unique Referral Link
-                    </span>
-                    <span style={{ fontSize: 11, color: "#ec4899", fontWeight: 600 }}>
-                      @{discordUser.username}
-                    </span>
-                  </div>
-
-                  <div className="vault-referral-input-group">
-                    <input
-                      type="text"
-                      readOnly
-                      value={getReferralUrl()}
-                      className="vault-referral-input"
-                      onClick={(e) => (e.target as HTMLInputElement).select()}
-                      aria-label="Your Referral Link"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleCopyReferralUrl}
-                      className="btn-vault-copy-ref"
-                      title="Copy referral link to clipboard"
-                    >
-                      <IconCopy size={13} />
-                      <span>{isRefCopied ? "Copied!" : "Copy Link"}</span>
-                    </button>
-                  </div>
-
-                  <div className="vault-referral-hint">
-                    <span>💡 Unlimited rewards</span>
-                    <span style={{ color: "#cbd5e1" }}>Share in AF clan GC &amp; FB groups</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2.6 REFERRAL HISTORY & INVITED CLANMATES */}
-            <section className="vault-orders-card" aria-label="Referral History" style={{ borderTop: "2px solid #ec4899", marginBottom: 28 }}>
-              <div className="vault-card-head">
-                <div className="vault-card-title">
-                  <span style={{ fontSize: 16 }}>🎁</span>
-                  <span>Clanmates Invited &amp; Referral Rewards</span>
-                </div>
-                <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 12, color: "#94a3b8" }}>
-                    Total Invited: <strong style={{ color: "#ffffff" }}>{referralStats.total_referrals}</strong>
-                  </span>
-                  <span style={{ fontSize: 12, color: "#ec4899", fontWeight: 700 }}>
-                    Earned: +{referralStats.total_reward_days_earned} Free VIP Days
-                  </span>
-                </div>
-              </div>
-
-              {isLoadingReferrals ? (
-                <div style={{ textAlign: "center", padding: "24px", color: "#64748b", fontSize: 13 }}>
-                  Loading referral history...
-                </div>
-              ) : referralHistory.length > 0 ? (
-                <div className="vault-orders-table-wrapper">
-                  <table className="vault-table">
-                    <thead>
-                      <tr>
-                        <th>Clanmate</th>
-                        <th>VIP Pass Tier</th>
-                        <th>Amount</th>
-                        <th>Purchase Date</th>
-                        <th>Verification Status</th>
-                        <th style={{ textAlign: "right" }}>Your Reward</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {referralHistory.map((item) => (
-                        <tr key={item.id || item.order_id}>
-                          <td>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <div style={{
-                                width: 24,
-                                height: 24,
-                                borderRadius: "50%",
-                                background: "rgba(236, 72, 153, 0.2)",
-                                color: "#f472b6",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: 800,
-                                fontSize: 11
-                              }}>
-                                {item.clanmate_username?.charAt(0).toUpperCase()}
-                              </div>
-                              <span style={{ fontWeight: 700, color: "#f1f5f9" }}>
-                                @{item.clanmate_username}
-                              </span>
-                            </div>
-                          </td>
-                          <td style={{ fontWeight: 600, color: "#cbd5e1" }}>
-                            {item.tier}
-                          </td>
-                          <td style={{ fontVariantNumeric: "tabular-nums" }}>
-                            {formatOrderPrice(item.price, item.tier)}
-                          </td>
-                          <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </td>
-                          <td>
-                            {item.status === "approved" ? (
-                              <span className="subscription-status-badge status-active-pill" style={{ fontSize: 11, padding: "3px 8px" }}>
-                                ● Verified &amp; Credited
-                              </span>
-                            ) : item.status === "pending" ? (
-                              <span style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 4,
-                                background: "rgba(245, 158, 11, 0.12)",
-                                border: "1px solid rgba(245, 158, 11, 0.3)",
-                                color: "#f59e0b",
-                                padding: "3px 8px",
-                                borderRadius: 9999,
-                                fontSize: 11,
-                                fontWeight: 600
-                              }}>
-                                ● Pending Review
-                              </span>
-                            ) : (
-                              <span style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 4,
-                                background: "rgba(239, 68, 68, 0.12)",
-                                border: "1px solid rgba(239, 68, 68, 0.3)",
-                                color: "#ef4444",
-                                padding: "3px 8px",
-                                borderRadius: 9999,
-                                fontSize: 11,
-                                fontWeight: 600
-                              }}>
-                                ● Rejected
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ textAlign: "right" }}>
-                            {item.status === "approved" ? (
-                              <span style={{ color: "#10b981", fontWeight: 800, fontSize: 13 }}>
-                                +{item.reward_days} Free Day{item.reward_days !== 1 ? "s" : ""}
-                              </span>
-                            ) : item.status === "pending" ? (
-                              <span style={{ color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>
-                                +{item.potential_reward_days} Days (Pending)
-                              </span>
-                            ) : (
-                              <span style={{ color: "#64748b", fontSize: 12 }}>—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div style={{ textAlign: "center", padding: "28px 16px", color: "#64748b", fontSize: 13 }}>
-                  <div style={{ fontSize: 24, marginBottom: 8 }}>🎁</div>
-                  <div style={{ color: "#94a3b8", fontWeight: 600, marginBottom: 4 }}>
-                    No clanmate referral purchases yet
-                  </div>
-                  <div>
-                    Share your unique referral link above in clan chats &amp; Facebook groups to earn free VIP days!
-                  </div>
-                </div>
-              )}
-            </section>
-
-            {/* 3. ORDER & PAYMENT HISTORY */}
-            <section className="vault-orders-card" aria-label="Order History">
+            {/* TAB 3: ORDER & PAYMENT HISTORY */}
+            {activeTab === "orders" && (
+              <section className="vault-orders-card" aria-label="Order History">
               <div className="vault-card-head">
                 <div className="vault-card-title">
                   <IconDocument size={16} />
@@ -1363,6 +1474,7 @@ export default function ProfilePage() {
                 </div>
               )}
             </section>
+            )}
           </>
         )}
       </main>

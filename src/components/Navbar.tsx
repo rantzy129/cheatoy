@@ -101,7 +101,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Navigation links */}
+        {/* Streamlined & Focused Navigation links */}
         <nav className="site-nav-links" aria-label="Main Navigation">
           <Link
             href="/"
@@ -116,40 +116,26 @@ export default function Navbar() {
             Features
           </Link>
           <Link
-            href="/#architecture"
-            className="site-nav-item"
-          >
-            Architecture
-          </Link>
-          <Link
             href="/#pricing"
             className="site-nav-item"
           >
             Pricing
           </Link>
           <Link
-            href="/#faq"
-            className="site-nav-item"
+            href="/profile?tab=referrals"
+            className="site-nav-referral-highlight"
+            title="Earn Free VIP Days by inviting clanmates"
           >
-            FAQ
+            <span>🎁</span>
+            <span>Free VIP Referrals</span>
+            <span className="site-nav-referral-badge">+3 Days</span>
           </Link>
           <Link
             href="/profile"
             className={`site-nav-item ${pathname === "/profile" ? "active" : ""}`}
           >
-            Profile & Vault
+            Vault
           </Link>
-          <a
-            href="https://discord.gg/Whwxq9QAEN"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="site-nav-item"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#5865F2" }}
-            title="Join official Discord community"
-          >
-            <IconDiscord size={15} />
-            <span>Discord Server</span>
-          </a>
         </nav>
 
         {/* Right action section */}

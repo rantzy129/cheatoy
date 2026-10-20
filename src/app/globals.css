@@ -3032,6 +3032,72 @@ a {
   justify-content: space-between;
 }
 
+/* Referral KPI Cards Grid */
+.vault-referral-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.vault-referral-kpi-card {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vault-referral-kpi-card-highlight {
+  border-color: rgba(236, 72, 153, 0.4);
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, var(--bg-surface-1) 100%);
+}
+
+.vault-referral-kpi-label {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vault-referral-kpi-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.vault-referral-kpi-sub {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.btn-vault-copy-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-vault-copy-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 /* Orders History Section */
 .vault-orders-card {
   background: var(--bg-surface-1);
@@ -3335,6 +3401,115 @@ a {
   color: #00d2ff;
   background: #111a2c;
   border: 1px solid #1a2a44;
+}
+
+/* Highlighted Referral Navigation Item */
+.site-nav-referral-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  text-decoration: none;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.22) 0%, rgba(168, 85, 247, 0.18) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 16px -2px rgba(236, 72, 153, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.site-nav-referral-highlight:hover {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.36) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-color: rgba(236, 72, 153, 0.85);
+  box-shadow: 0 0 24px rgba(236, 72, 153, 0.6);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.site-nav-referral-highlight.active {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.42) 0%, rgba(168, 85, 247, 0.36) 100%);
+  border-color: #ec4899;
+  box-shadow: 0 0 26px rgba(236, 72, 153, 0.7);
+}
+
+.site-nav-referral-badge {
+  background: #ec4899;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Vault Tabs Navigation Bar */
+.vault-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 24px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vault-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: var(--bg-surface-0);
+  border: 1px solid var(--border-subtle);
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vault-tab-btn:hover {
+  color: #ffffff;
+  background: var(--bg-surface-2);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.vault-tab-btn.active {
+  color: #00d2ff;
+  background: rgba(0, 210, 255, 0.08);
+  border-color: rgba(0, 210, 255, 0.45);
+  box-shadow: 0 0 16px -4px rgba(0, 210, 255, 0.25);
+}
+
+.vault-tab-btn-referral.active {
+  color: #f472b6;
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 16px -4px rgba(236, 72, 153, 0.35);
+}
+
+.vault-tab-badge {
+  background: #ec4899;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 9999px;
+}
+
+.vault-tab-badge-subtle {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
 }
 
 @media (max-width: 768px) {
