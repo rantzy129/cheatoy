@@ -192,31 +192,38 @@ function IconSliders({ size = 18, className = "" }: { size?: number; className?:
 /* ─── Product Tiers (Assault Fire PH Chams) ───────────────── */
 const TIERS = [
   {
+    id: "3days",
+    duration: "3 Days Pass",
+    priceUsd: "$2.99",
+    pricePhp: "₱150",
+    desc: "Quick weekend trial to test out undetected chams",
+  },
+  {
     id: "7days",
     duration: "7 Days Pass",
-    priceUsd: "$9.99",
-    pricePhp: "₱500",
-    desc: "Starter access for weekly matches & climbing",
+    priceUsd: "$5.99",
+    pricePhp: "₱300",
+    desc: "Starter access for weekly matches & ranked climbing",
   },
   {
     id: "15days",
     duration: "15 Days Pass",
-    priceUsd: "$18.99",
-    pricePhp: "₱1,000",
+    priceUsd: "$10.99",
+    pricePhp: "₱550",
     desc: "Popular mid-tier pass for competitive play",
   },
   {
     id: "month",
     duration: "1 Month Pass",
-    priceUsd: "$27.99",
-    pricePhp: "₱1,500",
+    priceUsd: "$16.99",
+    pricePhp: "₱850",
     desc: "Best monthly value with priority updates",
   },
   {
     id: "lifetime",
     duration: "Lifetime VIP",
-    priceUsd: "$45.99",
-    pricePhp: "₱2,500",
+    priceUsd: "$34.99",
+    pricePhp: "₱1,800",
     desc: "Permanent loader access & all future updates",
   },
 ];
@@ -760,7 +767,7 @@ export default function Home() {
                 <span>↓</span>
               </a>
               <a href="#pricing" className="btn-secondary">
-                <span>VIP Pricing (₱500+)</span>
+                <span>VIP Pricing (₱150+)</span>
                 <span>↗</span>
               </a>
             </div>

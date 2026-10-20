@@ -7,10 +7,11 @@ import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
 const VALID_TIERS: Record<string, { duration: string; pricePhp: string; priceUsd: string }> = {
-  "7days": { duration: "7 Days Pass", pricePhp: "₱500", priceUsd: "$9.99" },
-  "15days": { duration: "15 Days Pass", pricePhp: "₱1,000", priceUsd: "$18.99" },
-  "month": { duration: "1 Month Pass", pricePhp: "₱1,500", priceUsd: "$27.99" },
-  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱2,500", priceUsd: "$45.99" },
+  "3days": { duration: "3 Days Pass", pricePhp: "₱150", priceUsd: "$2.99" },
+  "7days": { duration: "7 Days Pass", pricePhp: "₱300", priceUsd: "$5.99" },
+  "15days": { duration: "15 Days Pass", pricePhp: "₱550", priceUsd: "$10.99" },
+  "month": { duration: "1 Month Pass", pricePhp: "₱850", priceUsd: "$16.99" },
+  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱1,800", priceUsd: "$34.99" },
 };
 
 export async function POST(request: Request) {

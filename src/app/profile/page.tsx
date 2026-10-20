@@ -134,18 +134,22 @@ export default function ProfilePage() {
 
   const formatOrderPrice = (price?: string | null, tier?: string) => {
     if (!price) {
-      if (tier?.includes("15")) return "₱1,000";
-      if (tier?.includes("Month")) return "₱1,500";
-      if (tier?.includes("Lifetime")) return "₱2,500";
-      return "₱500";
+      if (tier?.includes("3")) return "₱150";
+      if (tier?.includes("7")) return "₱300";
+      if (tier?.includes("15")) return "₱550";
+      if (tier?.includes("Month")) return "₱850";
+      if (tier?.includes("Lifetime")) return "₱1,800";
+      return "₱150";
     }
     const isUsd = price.includes("$");
     const digits = price.replace(/[^\d,.]/g, "");
     if (!digits) {
-      if (tier?.includes("15")) return "₱1,000";
-      if (tier?.includes("Month")) return "₱1,500";
-      if (tier?.includes("Lifetime")) return "₱2,500";
-      return "₱500";
+      if (tier?.includes("3")) return "₱150";
+      if (tier?.includes("7")) return "₱300";
+      if (tier?.includes("15")) return "₱550";
+      if (tier?.includes("Month")) return "₱850";
+      if (tier?.includes("Lifetime")) return "₱1,800";
+      return "₱150";
     }
     return isUsd ? `$${digits}` : `₱${digits}`;
   };
@@ -601,7 +605,7 @@ export default function ProfilePage() {
                 <span>← Return to Storefront</span>
               </Link>
               <Link href="/#pricing" className="btn-vault-action-secondary">
-                <span>View VIP Passes (₱500+) →</span>
+                <span>View VIP Passes (₱150+) →</span>
               </Link>
             </div>
 
@@ -904,7 +908,7 @@ export default function ProfilePage() {
                     className="btn-key-copy"
                     style={{ textDecoration: "none", display: "inline-flex", padding: "10px 24px", fontSize: 13 }}
                   >
-                    {remaining?.isExpired ? "Extend VIP Pass" : "Browse Passes (From ₱500)"}
+                    {remaining?.isExpired ? "Extend VIP Pass" : "Browse Passes (From ₱150)"}
                   </Link>
 
                   <div
