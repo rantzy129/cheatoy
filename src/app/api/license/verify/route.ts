@@ -9,6 +9,33 @@ const SIGNING_SECRET =
   process.env.ADMIN_SECRET_KEY ||
   "4f2e2368fc5f669483af135071a355d4130a9832f8b304024d6cddc7b28c9351";
 
+// In-memory debounce cache to prevent duplicate Discord webhook spam
+// (e.g. Loader verifying followed immediately by Injected DLL verifying)
+const recentSuccessWebhooks = new Map<string, number>();
+const WEBHOOK_DEBOUNCE_WINDOW_MS = 60 * 1000; // 60 seconds debounce window
+
+function shouldDispatchSuccessWebhook(licenseKey: string, hwid?: string): boolean {
+  const key = `${licenseKey.trim().toUpperCase()}:${(hwid || "").trim().toUpperCase()}`;
+  const now = Date.now();
+
+  // Prune cache if it grows large
+  if (recentSuccessWebhooks.size > 1000) {
+    for (const [k, time] of recentSuccessWebhooks.entries()) {
+      if (now - time > WEBHOOK_DEBOUNCE_WINDOW_MS) {
+        recentSuccessWebhooks.delete(k);
+      }
+    }
+  }
+
+  const lastSent = recentSuccessWebhooks.get(key);
+  if (lastSent && now - lastSent < WEBHOOK_DEBOUNCE_WINDOW_MS) {
+    return false; // Suppress duplicate webhook within 60s
+  }
+
+  recentSuccessWebhooks.set(key, now);
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -110,17 +137,20 @@ export async function POST(request: Request) {
     const signPayload = `${license.license_key.trim()}:${(hwid || "").trim()}:${timestamp}`;
     const signature = crypto.createHmac("sha256", SIGNING_SECRET).update(signPayload).digest("hex");
 
-    // Dispatch User Activity Webhook (Injector Launch Log)
-    sendUserAuthWebhook({
-      license_key: license.license_key,
-      discord_id: license.discord_id || discord_id,
-      discord_username: license.discord_username || "Verified VIP",
-      tier: license.tier || "VIP",
-      hwid: hwid || license.hwid,
-      expires_at: license.expires_at || "Lifetime",
-      success: true,
-      message: "License validated successfully",
-    }).catch((e) => console.warn("User auth webhook error:", e));
+    // Dispatch User Activity Webhook (Injector Launch Log) with debounce deduplication
+    const activeHwid = hwid || license.hwid;
+    if (shouldDispatchSuccessWebhook(license.license_key, activeHwid)) {
+      sendUserAuthWebhook({
+        license_key: license.license_key,
+        discord_id: license.discord_id || discord_id,
+        discord_username: license.discord_username || "Verified VIP",
+        tier: license.tier || "VIP",
+        hwid: activeHwid,
+        expires_at: license.expires_at || "Lifetime",
+        success: true,
+        message: "License validated successfully",
+      }).catch((e) => console.warn("User auth webhook error:", e));
+    }
 
     return NextResponse.json({
       valid: true,
