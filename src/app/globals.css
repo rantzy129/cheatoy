@@ -3137,104 +3137,46 @@ a {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Guest / Login Station — Premium Anti-Slop Enclave Terminal */
+/* Guest / Login Station — Clean Auth Terminal */
 .vault-guest-station {
-  max-width: 620px;
-  margin: 50px auto 80px auto;
-  background: #070c18;
-  border: 1px solid #142136;
-  border-radius: 10px;
-  padding: 40px 36px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  max-width: 520px;
+  margin: 60px auto 90px auto;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 40px 32px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
   text-align: center;
-}
-
-.vault-guest-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #00d2ff;
-  background: rgba(0, 210, 255, 0.08);
-  border: 1px solid rgba(0, 210, 255, 0.22);
-  padding: 4px 12px;
-  border-radius: 4px;
-  margin: 0 auto 12px auto;
-  width: fit-content;
 }
 
 .vault-guest-station h1 {
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .vault-guest-station p.vault-guest-subtext {
   font-size: 13.5px;
   color: #94a3b8;
   line-height: 1.6;
-  max-width: 480px;
-  margin: 0 auto 4px auto;
-}
-
-/* 2x2 Feature Value Matrix inside Guest Card */
-.vault-guest-features {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  background: #050811;
-  border: 1px solid #101a2b;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 4px 0;
-}
-
-.vault-feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  text-align: left;
-}
-
-.vault-feature-icon {
-  color: #00d2ff;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.vault-feature-title {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #f1f5f9;
-  display: block;
-}
-
-.vault-feature-desc {
-  font-size: 11px;
-  color: #64748b;
-  line-height: 1.4;
-  margin-top: 2px;
+  margin: 0;
 }
 
 /* Prominent Full-Width Discord Login Button */
 .btn-discord-login-prominent {
   width: 100%;
-  height: 48px;
+  height: 46px;
   background: #5865f2;
   color: #ffffff;
   border: 1px solid #5865f2;
   border-radius: 6px;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -3256,45 +3198,36 @@ a {
 
 /* Secondary Actions Bar */
 .vault-guest-actions-bar {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .btn-vault-action-secondary {
-  height: 40px;
-  background: #090e1a;
+  height: 36px;
+  background: var(--bg-surface-0);
   color: #cbd5e1;
-  border: 1px solid #1c2b42;
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   font-family: var(--font-body);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0 14px;
   gap: 6px;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .btn-vault-action-secondary:hover {
-  background: #121c32;
-  border-color: #2b3e5e;
+  background: var(--bg-surface-2);
+  border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-}
-
-/* Security Guarantee Footer Note */
-.vault-guest-security-note {
-  font-size: 11.5px;
-  color: #64748b;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding-top: 10px;
-  border-top: 1px solid #0f1726;
 }
 
 @media (max-width: 540px) {

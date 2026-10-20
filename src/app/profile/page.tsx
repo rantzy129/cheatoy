@@ -582,60 +582,13 @@ export default function ProfilePage() {
       {/* Main Vault Workspace Container */}
       <main className="vault-container">
         {!discordUser ? (
-          /* ================= GUEST / LOGIN PROMPT SCREEN ================= */
+          /* ================= GUEST / LOGIN PROMPT SCREEN (Anti-Slop Clean Auth) ================= */
           <div className="vault-guest-station">
-            <div className="vault-guest-badge">
-              <span style={{ color: "#00d2ff" }}>●</span>
-              <span>Hardware Enclave • Single Sign-On</span>
-            </div>
-
-            <h1>Member Vault &amp; License Access</h1>
+            <h1>Member Vault</h1>
             <p className="vault-guest-subtext">
-              Sign in with your verified Discord account to view active VIP subscriptions,
-              retrieve private Assault Fire PH license keys, and download the latest loader.
+              Sign in with your verified Discord account to view your private Assault Fire PH license key, download the VIP loader, and manage clan referrals.
             </p>
 
-            {/* Feature Value Matrix (Substance) */}
-            <div className="vault-guest-features">
-              <div className="vault-feature-item">
-                <span className="vault-feature-icon">
-                  <IconKey size={16} />
-                </span>
-                <div>
-                  <span className="vault-feature-title">Private License Key</span>
-                  <span className="vault-feature-desc">Bound to Discord Snowflake ID with single-click reveal &amp; copy</span>
-                </div>
-              </div>
-              <div className="vault-feature-item">
-                <span className="vault-feature-icon">
-                  <IconShieldCheck size={16} />
-                </span>
-                <div>
-                  <span className="vault-feature-title">Hardware Telemetry</span>
-                  <span className="vault-feature-desc">Single-PC motherboard lock with automated first-launch binding</span>
-                </div>
-              </div>
-              <div className="vault-feature-item">
-                <span className="vault-feature-icon">
-                  <IconDownload size={16} />
-                </span>
-                <div>
-                  <span className="vault-feature-title">Direct Loader ZIP</span>
-                  <span className="vault-feature-desc">Encrypted build with 2026.10 PlayPark patch compatibility</span>
-                </div>
-              </div>
-              <div className="vault-feature-item">
-                <span className="vault-feature-icon">
-                  <IconDocument size={16} />
-                </span>
-                <div>
-                  <span className="vault-feature-title">Real-Time Orders</span>
-                  <span className="vault-feature-desc">Live GCash payment validation and automated @VIP server role</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Authoritative Discord Login Button */}
             <button
               type="button"
               className="btn-discord-login-prominent"
@@ -646,43 +599,21 @@ export default function ProfilePage() {
               <span>Continue with Discord</span>
             </button>
 
-            {/* Discord Server Notice Banner */}
-            <div className="modal-discord-banner" style={{ margin: 0 }}>
-              <div className="modal-discord-banner-info">
-                <IconDiscord size={20} className="modal-discord-icon" />
-                <div>
-                  <span className="modal-discord-banner-title">
-                    Official Discord Community
-                  </span>
-                  <span className="modal-discord-banner-sub">
-                    Join our server for instant @VIP role and automated key delivery.
-                  </span>
-                </div>
-              </div>
-              <a
-                href="https://discord.gg/Whwxq9QAEN"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="modal-discord-banner-btn"
-              >
-                Join Server ↗
-              </a>
-            </div>
-
-            {/* Navigation Actions */}
             <div className="vault-guest-actions-bar">
               <Link href="/" className="btn-vault-action-secondary">
                 <span>← Return to Storefront</span>
               </Link>
               <Link href="/#pricing" className="btn-vault-action-secondary">
-                <span>View VIP Passes (₱150+) →</span>
+                <span>Browse Passes (₱150+) →</span>
               </Link>
-            </div>
-
-            {/* Security Guarantee Note */}
-            <div className="vault-guest-security-note">
-              <IconLock size={13} />
-              <span>Protected by Discord OAuth2 • Zero plain-text credentials stored • Hardware-locked</span>
+              <a
+                href="https://discord.gg/Whwxq9QAEN"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-vault-action-secondary"
+              >
+                <span>Discord Support ↗</span>
+              </a>
             </div>
           </div>
         ) : (
@@ -946,29 +877,23 @@ export default function ProfilePage() {
                     </a>
 
                     <div className="vault-instructions-block">
-                      <div className="vault-instructions-title">Quick setup guide</div>
+                      <div className="vault-instructions-title">Setup Guide</div>
 
                       <ol className="vault-instructions-list">
                         <li>
-                          <strong>Extract Loader</strong>: Extract the downloaded archive into a private folder on your PC.
+                          <strong>Extract</strong>: Extract archive to a secure folder.
                         </li>
                         <li>
-                          <strong>Run as Admin</strong>: Right-click <code>ChameleonLoader.exe</code> and select Run as administrator.
+                          <strong>Run as Admin</strong>: Launch <code>ChameleonLoader.exe</code>.
                         </li>
                         <li>
-                          <strong>Input License</strong>: Paste your private key from the license console.
-                        </li>
-                        <li>
-                          <strong>Launch Game</strong>: Start Assault Fire PH and press <kbd>INSERT</kbd> to open the in-game VIP control menu.
+                          <strong>Activate</strong>: Paste license key and press <kbd>INSERT</kbd> in-game.
                         </li>
                       </ol>
 
                       <div className="vault-keybinds-row">
                         <span>Menu keybind:</span>
-                        <span><kbd>INSERT</kbd> Open / Close Menu</span>
-                        <span style={{ color: "#94a3b8", marginLeft: "auto", fontSize: 11 }}>
-                          Full Control: Wallhack, Chams, Health &amp; 2D Box
-                        </span>
+                        <kbd>INSERT</kbd>
                       </div>
                     </div>
                   </div>
@@ -980,45 +905,28 @@ export default function ProfilePage() {
                 </div>
               </div>
             ) : (
-              /* NON-VIP OR EXPIRED: Loader is completely hidden */
+              /* NON-VIP OR EXPIRED: Clean, dignified empty state without slop */
               <div className="vault-card" style={{ marginBottom: 28 }}>
                 <div className="vault-card-head">
                   <div className="vault-card-title">
                     <IconShieldCheck size={18} />
-                    <span>VIP Access &amp; License Status</span>
+                    <span>VIP License Status</span>
                   </div>
 
                   <span className="subscription-status-badge status-none-pill">
-                    ● {remaining?.isExpired ? "Expired" : "Free Member"}
+                    ● {remaining?.isExpired ? "Pass Expired" : "Free Member"}
                   </span>
                 </div>
 
-                <div style={{ padding: "36px 24px", textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
-                  <div
-                    style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 8,
-                      background: "rgba(245, 158, 11, 0.1)",
-                      border: "1px solid rgba(245, 158, 11, 0.25)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto 16px auto",
-                      color: "#f59e0b",
-                    }}
-                  >
-                    <IconKey size={24} />
-                  </div>
-
-                  <h2 style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", marginBottom: 8, letterSpacing: "-0.015em" }}>
+                <div style={{ padding: "32px 20px", textAlign: "center", maxWidth: 540, margin: "0 auto" }}>
+                  <h2 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", marginBottom: 8, letterSpacing: "-0.015em" }}>
                     {remaining?.isExpired ? "VIP Pass Expired" : "No Active VIP License"}
                   </h2>
 
-                  <p style={{ fontSize: 13.5, color: "#94a3b8", lineHeight: 1.6, marginBottom: 24 }}>
+                  <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, marginBottom: 20 }}>
                     {remaining?.isExpired
-                      ? "Your VIP pass has expired. Extend your pass to immediately re-unlock private loader downloads, license keys, and undetected memory virtualization."
-                      : "This Discord account does not have an active Assault Fire PH license key. Acquire a VIP pass below to unlock private loader access, hardware binding, and automated key delivery."}
+                      ? "Your VIP pass has expired. Extend your pass to immediately re-unlock private loader downloads and license key generation."
+                      : "This Discord account does not currently hold an active VIP pass. Acquire a pass below to generate your private key and download the loader."}
                   </p>
 
                   <Link
@@ -1028,42 +936,6 @@ export default function ProfilePage() {
                   >
                     {remaining?.isExpired ? "Extend VIP Pass" : "Browse Passes (From ₱150)"}
                   </Link>
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                      gap: 16,
-                      marginTop: 36,
-                      paddingTop: 24,
-                      borderTop: "1px solid var(--border-subtle)",
-                      textAlign: "left",
-                      fontSize: 12,
-                      color: "#cbd5e1",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <span style={{ color: "#00d2ff", fontWeight: 700 }}>✓</span>
-                      <div>
-                        <strong>Private Loader</strong>
-                        <div style={{ color: "#94a3b8", marginTop: 2 }}>Encrypted build with automatic hardware lock</div>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <span style={{ color: "#00d2ff", fontWeight: 700 }}>✓</span>
-                      <div>
-                        <strong>Instant Discord Delivery</strong>
-                        <div style={{ color: "#94a3b8", marginTop: 2 }}>Automatic @VIP role and private key dispatch</div>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <span style={{ color: "#00d2ff", fontWeight: 700 }}>✓</span>
-                      <div>
-                        <strong>Memory Virtualization</strong>
-                        <div style={{ color: "#94a3b8", marginTop: 2 }}>Undetected status on latest 2026.10 patch</div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )
@@ -1075,19 +947,19 @@ export default function ProfilePage() {
                 {/* Top KPI Cards Row */}
                 <div className="vault-referral-kpi-grid">
                   <div className="vault-referral-kpi-card">
-                    <span className="vault-referral-kpi-label">Total Clanmates Invited</span>
+                    <span className="vault-referral-kpi-label">Clanmates Invited</span>
                     <span className="vault-referral-kpi-value">{referralStats.total_referrals}</span>
-                    <span className="vault-referral-kpi-sub">{referralStats.approved_referrals} approved &amp; verified</span>
+                    <span className="vault-referral-kpi-sub">{referralStats.approved_referrals} verified</span>
                   </div>
 
                   <div className="vault-referral-kpi-card vault-referral-kpi-card-highlight">
                     <span className="vault-referral-kpi-label" style={{ color: "#f472b6" }}>Free VIP Days Earned</span>
                     <span className="vault-referral-kpi-value" style={{ color: "#f472b6" }}>+{referralStats.total_reward_days_earned} Days</span>
-                    <span className="vault-referral-kpi-sub">Added to your license duration</span>
+                    <span className="vault-referral-kpi-sub">Added to license duration</span>
                   </div>
 
                   <div className="vault-referral-kpi-card">
-                    <span className="vault-referral-kpi-label">Your Current Reward Rate</span>
+                    <span className="vault-referral-kpi-label">Reward Rate</span>
                     <span className="vault-referral-kpi-value" style={{ fontSize: 18, color: isVip ? "#10b981" : "#38bdf8" }}>
                       {isVip ? "+3 Days / Sale" : "+1 Day / Sale"}
                     </span>
@@ -1099,47 +971,29 @@ export default function ProfilePage() {
 
                 {/* Main Referral Card */}
                 <div className="vault-referral-card" style={{ margin: 0 }}>
-                  <div className="vault-referral-badge">
-                    <span>🎁 Viral Clanmate Referral Program</span>
-                  </div>
-
                   <div className="vault-referral-grid">
                     <div>
-                      <h2 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
-                        Invite Clanmates &amp; Earn Free VIP Days
+                      <h2 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.015em" }}>
+                        Clanmate Referral Program
                       </h2>
-                      <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, margin: 0 }}>
-                        Share your unique referral link in clan chats, Discord servers, and Facebook groups.
-                        When a friend buys any pass with your link, both of you get rewarded!
+                      <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.5, margin: "0 0 16px 0" }}>
+                        Share your unique referral link with clan members and friends.
                       </p>
 
-                      <div className="vault-referral-perks">
-                        <div className="vault-referral-perk-row">
-                          <div className="vault-referral-perk-icon" style={{ background: "rgba(56, 189, 248, 0.2)", color: "#38bdf8" }}>+1</div>
-                          <div>
-                            <strong style={{ color: "#38bdf8" }}>Buyer Perk:</strong>
-                            <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
-                              Gets <strong>+1 Extra Bonus Day</strong> added onto their VIP pass automatically.
-                            </span>
-                          </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13, color: "#cbd5e1" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ color: "#38bdf8", fontWeight: 700 }}>● Buyer Perk:</span>
+                          <span>Gets <strong>+1 Extra Bonus Day</strong> added onto their VIP pass automatically.</span>
                         </div>
-
-                        <div className="vault-referral-perk-row">
-                          <div className="vault-referral-perk-icon" style={{ background: "rgba(236, 72, 153, 0.2)", color: "#f472b6" }}>VIP</div>
-                          <div>
-                            <strong style={{ color: "#f472b6" }}>Your Reward:</strong>
-                            <span style={{ color: "#cbd5e1", marginLeft: 4 }}>
-                              {isVip ? (
-                                <>
-                                  As an active VIP, you earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral!
-                                </>
-                              ) : (
-                                <>
-                                  Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> pass per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> once you have an active VIP pass)!
-                                </>
-                              )}
-                            </span>
-                          </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ color: "#f472b6", fontWeight: 700 }}>● Your Reward:</span>
+                          <span>
+                            {isVip ? (
+                              <>Earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral.</>
+                            ) : (
+                              <>Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> with an active VIP pass).</>
+                            )}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1147,7 +1001,7 @@ export default function ProfilePage() {
                     <div className="vault-referral-link-box">
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: "#f1f5f9" }}>
-                          Your Unique Referral Link
+                          Your Referral Link
                         </span>
                         <span style={{ fontSize: 11, color: "#ec4899", fontWeight: 600 }}>
                           @{discordUser.username}
@@ -1183,13 +1037,8 @@ export default function ProfilePage() {
                           title="Copy ready-to-paste message for clan chat"
                         >
                           <span>💬</span>
-                          <span>{isClanPitchCopied ? "Clan Pitch Copied!" : "Copy Clan Chat Message"}</span>
+                          <span>{isClanPitchCopied ? "Pitch Copied!" : "Copy Clan Chat Pitch"}</span>
                         </button>
-                      </div>
-
-                      <div className="vault-referral-hint">
-                        <span>💡 Unlimited rewards</span>
-                        <span style={{ color: "#cbd5e1" }}>Share in AF clan GC &amp; FB groups</span>
                       </div>
                     </div>
                   </div>

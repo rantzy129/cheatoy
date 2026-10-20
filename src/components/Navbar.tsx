@@ -110,12 +110,6 @@ export default function Navbar() {
             Home
           </Link>
           <Link
-            href="/#features"
-            className="site-nav-item"
-          >
-            Features
-          </Link>
-          <Link
             href="/#pricing"
             className="site-nav-item"
           >
@@ -127,7 +121,7 @@ export default function Navbar() {
             title="Earn Free VIP Days by inviting clanmates"
           >
             <span>🎁</span>
-            <span>Free VIP Referrals</span>
+            <span>Referrals</span>
             <span className="site-nav-referral-badge">+3 Days</span>
           </Link>
           <Link
