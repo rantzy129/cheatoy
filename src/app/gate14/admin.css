@@ -1407,4 +1407,170 @@
   }
 }
 
+/* ─── ENTERPRISE PAGINATION BAR ────────────────────────────────────────── */
+.admin-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #060b16;
+  border-top: 1px solid #141f32;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #70849e;
+  user-select: none;
+}
+
+.admin-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-pagination-counter {
+  color: #8da0b8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-pagination-counter strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.admin-pagination-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #556882;
+  font-size: 11.5px;
+}
+
+.admin-pagination-select {
+  background: #09101f;
+  border: 1px solid #1a2942;
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-pagination-select:hover {
+  border-color: #253d63;
+}
+
+.admin-pagination-select:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.15);
+}
+
+.admin-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-pagination-btn {
+  background: #09101f;
+  border: 1px solid #1a2942;
+  color: #94a3b8;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-pagination-btn:hover:not(:disabled) {
+  color: #ffffff;
+  background: #142036;
+  border-color: #283e63;
+  transform: translateY(-1px);
+}
+
+.admin-pagination-btn.active {
+  background: #00d2ff;
+  color: #04070e;
+  border-color: #00d2ff;
+  box-shadow: 0 0 14px rgba(0, 210, 255, 0.35);
+  font-weight: 800;
+}
+
+.admin-pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #121c2d;
+  background: transparent;
+  color: #475569;
+  transform: none;
+}
+
+.admin-pagination-ellipsis {
+  color: #475569;
+  padding: 0 5px;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* ─── TABLE UI POLISH & CELL ALIGNMENT ─────────────────────────────────── */
+.admin-actions-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.admin-search-clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #94a3b8;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.admin-search-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+.admin-version-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .admin-version-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 

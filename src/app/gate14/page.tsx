@@ -207,6 +207,158 @@ function IconArrowRight({ size = 16 }: { size?: number }) {
   );
 }
 
+function IconChevronLeft({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  );
+}
+
+function IconChevronRight({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
+function IconChevronsLeft({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="11 17 6 12 11 7" />
+      <polyline points="18 17 13 12 18 7" />
+    </svg>
+  );
+}
+
+function IconChevronsRight({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="13 17 18 12 13 7" />
+      <polyline points="6 17 11 12 6 7" />
+    </svg>
+  );
+}
+
+function PaginationBar({
+  currentPage,
+  totalItems,
+  itemsPerPage,
+  onPageChange,
+  onItemsPerPageChange,
+  itemLabel = "entries",
+}: {
+  currentPage: number;
+  totalItems: number;
+  itemsPerPage: number;
+  onPageChange: (p: number) => void;
+  onItemsPerPageChange: (n: number) => void;
+  itemLabel?: string;
+}) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const startIdx = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endIdx = Math.min(currentPage * itemsPerPage, totalItems);
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, "...", totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
+    return pages;
+  };
+
+  return (
+    <div className="admin-pagination-container">
+      <div className="admin-pagination-info">
+        <span className="admin-pagination-counter">
+          Showing <strong>{startIdx}</strong> to <strong>{endIdx}</strong> of <strong>{totalItems}</strong> {itemLabel}
+        </span>
+        <div className="admin-pagination-select-wrap">
+          <span>Show</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+            className="admin-pagination-select"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+          <span>per page</span>
+        </div>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="admin-pagination-nav">
+          <button
+            type="button"
+            onClick={() => onPageChange(1)}
+            disabled={currentPage === 1}
+            className="admin-pagination-btn"
+            title="First Page"
+          >
+            <IconChevronsLeft size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="admin-pagination-btn"
+            title="Previous Page"
+          >
+            <IconChevronLeft size={13} />
+          </button>
+
+          {getPageNumbers().map((p, i) =>
+            typeof p === "number" ? (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onPageChange(p)}
+                className={`admin-pagination-btn ${currentPage === p ? "active" : ""}`}
+              >
+                {p}
+              </button>
+            ) : (
+              <span key={i} className="admin-pagination-ellipsis">
+                •••
+              </span>
+            )
+          )}
+
+          <button
+            type="button"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="admin-pagination-btn"
+            title="Next Page"
+          >
+            <IconChevronRight size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onPageChange(totalPages)}
+            disabled={currentPage === totalPages}
+            className="admin-pagination-btn"
+            title="Last Page"
+          >
+            <IconChevronsRight size={13} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function IconReceipt({ size = 13 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -444,9 +596,18 @@ export default function AdminPage() {
 
   // Loader Version Control & Kill-Switch State
   const [minLoaderVersion, setMinLoaderVersion] = useState("1.0.6");
+  const [enforcedVersion, setEnforcedVersion] = useState("1.0.6");
   const [downloadPageUrl, setDownloadPageUrl] = useState("https://chameleon-cheats.vercel.app/profile");
   const [isSavingVersion, setIsSavingVersion] = useState(false);
   const [versionStatusMsg, setVersionStatusMsg] = useState<string | null>(null);
+
+  // Pagination States
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [ordersPerPage, setOrdersPerPage] = useState(10);
+  const [licensesPage, setLicensesPage] = useState(1);
+  const [licensesPerPage, setLicensesPerPage] = useState(10);
+  const [notifsPage, setNotifsPage] = useState(1);
+  const [notifsPerPage, setNotifsPerPage] = useState(5);
 
   const fetchLoaderVersion = async () => {
     try {
@@ -454,6 +615,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (res.ok && data.success && data.minVersion) {
         setMinLoaderVersion(data.minVersion);
+        setEnforcedVersion(data.minVersion);
         if (data.downloadUrl) setDownloadPageUrl(data.downloadUrl);
       }
     } catch { }
@@ -476,6 +638,7 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        setEnforcedVersion(data.minVersion);
         setVersionStatusMsg(`Enforced v${data.minVersion}! All older versions blocked.`);
         setTimeout(() => setVersionStatusMsg(null), 6000);
       } else {
@@ -914,6 +1077,24 @@ export default function AdminPage() {
     );
   }, [licenses, searchQuery]);
 
+  // Paginated Orders
+  const paginatedOrders = useMemo(() => {
+    const start = (ordersPage - 1) * ordersPerPage;
+    return filteredOrders.slice(start, start + ordersPerPage);
+  }, [filteredOrders, ordersPage, ordersPerPage]);
+
+  // Paginated Licenses
+  const paginatedLicenses = useMemo(() => {
+    const start = (licensesPage - 1) * licensesPerPage;
+    return filteredLicenses.slice(start, start + licensesPerPage);
+  }, [filteredLicenses, licensesPage, licensesPerPage]);
+
+  // Paginated Notifications
+  const paginatedNotifs = useMemo(() => {
+    const start = (notifsPage - 1) * notifsPerPage;
+    return adminNotifs.slice(start, start + notifsPerPage);
+  }, [adminNotifs, notifsPage, notifsPerPage]);
+
   // Metrics
   const pendingOrdersCount = orders.filter((o) => o.status === "pending").length;
   const approvedOrdersCount = orders.filter((o) => o.status === "approved").length;
@@ -1235,28 +1416,40 @@ export default function AdminPage() {
                   <button
                     type="button"
                     className={`admin-tab-btn ${orderFilter === "pending" ? "active" : ""}`}
-                    onClick={() => setOrderFilter("pending")}
+                    onClick={() => {
+                      setOrderFilter("pending");
+                      setOrdersPage(1);
+                    }}
                   >
                     Pending ({pendingOrdersCount})
                   </button>
                   <button
                     type="button"
                     className={`admin-tab-btn ${orderFilter === "approved" ? "active" : ""}`}
-                    onClick={() => setOrderFilter("approved")}
+                    onClick={() => {
+                      setOrderFilter("approved");
+                      setOrdersPage(1);
+                    }}
                   >
                     Approved ({approvedOrdersCount})
                   </button>
                   <button
                     type="button"
                     className={`admin-tab-btn ${orderFilter === "all" ? "active" : ""}`}
-                    onClick={() => setOrderFilter("all")}
+                    onClick={() => {
+                      setOrderFilter("all");
+                      setOrdersPage(1);
+                    }}
                   >
                     All ({orders.length})
                   </button>
                   <button
                     type="button"
                     className={`admin-tab-btn ${orderFilter === "rejected" ? "active" : ""}`}
-                    onClick={() => setOrderFilter("rejected")}
+                    onClick={() => {
+                      setOrderFilter("rejected");
+                      setOrdersPage(1);
+                    }}
                   >
                     Rejected
                   </button>
@@ -1270,9 +1463,27 @@ export default function AdminPage() {
                     type="text"
                     placeholder="Search Reference, Order ID, User..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setOrdersPage(1);
+                      setLicensesPage(1);
+                    }}
                     className="admin-search-input"
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setOrdersPage(1);
+                        setLicensesPage(1);
+                      }}
+                      className="admin-search-clear-btn"
+                      title="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -1290,22 +1501,23 @@ export default function AdminPage() {
                     </span>
                   </div>
                 ) : (
-                  <div className="admin-table-container">
-                    <table className="admin-custom-table">
-                      <thead>
-                        <tr>
-                          <th>Order ID</th>
-                          <th>Discord User</th>
-                          <th>Tier & Price</th>
-                          <th>GCash Reference #</th>
-                          <th>Sender Name</th>
-                          <th>Submitted</th>
-                          <th>Status</th>
-                          <th style={{ textAlign: "right" }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredOrders.map((order) => (
+                  <>
+                    <div className="admin-table-container">
+                      <table className="admin-custom-table">
+                        <thead>
+                          <tr>
+                            <th>Order ID</th>
+                            <th>Discord User</th>
+                            <th>Tier & Price</th>
+                            <th>GCash Reference #</th>
+                            <th>Sender Name</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th style={{ textAlign: "right" }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedOrders.map((order) => (
                           <tr key={order.id}>
                             <td style={{ fontFamily: "monospace", fontSize: 12, color: "#8da0b8" }}>
                               {order.order_id}
@@ -1477,8 +1689,20 @@ export default function AdminPage() {
                       </tbody>
                     </table>
                   </div>
-                )}
-              </div>
+                  <PaginationBar
+                    currentPage={ordersPage}
+                    totalItems={filteredOrders.length}
+                    itemsPerPage={ordersPerPage}
+                    onPageChange={setOrdersPage}
+                    onItemsPerPageChange={(n) => {
+                      setOrdersPerPage(n);
+                      setOrdersPage(1);
+                    }}
+                    itemLabel="orders"
+                  />
+                </>
+              )}
+            </div>
             </>
           )}
 
@@ -1539,14 +1763,29 @@ export default function AdminPage() {
                           fontSize: 11,
                           background: "rgba(0, 210, 255, 0.12)",
                           color: "#00d2ff",
-                          padding: "2px 8px",
+                          padding: "3px 9px",
                           borderRadius: 6,
                           fontWeight: 700,
                           border: "1px solid rgba(0, 210, 255, 0.25)",
                         }}
                       >
-                        v{minLoaderVersion} Enforced
+                        v{enforcedVersion} Active
                       </span>
+                      {minLoaderVersion.trim() !== enforcedVersion && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            background: "rgba(245, 158, 11, 0.15)",
+                            color: "#f59e0b",
+                            padding: "3px 9px",
+                            borderRadius: 6,
+                            fontWeight: 700,
+                            border: "1px solid rgba(245, 158, 11, 0.3)",
+                          }}
+                        >
+                          ● Unsaved (Click Save)
+                        </span>
+                      )}
                     </div>
                     <p
                       style={{
@@ -1576,13 +1815,13 @@ export default function AdminPage() {
                   )}
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 150 }}>
+                <div className="admin-version-grid">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     <label
                       style={{
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: 700,
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: "rgba(255, 255, 255, 0.55)",
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                       }}
@@ -1598,22 +1837,24 @@ export default function AdminPage() {
                         background: "rgba(0, 0, 0, 0.45)",
                         border: "1px solid rgba(255, 255, 255, 0.14)",
                         borderRadius: 8,
-                        padding: "7px 11px",
+                        padding: "8px 12px",
+                        height: 38,
                         color: "#ffffff",
                         fontSize: 13,
                         fontWeight: 700,
                         outline: "none",
                         fontFamily: "monospace",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 240 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     <label
                       style={{
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: 700,
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: "rgba(255, 255, 255, 0.55)",
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                       }}
@@ -1629,15 +1870,17 @@ export default function AdminPage() {
                         background: "rgba(0, 0, 0, 0.45)",
                         border: "1px solid rgba(255, 255, 255, 0.14)",
                         borderRadius: 8,
-                        padding: "7px 11px",
+                        padding: "8px 12px",
+                        height: 38,
                         color: "#ffffff",
-                        fontSize: 12,
+                        fontSize: 12.5,
                         outline: "none",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
 
-                  <div style={{ alignSelf: "flex-end" }}>
+                  <div>
                     <button
                       type="button"
                       onClick={handleSaveLoaderVersion}
@@ -1646,20 +1889,23 @@ export default function AdminPage() {
                         background: "linear-gradient(135deg, #00d2ff 0%, #0077ff 100%)",
                         color: "#000000",
                         fontWeight: 700,
-                        fontSize: 12,
+                        fontSize: 12.5,
                         border: "none",
                         borderRadius: 8,
-                        padding: "9px 16px",
+                        padding: "0 18px",
+                        height: 38,
                         cursor: isSavingVersion ? "wait" : "pointer",
                         opacity: isSavingVersion ? 0.7 : 1,
                         boxShadow: "0 4px 14px rgba(0, 210, 255, 0.25)",
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
+                        whiteSpace: "nowrap",
+                        boxSizing: "border-box",
                       }}
                     >
                       <span>{isSavingVersion ? "Saving..." : "Save & Enforce Version"}</span>
-                      <IconArrowRight size={12} />
+                      <IconArrowRight size={13} />
                     </button>
                   </div>
                 </div>
@@ -1701,142 +1947,186 @@ export default function AdminPage() {
                     type="text"
                     placeholder="Search License Key, Discord User, HWID..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setLicensesPage(1);
+                      setOrdersPage(1);
+                    }}
                     className="admin-search-input"
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setLicensesPage(1);
+                        setOrdersPage(1);
+                      }}
+                      className="admin-search-clear-btn"
+                      title="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
 
               <div className="admin-card-table">
-                <div className="admin-table-container">
-                  <table className="admin-custom-table">
-                    <thead>
-                      <tr>
-                        <th>License Key</th>
-                        <th>Bound Discord User</th>
-                        <th>Tier</th>
-                        <th>Hardware ID (HWID)</th>
-                        <th>Expires</th>
-                        <th>Status</th>
-                        <th style={{ textAlign: "right" }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredLicenses.map((lic) => (
-                        <tr key={lic.id}>
-                          <td>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#00d2ff" }}>
-                                {lic.license_key}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleCopy(lic.license_key)}
-                                className="admin-btn-copy-inline"
-                              >
-                                {copiedKey === lic.license_key ? "Copied" : "Copy"}
-                              </button>
-                            </div>
-                          </td>
-
-                          <td>
-                            <span style={{ color: "#ffffff", fontWeight: 600 }}>
-                              {lic.discord_username || "Unassigned"}
-                            </span>
-                            {lic.discord_id && (
-                              <div style={{ fontSize: 11, fontFamily: "monospace", color: "#556882" }}>
-                                {lic.discord_id}
-                              </div>
-                            )}
-                          </td>
-
-                          <td>
-                            <div style={{ fontSize: 12, color: "#cbd5e1", fontWeight: 600 }}>
-                              {lic.tier || "Standard Pass"}
-                            </div>
-                            {lic.tier && (lic.tier.includes("Vouch") || lic.tier.includes("Bonus")) && (
-                              <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 10.5, color: "#34d399", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 4, padding: "1px 6px", fontWeight: 700 }}>
-                                <span>🎁 Vouch Bonus Active</span>
-                              </div>
-                            )}
-                          </td>
-
-                          <td>
-                            {lic.hwid ? (
-                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <IconHardware size={14} />
-                                <span style={{ fontFamily: "monospace", fontSize: 12, color: "#f59e0b" }}>
-                                  {lic.hwid.substring(0, 12)}...
-                                </span>
-                              </div>
-                            ) : (
-                              <span style={{ fontSize: 12, color: "#10b981" }}>Unbound (Any PC)</span>
-                            )}
-                          </td>
-
-                          <td>
-                            {lic.expires_at ? (
-                              <div>
-                                <div style={{ fontSize: 12, color: "#ffffff", fontWeight: 600, fontFamily: "monospace" }}>
-                                  {new Date(lic.expires_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}{" "}
-                                  <span style={{ color: "#70849e", fontSize: 11 }}>
-                                    {new Date(lic.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {filteredLicenses.length === 0 ? (
+                  <div className="admin-table-empty">
+                    <p className="admin-table-empty-title">
+                      No licenses found
+                    </p>
+                    <span style={{ fontSize: 13 }}>
+                      {searchQuery
+                        ? `No licenses match "${searchQuery}"`
+                        : "No license keys found in database."}
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="admin-table-container">
+                      <table className="admin-custom-table">
+                        <thead>
+                          <tr>
+                            <th>License Key</th>
+                            <th>Bound Discord User</th>
+                            <th>Tier</th>
+                            <th>Hardware ID (HWID)</th>
+                            <th>Expires</th>
+                            <th>Status</th>
+                            <th style={{ textAlign: "right" }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedLicenses.map((lic) => (
+                            <tr key={lic.id}>
+                              <td>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#00d2ff" }}>
+                                    {lic.license_key}
                                   </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopy(lic.license_key)}
+                                    className="admin-btn-copy-inline"
+                                  >
+                                    {copiedKey === lic.license_key ? "Copied" : "Copy"}
+                                  </button>
                                 </div>
-                                <div style={{ fontSize: 10.5, color: new Date(lic.expires_at).getTime() > Date.now() ? "#10b981" : "#ef4444", marginTop: 2, fontWeight: 700 }}>
-                                  {new Date(lic.expires_at).getTime() > Date.now()
-                                    ? `● ${Math.max(1, Math.ceil((new Date(lic.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining`
-                                    : "● Expired"}
+                              </td>
+
+                              <td>
+                                <span style={{ color: "#ffffff", fontWeight: 600 }}>
+                                  {lic.discord_username || "Unassigned"}
+                                </span>
+                                {lic.discord_id && (
+                                  <div style={{ fontSize: 11, fontFamily: "monospace", color: "#556882" }}>
+                                    {lic.discord_id}
+                                  </div>
+                                )}
+                              </td>
+
+                              <td>
+                                <div style={{ fontSize: 12, color: "#cbd5e1", fontWeight: 600 }}>
+                                  {lic.tier || "Standard Pass"}
                                 </div>
-                              </div>
-                            ) : (
-                              <span style={{ fontSize: 12, color: "#00d2ff", fontWeight: 700 }}>Permanent VIP</span>
-                            )}
-                          </td>
+                                {lic.tier && (lic.tier.includes("Vouch") || lic.tier.includes("Bonus")) && (
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 10.5, color: "#34d399", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 4, padding: "1px 6px", fontWeight: 700 }}>
+                                    <span>🎁 Vouch Bonus Active</span>
+                                  </div>
+                                )}
+                              </td>
 
-                          <td>
-                            <span className={`admin-status-badge ${lic.is_banned ? "admin-status-badge-rejected" : "admin-status-badge-approved"}`}>
-                              {lic.is_banned ? "BANNED" : "ACTIVE"}
-                            </span>
-                          </td>
+                              <td>
+                                {lic.hwid ? (
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <IconHardware size={14} />
+                                    <span style={{ fontFamily: "monospace", fontSize: 12, color: "#f59e0b" }}>
+                                      {lic.hwid.substring(0, 12)}...
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span style={{ fontSize: 12, color: "#10b981" }}>Unbound (Any PC)</span>
+                                )}
+                              </td>
 
-                          <td style={{ textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", gap: 6 }}>
-                              {lic.expires_at !== null && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleExtendDays(lic, 1)}
-                                  disabled={actionLoading === lic.id}
-                                  className="admin-btn-extend-day"
-                                  title="Add +1 Extra Day for Discord Vouch"
-                                >
-                                  {actionLoading === lic.id ? "Adding..." : "+1 Day"}
-                                </button>
-                              )}
-                              {lic.hwid && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleResetHWID(lic.id)}
-                                  className="admin-btn-hwid-reset"
-                                  title="Unbind HWID"
-                                >
-                                  Reset HWID
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => handleToggleBan(lic.id)}
-                                className={`admin-btn-ban-toggle ${lic.is_banned ? "unban" : "ban"}`}
-                              >
-                                {lic.is_banned ? "Unban" : "Ban Key"}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                              <td>
+                                {lic.expires_at ? (
+                                  <div>
+                                    <div style={{ fontSize: 12, color: "#ffffff", fontWeight: 600, fontFamily: "monospace" }}>
+                                      {new Date(lic.expires_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}{" "}
+                                      <span style={{ color: "#70849e", fontSize: 11 }}>
+                                        {new Date(lic.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                      </span>
+                                    </div>
+                                    <div style={{ fontSize: 10.5, color: new Date(lic.expires_at).getTime() > Date.now() ? "#10b981" : "#ef4444", marginTop: 2, fontWeight: 700 }}>
+                                      {new Date(lic.expires_at).getTime() > Date.now()
+                                        ? `● ${Math.max(1, Math.ceil((new Date(lic.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining`
+                                        : "● Expired"}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span style={{ fontSize: 12, color: "#00d2ff", fontWeight: 700 }}>Permanent VIP</span>
+                                )}
+                              </td>
+
+                              <td>
+                                <span className={`admin-status-badge ${lic.is_banned ? "admin-status-badge-rejected" : "admin-status-badge-approved"}`}>
+                                  {lic.is_banned ? "BANNED" : "ACTIVE"}
+                                </span>
+                              </td>
+
+                              <td style={{ textAlign: "right" }}>
+                                <div className="admin-actions-cell">
+                                  {lic.expires_at !== null && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleExtendDays(lic, 1)}
+                                      disabled={actionLoading === lic.id}
+                                      className="admin-btn-extend-day"
+                                      title="Add +1 Extra Day for Discord Vouch"
+                                    >
+                                      {actionLoading === lic.id ? "Adding..." : "+1 Day"}
+                                    </button>
+                                  )}
+                                  {lic.hwid && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleResetHWID(lic.id)}
+                                      className="admin-btn-hwid-reset"
+                                      title="Unbind HWID"
+                                    >
+                                      Reset HWID
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleBan(lic.id)}
+                                    className={`admin-btn-ban-toggle ${lic.is_banned ? "unban" : "ban"}`}
+                                  >
+                                    {lic.is_banned ? "Unban" : "Ban Key"}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <PaginationBar
+                      currentPage={licensesPage}
+                      totalItems={filteredLicenses.length}
+                      itemsPerPage={licensesPerPage}
+                      onPageChange={setLicensesPage}
+                      onItemsPerPageChange={(n) => {
+                        setLicensesPerPage(n);
+                        setLicensesPage(1);
+                      }}
+                      itemLabel="licenses"
+                    />
+                  </>
+                )}
               </div>
             </>
           )}
@@ -2313,60 +2603,75 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                     No dispatched notifications found in store.
                   </div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "16px 20px" }}>
-                    {adminNotifs.map((item) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "space-between",
-                          padding: "14px 16px",
-                          background: "#080e1a",
-                          border: "1px solid #142034",
-                          borderRadius: 8,
-                          gap: 16,
-                        }}
-                      >
-                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: "#00d2ff" }}>
-                              Chameleon Cheats
-                            </span>
-                            <span style={{ fontSize: 10, background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 4, color: "#94a3b8" }}>
-                              Target: {item.target}
-                            </span>
-                            <span style={{ fontSize: 10, color: "#64748b" }}>
-                              {new Date(item.createdAt).toLocaleString()}
-                            </span>
-                          </div>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "#ffffff" }}>
-                            {item.title}
-                          </span>
-                          <span style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.4 }}>
-                            {item.message}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteNotification(item.id)}
+                  <>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "16px 20px" }}>
+                      {paginatedNotifs.map((item) => (
+                        <div
+                          key={item.id}
                           style={{
-                            background: "rgba(239, 68, 68, 0.1)",
-                            border: "1px solid rgba(239, 68, 68, 0.3)",
-                            color: "#f87171",
-                            padding: "6px 10px",
-                            borderRadius: 6,
-                            fontSize: 11,
-                            fontWeight: 600,
-                            cursor: "pointer",
-                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "flex-start",
+                            justifyContent: "space-between",
+                            padding: "14px 16px",
+                            background: "#080e1a",
+                            border: "1px solid #142034",
+                            borderRadius: 8,
+                            gap: 16,
                           }}
                         >
-                          Delete
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: "#00d2ff" }}>
+                                Chameleon Cheats
+                              </span>
+                              <span style={{ fontSize: 10, background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 4, color: "#94a3b8" }}>
+                                Target: {item.target}
+                              </span>
+                              <span style={{ fontSize: 10, color: "#64748b" }}>
+                                {new Date(item.createdAt).toLocaleString()}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "#ffffff" }}>
+                              {item.title}
+                            </span>
+                            <span style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.4 }}>
+                              {item.message}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteNotification(item.id)}
+                            style={{
+                              background: "rgba(239, 68, 68, 0.1)",
+                              border: "1px solid rgba(239, 68, 68, 0.3)",
+                              color: "#f87171",
+                              padding: "6px 10px",
+                              borderRadius: 6,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              flexShrink: 0,
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {adminNotifs.length > notifsPerPage && (
+                      <PaginationBar
+                        currentPage={notifsPage}
+                        totalItems={adminNotifs.length}
+                        itemsPerPage={notifsPerPage}
+                        onPageChange={setNotifsPage}
+                        onItemsPerPageChange={(n) => {
+                          setNotifsPerPage(n);
+                          setNotifsPage(1);
+                        }}
+                        itemLabel="broadcasts"
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </div>
