@@ -1018,7 +1018,7 @@ export default function ProfilePage() {
                         <div className="vault-loader-status-banner">
                           <h3>
                             <IconShield size={16} />
-                            <span>Chameleon V1.0.4</span>
+                            <span>Chameleon V1.0.5</span>
                           </h3>
                           <p>
                             Official memory virtualization loader for Assault Fire PH (Legacy &amp; Reborn).
