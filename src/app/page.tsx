@@ -77,6 +77,15 @@ function IconArrowDown({ size = 16, className = "" }: { size?: number; className
   );
 }
 
+function IconSearch({ size = 14, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
 function IconRefresh({ size = 14, className = "" }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
@@ -980,7 +989,10 @@ export default function Home() {
                 priority
               />
               <div className="showcase-zoom-overlay">
-                <span>🔍 Click to inspect Full HD</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <IconSearch size={13} />
+                  <span>Click to inspect Full HD</span>
+                </span>
               </div>
             </div>
 

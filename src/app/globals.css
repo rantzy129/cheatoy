@@ -4966,38 +4966,98 @@ a {
     max-height: calc(100vh - 60px);
   }
   .site-header-inner {
-    padding: 0 14px;
-    gap: 8px;
+    padding: 0 10px;
+    gap: 6px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
   .site-brand-link {
-    gap: 8px;
+    gap: 6px;
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
   }
   .brand-logo-img {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .site-brand-text {
+    min-width: 0;
+    overflow: hidden;
   }
   .site-brand-name {
-    font-size: 13.5px;
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .site-brand-tagline {
-    font-size: 9.5px;
+    display: none;
+  }
+  .site-header-actions {
+    gap: 6px;
+    flex-shrink: 0;
   }
   .site-discord-btn {
-    padding: 7px 11px;
-    font-size: 12px;
+    padding: 0;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
   }
   .site-discord-btn-text {
     display: none;
   }
   .site-discord-btn::after {
-    content: "Login";
+    display: none !important;
+    content: none !important;
   }
   .site-user-labels {
     display: none;
   }
   .site-user-profile-pill {
-    padding: 3px 6px;
+    padding: 0;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
     gap: 0;
+    flex-shrink: 0;
+  }
+  .site-mobile-toggle-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .notif-trigger-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
   }
   .site-logout-action {
     display: none;
@@ -5011,25 +5071,56 @@ a {
   }
 }
 
+@media (max-width: 360px) {
+  .site-brand-name {
+    font-size: 11.5px;
+  }
+}
+
 /* ─── 4. Hero Section Mobile Optimization (<= 768px & <= 480px) ─────────── */
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
-    padding: 36px var(--gutter, 16px) 30px;
-    gap: 28px;
+    padding: 24px 16px 20px;
+    gap: 22px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .hero::before {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .hero-title {
-    font-size: clamp(26px, 7.5vw, 38px);
+    font-size: clamp(24px, 7vw, 34px);
     line-height: 1.15;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     word-break: break-word;
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero-desc {
-    font-size: 14.5px;
-    line-height: 1.6;
-    margin-bottom: 22px;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .hero-buttons {
@@ -5045,10 +5136,16 @@ a {
     padding: 13px 20px;
     font-size: 14px;
     min-height: 48px;
+    box-sizing: border-box;
   }
 
   .hero-preview-box {
     border-radius: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 16px 12px;
+    overflow: hidden;
   }
 
   .hero-proof-selector {
@@ -5058,6 +5155,9 @@ a {
     scrollbar-width: none;
     gap: 6px;
     padding-bottom: 4px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .hero-proof-selector::-webkit-scrollbar {
     display: none;
