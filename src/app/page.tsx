@@ -2115,7 +2115,7 @@ export default function Home() {
                   style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
                   id="download-loader-home-btn"
                 >
-                  <span>Download Loader V1.0.5</span>
+                  <span>Download Loader V1.0.6</span>
                   <IconArrowUpRight size={16} />
                 </a>
               </div>
