@@ -279,17 +279,36 @@ export default function AdminPage() {
   // User List Discord Sync State
   const [isSyncingUsers, setIsSyncingUsers] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
+  const [syncCooldown, setSyncCooldown] = useState<number>(0);
+
+  // Active countdown timer for Discord sync cooldown
+  useEffect(() => {
+    if (syncCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setSyncCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [syncCooldown]);
 
   const handleSyncUserListToDiscord = async () => {
+    if (syncCooldown > 0) return;
     setIsSyncingUsers(true);
     setSyncStatusMsg(null);
     try {
-      const res = await fetch("/api/admin/licenses/sync-discord", { method: "POST" });
+      const res = await fetch("/api/admin/licenses/sync-discord", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setSyncStatusMsg(data.message || "User list synced to Discord!");
+        setSyncCooldown(15); // 15-second cooldown between live directory broadcasts
         setTimeout(() => setSyncStatusMsg(null), 5000);
       } else {
+        if (res.status === 429) {
+          setSyncCooldown(data.retryAfter || 20);
+        }
         alert(data.error || "Failed to sync user list to Discord");
       }
     } catch {
@@ -1250,11 +1269,18 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={handleSyncUserListToDiscord}
-                    disabled={isSyncingUsers}
+                    disabled={isSyncingUsers || syncCooldown > 0}
                     className="admin-btn-discord-sync"
+                    style={syncCooldown > 0 ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
                   >
                     <IconDiscord size={15} />
-                    <span>{isSyncingUsers ? "Broadcasting..." : "Sync User List to Discord"}</span>
+                    <span>
+                      {isSyncingUsers
+                        ? "Broadcasting..."
+                        : syncCooldown > 0
+                          ? `Cooldown (${syncCooldown}s)`
+                          : "Sync User List to Discord"}
+                    </span>
                   </button>
                   {syncStatusMsg && (
                     <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700 }}>

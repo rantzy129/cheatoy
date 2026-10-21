@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { sendUserAuthWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { getClientIp, checkRateLimit, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
 const SIGNING_SECRET =
   process.env.LICENSE_SIGNING_SECRET ||
@@ -38,6 +39,27 @@ function shouldDispatchSuccessWebhook(licenseKey: string, hwid?: string): boolea
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.LICENSE_VERIFY);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          valid: false,
+          error: `Verification rate limit exceeded. Please wait ${rateCheck.resetSeconds}s.`,
+          rateLimited: true,
+          retryAfter: rateCheck.resetSeconds,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": rateCheck.resetSeconds.toString(),
+            "X-RateLimit-Limit": rateCheck.limit.toString(),
+            "X-RateLimit-Remaining": rateCheck.remaining.toString(),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { license_key, discord_id, hwid } = body;
 

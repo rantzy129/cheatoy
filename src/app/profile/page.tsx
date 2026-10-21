@@ -171,6 +171,7 @@ export default function ProfilePage() {
   };
 
   const fetchReferralHistory = async (user: DiscordUser) => {
+    if (isLoadingReferrals) return;
     setIsLoadingReferrals(true);
     try {
       const res = await fetch(

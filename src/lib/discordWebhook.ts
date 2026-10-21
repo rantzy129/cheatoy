@@ -55,8 +55,16 @@ import path from "path";
 /**
  * Sends a Discord Embed message via Webhook
  */
-async function sendDiscordEmbed(targetWebhookUrl: string, embed: any, botName = "Chameleon Vault") {
-  if (!targetWebhookUrl) return;
+async function sendDiscordEmbed(
+  targetWebhookUrl: string,
+  embed: any,
+  botName = "Chameleon Vault",
+  throwOnError = false
+) {
+  if (!targetWebhookUrl) {
+    if (throwOnError) throw new Error("Discord webhook URL is not configured");
+    return;
+  }
 
   try {
     const payload = {
@@ -65,12 +73,21 @@ async function sendDiscordEmbed(targetWebhookUrl: string, embed: any, botName = 
       embeds: [embed],
     };
 
-    await fetch(targetWebhookUrl, {
+    const res = await fetch(targetWebhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.error(`Discord Webhook failed [HTTP ${res.status}]:`, errText);
+      if (throwOnError) {
+        throw new Error(`Discord Webhook HTTP ${res.status}: ${errText || res.statusText}`);
+      }
+    }
   } catch (err) {
+    if (throwOnError) throw err;
     console.warn("Failed to dispatch Discord Webhook log:", err);
   }
 }
@@ -639,12 +656,53 @@ export async function sendUserListWebhook(
     },
   ];
 
+  // Helper to chunk lines into separate fields strictly <= 900 chars (Discord max: 1024)
+  function chunkLinesIntoFields(
+    titlePrefix: string,
+    lines: string[],
+    maxCharsPerField = 900
+  ): { name: string; value: string; inline: boolean }[] {
+    if (!lines || lines.length === 0) return [];
+    const fields: { name: string; value: string; inline: boolean }[] = [];
+    let currentChunk: string[] = [];
+    let currentLen = 0;
+
+    for (const line of lines) {
+      const lineLen = line.length + 2; // +2 for \n\n
+      if (currentLen + lineLen > maxCharsPerField && currentChunk.length > 0) {
+        const partIndex = fields.length + 1;
+        fields.push({
+          name: partIndex === 1 ? titlePrefix : `${titlePrefix} (Part ${partIndex})`,
+          value: currentChunk.join("\n\n"),
+          inline: false,
+        });
+        currentChunk = [line];
+        currentLen = line.length;
+      } else {
+        currentChunk.push(line);
+        currentLen += lineLen;
+      }
+    }
+
+    if (currentChunk.length > 0) {
+      const partIndex = fields.length + 1;
+      fields.push({
+        name: fields.length === 0 ? titlePrefix : `${titlePrefix} (Part ${partIndex})`,
+        value: currentChunk.join("\n\n"),
+        inline: false,
+      });
+    }
+
+    return fields;
+  }
+
   if (vipLines.length > 0) {
-    embedFields.push({
-      name: `👑 Active VIP Members (${vipLines.length})`,
-      value: vipLines.slice(0, 15).join("\n\n") + (vipLines.length > 15 ? `\n\n*...and ${vipLines.length - 15} more VIP members*` : ""),
-      inline: false,
-    });
+    const maxVipDisplay = 25;
+    const displayedVip = vipLines.slice(0, maxVipDisplay);
+    if (vipLines.length > maxVipDisplay) {
+      displayedVip[displayedVip.length - 1] += `\n\n*...and ${vipLines.length - maxVipDisplay} more VIP members*`;
+    }
+    embedFields.push(...chunkLinesIntoFields(`👑 Active VIP Members (${vipLines.length})`, displayedVip));
   } else {
     embedFields.push({
       name: "👑 Active VIP Members (0)",
@@ -654,11 +712,12 @@ export async function sendUserListWebhook(
   }
 
   if (communityLines.length > 0) {
-    embedFields.push({
-      name: `📑 Registered Users & Community Roster (${communityLines.length})`,
-      value: communityLines.slice(0, 15).join("\n\n") + (communityLines.length > 15 ? `\n\n*...and ${communityLines.length - 15} more registered members*` : ""),
-      inline: false,
-    });
+    const maxCommunityDisplay = 25;
+    const displayedCommunity = communityLines.slice(0, maxCommunityDisplay);
+    if (communityLines.length > maxCommunityDisplay) {
+      displayedCommunity[displayedCommunity.length - 1] += `\n\n*...and ${communityLines.length - maxCommunityDisplay} more registered members*`;
+    }
+    embedFields.push(...chunkLinesIntoFields(`📑 Registered Users & Community Roster (${communityLines.length})`, displayedCommunity));
   }
 
   const embed = {
@@ -672,7 +731,7 @@ export async function sendUserListWebhook(
     timestamp: now.toISOString(),
   };
 
-  await sendDiscordEmbed(USER_LIST_WEBHOOK_URL, embed, "Chameleon Member Directory");
+  await sendDiscordEmbed(USER_LIST_WEBHOOK_URL, embed, "Chameleon Member Directory", true);
 }
 
 /**

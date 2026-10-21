@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
 const VALID_TIERS: Record<string, { duration: string; pricePhp: string }> = {
   "3days": { duration: "3 Days Pass", pricePhp: "₱150" },
@@ -16,6 +17,15 @@ const VALID_TIERS: Record<string, { duration: string; pricePhp: string }> = {
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const ipRate = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.ORDER_CREATE);
+    if (!ipRate.allowed) {
+      return createRateLimitResponse(
+        ipRate,
+        `Order submission rate limit reached. Please wait ${ipRate.resetSeconds}s before submitting again.`
+      );
+    }
+
     const body = await request.json();
     const {
       tier_id,
@@ -31,6 +41,15 @@ export async function POST(request: Request) {
 
     if (!discord_id || !discord_username) {
       return NextResponse.json({ success: false, error: "Discord authentication required" }, { status: 401 });
+    }
+
+    // Additional rate limit per Discord ID
+    const userRate = checkRateLimit(`user_${String(discord_id).trim()}`, RATE_LIMIT_PRESETS.ORDER_CREATE);
+    if (!userRate.allowed) {
+      return createRateLimitResponse(
+        userRate,
+        `Too many orders submitted from this Discord account. Please wait ${userRate.resetSeconds}s before trying again.`
+      );
     }
 
     if (!reference_no || reference_no.trim().length < 6) {

@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
 export async function GET(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.PROFILE_REFERRALS);
+    if (!rateCheck.allowed) {
+      return createRateLimitResponse(
+        rateCheck,
+        `Too many referral lookups. Please wait ${rateCheck.resetSeconds}s before refreshing.`
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username")?.trim();
     const discordId = searchParams.get("id")?.trim();

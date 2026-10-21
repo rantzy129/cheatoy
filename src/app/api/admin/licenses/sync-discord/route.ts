@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
 import { sendUserListWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +13,15 @@ export async function POST(request: Request) {
 
     if (!verifyAdminSession(credential)) {
       return NextResponse.json({ success: false, error: "Unauthorized access" }, { status: 401 });
+    }
+
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.ADMIN_DISCORD_SYNC);
+    if (!rateCheck.allowed) {
+      return createRateLimitResponse(
+        rateCheck,
+        `Discord Sync broadcast rate limit active. Please wait ${rateCheck.resetSeconds}s before broadcasting again.`
+      );
     }
 
     if (!SUPABASE_ANON_KEY) {

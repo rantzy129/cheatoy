@@ -3,9 +3,19 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
+import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.RECEIPT_ATTACH);
+    if (!rateCheck.allowed) {
+      return createRateLimitResponse(
+        rateCheck,
+        `Too many receipt upload attempts. Please wait ${rateCheck.resetSeconds}s before trying again.`
+      );
+    }
+
     const body = await request.json();
     const { order_id, receipt_image, receipt_name } = body;
 

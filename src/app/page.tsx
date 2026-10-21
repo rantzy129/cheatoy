@@ -391,6 +391,16 @@ export default function Home() {
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [isRefreshingOrder, setIsRefreshingOrder] = useState(false);
   const [orderError, setOrderError] = useState("");
+  const [submitCooldown, setSubmitCooldown] = useState<number>(0);
+
+  // Active countdown timer for order submission cooldown
+  useEffect(() => {
+    if (submitCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setSubmitCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [submitCooldown]);
 
   // GCash Receipt Screenshot State
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -817,6 +827,10 @@ export default function Home() {
       signInWithDiscord();
       return;
     }
+    if (submitCooldown > 0) {
+      setOrderError(`Please wait ${submitCooldown}s before submitting again.`);
+      return;
+    }
     if (!gcashRefNo.trim() || gcashRefNo.trim().length < 6) {
       setOrderError("Please enter a valid GCash / Bank reference number (at least 6 digits)");
       return;
@@ -850,6 +864,9 @@ export default function Home() {
       const data = await res.json();
       if (!data.success) {
         setOrderError(data.error || "Failed to submit order");
+        // Apply cooldown: if rate limited, use retryAfter from server; otherwise add a 4s anti-spam lock
+        const cooldown = data.retryAfter || (res.status === 429 ? 15 : 4);
+        setSubmitCooldown(cooldown);
       } else {
         setUserOrder(data.order);
         if (data.order_token) {
@@ -859,9 +876,11 @@ export default function Home() {
         setSenderName("");
         setReceiptFile(null);
         setReceiptPreview(null);
+        setSubmitCooldown(0);
       }
     } catch (err: any) {
       setOrderError("Submission failed: " + err.message);
+      setSubmitCooldown(4);
     } finally {
       setIsSubmittingOrder(false);
     }
@@ -1926,14 +1945,16 @@ export default function Home() {
                   <button
                     type="submit"
                     className="gcash-btn-submit"
-                    disabled={isSubmittingOrder || isProcessingReceipt}
+                    disabled={isSubmittingOrder || isProcessingReceipt || submitCooldown > 0}
                   >
                     <span>
                       {isSubmittingOrder
                         ? "Submitting Order..."
                         : isProcessingReceipt
                           ? "Optimizing Slip..."
-                          : "Submit Payment for Admin Approval"}
+                          : submitCooldown > 0
+                            ? `Please wait (${submitCooldown}s)...`
+                            : "Submit Payment for Admin Approval"}
                     </span>
                     <IconArrowUpRight size={15} />
                   </button>
