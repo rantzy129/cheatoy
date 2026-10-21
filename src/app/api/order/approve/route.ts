@@ -6,6 +6,7 @@ import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
 import {
   sendOrderApprovedWebhook,
   sendOrderRejectedWebhook,
+  updateCurrentUsersCountWebhook,
 } from "@/lib/discordWebhook";
 import { assignDiscordVipRoleAndSendDm } from "@/lib/discordBot";
 
@@ -244,6 +245,11 @@ export async function POST(request: Request) {
     // Dispatch Discord Webhook Notification for Approved Order & Minted Key
     sendOrderApprovedWebhook(order, newKey, expiresAt, referralRewardStatus).catch((e) =>
       console.warn("Approve webhook notice:", e)
+    );
+
+    // Automatically update the live VIP count card in #current-users channel (edits in-place)
+    updateCurrentUsersCountWebhook().catch((e) =>
+      console.warn("Current users count webhook notice:", e)
     );
 
     // Automated Discord VIP Role Assignment & Private DM Dispatch

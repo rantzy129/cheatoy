@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import { assignDiscordVipRoleAndSendDm } from "@/lib/discordBot";
+import { updateCurrentUsersCountWebhook } from "@/lib/discordWebhook";
 
 function calculateExpiry(tier: string) {
   const now = new Date();
@@ -57,6 +58,11 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
+
+    // Automatically update the live VIP count card in #current-users channel (edits in-place)
+    updateCurrentUsersCountWebhook().catch((e) =>
+      console.warn("Auto-update current users count notice:", e)
+    );
 
     // Auto-assign VIP role and DM customer if Discord ID is provided
     let discordBotStatus: any = null;

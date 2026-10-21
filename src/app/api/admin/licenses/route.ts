@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
-import { sendUserStatusChangeWebhook, sendLicenseExtendedWebhook } from "@/lib/discordWebhook";
+import {
+  sendUserStatusChangeWebhook,
+  sendLicenseExtendedWebhook,
+  updateCurrentUsersCountWebhook,
+} from "@/lib/discordWebhook";
 import { sendVouchBonusDm } from "@/lib/discordBot";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
@@ -89,6 +93,11 @@ export async function PATCH(request: Request) {
         }).catch((e) => console.warn("User status webhook notice:", e));
       }
 
+      // Automatically update live VIP count in #current-users channel (edits in-place)
+      updateCurrentUsersCountWebhook().catch((e) =>
+        console.warn("Auto-update current users count notice:", e)
+      );
+
       return NextResponse.json({ success: true, is_banned: newStatus, message: newStatus ? "License banned" : "License unbanned" });
     }
 
@@ -162,6 +171,11 @@ export async function PATCH(request: Request) {
           return { dmSent: false, dmError: e.message };
         });
       }
+
+      // 3. Automatically update live VIP count in #current-users channel (edits in-place)
+      updateCurrentUsersCountWebhook().catch((e) =>
+        console.warn("Auto-update current users count notice:", e)
+      );
 
       return NextResponse.json({
         success: true,

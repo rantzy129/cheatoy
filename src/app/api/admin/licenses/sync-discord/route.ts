@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
-import { sendUserListWebhook } from "@/lib/discordWebhook";
+import { sendUserListWebhook, sendCurrentUsersCountWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
 
@@ -65,12 +65,21 @@ export async function POST(request: Request) {
       }
     }
 
-    // Dispatch comprehensive User List Roster to Discord Webhook
-    await sendUserListWebhook({
-      licenses: licenses || [],
-      orders: orders || [],
-      guildMembers: guildMembers,
-    });
+    const target = body?.target || "both"; // "both" | "current_users" | "user_list"
+
+    // 1. Dispatch Public Live VIP Count to CURRENT USERS Webhook (Count only, NO user details)
+    if (target === "both" || target === "current_users") {
+      await sendCurrentUsersCountWebhook(licenses || []);
+    }
+
+    // 2. Dispatch Comprehensive Directory to USER LIST Webhook
+    if (target === "both" || target === "user_list") {
+      await sendUserListWebhook({
+        licenses: licenses || [],
+        orders: orders || [],
+        guildMembers: guildMembers,
+      });
+    }
 
     const totalTracked = (licenses || []).length + (orders || []).length + guildMembers.length;
 
@@ -79,7 +88,7 @@ export async function POST(request: Request) {
       license_count: (licenses || []).length,
       order_count: (orders || []).length,
       guild_member_count: guildMembers.length,
-      message: `Successfully synchronized ${totalTracked} registered users, orders, and VIP members to Discord!`,
+      message: `Successfully synchronized Discord channels (Current Users Count & Member Directory)!`,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message || "Internal server error" }, { status: 500 });

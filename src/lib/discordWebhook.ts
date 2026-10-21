@@ -17,6 +17,11 @@ const USER_LIST_WEBHOOK_URL =
   process.env.DISCORD_USER_LIST_WEBHOOK_URL ||
   "https://discord.com/api/webhooks/1561427589262999702/nkwPzgtON8LsGD9nRlsxq7nww2LzGXdepfi1IUDCcpOLMXi0eHQuy2RfV7xocN14Ko3M";
 
+// Dedicated Webhook: CURRENT USERS (COUNT ONLY — PUBLIC-SAFE CHANNEL)
+const CURRENT_USERS_WEBHOOK_URL =
+  process.env.DISCORD_CURRENT_USERS_WEBHOOK_URL ||
+  "https://discord.com/api/webhooks/1562463968822431756/V_mlQ4OBJ8rVRrq5bXvY8lAr_pBwqd_cdPGtwKWX92y4au0W_k67zO7hb-CuLXxqROti";
+
 interface OrderWebhookData {
   order_id: string;
   discord_id: string;
@@ -733,6 +738,146 @@ export async function sendUserListWebhook(
 
   await sendDiscordEmbed(USER_LIST_WEBHOOK_URL, embed, "Chameleon Member Directory", true);
 }
+
+const CURRENT_USERS_STATE_FILE = path.join(process.cwd(), "data", "discord_current_users.json");
+
+function getCurrentUsersMessageId(): string | null {
+  if (process.env.DISCORD_CURRENT_USERS_MESSAGE_ID) {
+    return process.env.DISCORD_CURRENT_USERS_MESSAGE_ID.trim();
+  }
+  try {
+    if (fs.existsSync(CURRENT_USERS_STATE_FILE)) {
+      const content = fs.readFileSync(CURRENT_USERS_STATE_FILE, "utf-8");
+      const parsed = JSON.parse(content);
+      if (parsed?.messageId) return String(parsed.messageId).trim();
+    }
+  } catch {}
+  return "1562469590842220635";
+}
+
+function saveCurrentUsersMessageId(messageId: string) {
+  try {
+    const dir = path.dirname(CURRENT_USERS_STATE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      CURRENT_USERS_STATE_FILE,
+      JSON.stringify({ messageId, updatedAt: new Date().toISOString() }, null, 2),
+      "utf-8"
+    );
+  } catch (e) {
+    console.warn("Notice saving current users message id:", e);
+  }
+}
+
+/**
+ * Updates the Live Active VIP Count on Discord by EDITING the existing message in-place.
+ * STRICT REQUIREMENT: COUNT ONLY — NO personal details, usernames, IDs, or HWIDs (Publicly visible).
+ * If the message doesn't exist yet or was deleted, it creates a new one and tracks the message ID.
+ */
+export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
+  if (!CURRENT_USERS_WEBHOOK_URL) return;
+
+  const now = new Date();
+  const nowUnix = Math.floor(now.getTime() / 1000);
+  let activeCount = 0;
+
+  if (passedLicenses && Array.isArray(passedLicenses)) {
+    activeCount = passedLicenses.filter(
+      (lic) => !lic.is_banned && lic.expires_at && new Date(lic.expires_at) > now
+    ).length;
+  } else {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const { SUPABASE_URL, SUPABASE_ANON_KEY } = await import("./supabase");
+      if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data: licenses } = await supabase.from("licenses").select("is_banned, expires_at");
+        activeCount = (licenses || []).filter(
+          (lic: any) => !lic.is_banned && lic.expires_at && new Date(lic.expires_at) > now
+        ).length;
+      }
+    } catch (e) {
+      console.warn("Notice querying live licenses for current users count:", e);
+    }
+  }
+
+  const embed = {
+    title: "⚡ Chameleon Cheats — Live Active VIP Status",
+    description: "Official real-time counter of current active VIP subscribers. Fully verified and operational.",
+    color: 0x00d2ff, // Neon Cyan
+    fields: [
+      {
+        name: "👥 Current Active VIPs",
+        value: `\`\`\`css\n[ ${activeCount} ACTIVE SUBSCRIBERS ]\n\`\`\``,
+        inline: false,
+      },
+      {
+        name: "🛡️ Cheat Status",
+        value: "🟢 **Undetected & Online**",
+        inline: true,
+      },
+      {
+        name: "⚡ System Health",
+        value: "🟢 **100% Operational**",
+        inline: true,
+      },
+      {
+        name: "📅 Last Synced",
+        value: `<t:${nowUnix}:F>\n(<t:${nowUnix}:R>)`,
+        inline: false,
+      },
+    ],
+    footer: {
+      text: "Chameleon Cheats • Public Status Channel (Live Auto-Sync)",
+      icon_url: "https://chameleoncheats.com/favicon.ico",
+    },
+    timestamp: now.toISOString(),
+  };
+
+  const messageId = getCurrentUsersMessageId();
+
+  // 1. Attempt to EDIT the existing message in-place
+  if (messageId) {
+    try {
+      const res = await fetch(`${CURRENT_USERS_WEBHOOK_URL}/messages/${messageId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+
+      if (res.ok) {
+        return; // Successfully edited existing message in-place!
+      }
+      console.warn(`Discord Webhook PATCH returned HTTP ${res.status}, creating new message...`);
+    } catch (err) {
+      console.warn("Notice editing current users webhook message:", err);
+    }
+  }
+
+  // 2. Fallback: POST a new message with wait=true to capture the message ID for future edits
+  try {
+    const res = await fetch(`${CURRENT_USERS_WEBHOOK_URL}?wait=true`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: "Chameleon VIP Live Status",
+        avatar_url: "https://chameleoncheats.com/favicon.ico",
+        embeds: [embed],
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data?.id) {
+        saveCurrentUsersMessageId(data.id);
+      }
+    }
+  } catch (err) {
+    console.warn("Notice creating new current users webhook message:", err);
+  }
+}
+
+export const updateCurrentUsersCountWebhook = sendCurrentUsersCountWebhook;
 
 /**
  * Sends a webhook notification when bonus days are added to a license (e.g. Vouch reward)
