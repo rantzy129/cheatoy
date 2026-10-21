@@ -740,7 +740,7 @@ namespace ChameleonAuth
             }
             else
             {
-                std::string err = "ACCESS DENIED: " + auth.errorMessage + "\n\nLicense mismatch, expired, or tampered.\nPlease renew at https://chameleoncheats.com";
+                std::string err = "ACCESS DENIED: " + auth.errorMessage + "\n\nLicense mismatch, expired, or tampered.\nPlease renew at https://chameleon-cheats.vercel.app";
                 MessageBoxA(NULL, err.c_str(), "Chameleon Cheats - Security Enclave", MB_OK | MB_ICONERROR);
                 return false;
             }

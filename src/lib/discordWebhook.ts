@@ -74,7 +74,7 @@ async function sendDiscordEmbed(
   try {
     const payload = {
       username: botName,
-      avatar_url: "https://chameleoncheats.com/favicon.ico",
+      avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
       embeds: [embed],
     };
 
@@ -115,13 +115,13 @@ async function sendDiscordEmbedWithFile(
       fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")
         ? "image/jpeg"
         : fileName.endsWith(".webp")
-        ? "image/webp"
-        : "image/png";
+          ? "image/webp"
+          : "image/png";
 
     const formData = new FormData();
     const payload = {
       username: botName,
-      avatar_url: "https://chameleoncheats.com/favicon.ico",
+      avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
       embeds: [
         {
           ...embed,
@@ -155,9 +155,8 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFi
 
   const embed = {
     title: "📦 New VIP Order Submitted (Pending Verification)",
-    description: `A customer has submitted a new payment for verification.${
-      receiptFilePath ? "\n📎 **Official GCash payment receipt attached below.**" : ""
-    }`,
+    description: `A customer has submitted a new payment for verification.${receiptFilePath ? "\n📎 **Official GCash payment receipt attached below.**" : ""
+      }`,
     color: 0x00d2ff, // Neon Cyan
     fields: [
       {
@@ -360,7 +359,7 @@ export async function sendOrderRejectedWebhook(order: OrderWebhookData) {
 export async function sendUserAuthWebhook(log: UserAuthLogData) {
   const userMention = log.discord_id ? `<@${log.discord_id}>` : `\`${log.discord_username || "Unknown"}\``;
   const usernameClean = log.discord_username ? `@${log.discord_username}` : "Unbound";
-  
+
   const expiryDisplay = log.expires_at && log.expires_at !== "Lifetime"
     ? `<t:${Math.floor(new Date(log.expires_at).getTime() / 1000)}:R>`
     : "♾️ Lifetime";
@@ -414,7 +413,7 @@ export async function sendUserAuthWebhook(log: UserAuthLogData) {
  */
 export async function sendUserStatusChangeWebhook(data: UserStatusChangeData) {
   const userMention = data.discord_id ? `<@${data.discord_id}>` : `\`${data.discord_username || "Unbound"}\``;
-  
+
   let actionTitle = "⚙️ User Status Updated";
   let actionColor = 0x3b82f6; // Blue
 
@@ -629,7 +628,7 @@ export async function sendUserListWebhook(
   const communityLines: string[] = nonVipUsers.map((u, idx) => {
     const mention = u.discord_id ? `<@${u.discord_id}>` : `@${u.discord_username || "Unknown"}`;
     const nameStr = u.discord_username ? `(\`@${u.discord_username}\`)` : (u.global_name ? `(\`${u.global_name}\`)` : "");
-    
+
     if (u.status === "pending") {
       return `🟡 **${idx + 1}.** ${mention} ${nameStr}\n> ⏳ **Payment Under Review** (Ref: \`${u.reference_no || "N/A"}\` • ${u.tier || "VIP"})\n> 🆔 Order: \`${u.order_id || "N/A"}\``;
     }
@@ -751,7 +750,7 @@ function getCurrentUsersMessageId(): string | null {
       const parsed = JSON.parse(content);
       if (parsed?.messageId) return String(parsed.messageId).trim();
     }
-  } catch {}
+  } catch { }
   return "1562469590842220635";
 }
 
@@ -829,7 +828,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
     ],
     footer: {
       text: "Chameleon Cheats • Public Status Channel (Live Auto-Sync)",
-      icon_url: "https://chameleoncheats.com/favicon.ico",
+      icon_url: "https://chameleon-cheats.vercel.app/favicon.ico",
     },
     timestamp: now.toISOString(),
   };
@@ -861,7 +860,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: "Chameleon VIP Live Status",
-        avatar_url: "https://chameleoncheats.com/favicon.ico",
+        avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
         embeds: [embed],
       }),
     });
