@@ -456,7 +456,7 @@ export default function AdminPage() {
         setMinLoaderVersion(data.minVersion);
         if (data.downloadUrl) setDownloadPageUrl(data.downloadUrl);
       }
-    } catch {}
+    } catch { }
   };
 
   const handleSaveLoaderVersion = async () => {
@@ -539,7 +539,7 @@ export default function AdminPage() {
           setIsAuthenticated(true);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       isMounted = false;
@@ -822,11 +822,11 @@ export default function AdminPage() {
           prev.map((l) =>
             l.id === lic.id
               ? {
-                  ...l,
-                  expires_at: data.new_expires_at,
-                  tier: data.tier || l.tier,
-                  is_banned: false,
-                }
+                ...l,
+                expires_at: data.new_expires_at,
+                tier: data.tier || l.tier,
+                is_banned: false,
+              }
               : l
           )
         );
@@ -2172,8 +2172,8 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                         {notifTarget === "all"
                           ? "Every visitor and registered Discord account (including Free Members like @somaris1) will see this announcement."
                           : notifTarget === "buyers"
-                          ? "Only accounts with an unexpired VIP License will receive this. Accounts marked as 'Free Member' are excluded."
-                          : "Only users with an active VIP license whose Discord snowflake is not found in your server will see this."}
+                            ? "Only accounts with an unexpired VIP License will receive this. Accounts marked as 'Free Member' are excluded."
+                            : "Only users with an active VIP license whose Discord snowflake is not found in your server will see this."}
                       </p>
                     </div>
 

@@ -25,12 +25,12 @@ function ensureDir() {
   if (!fs.existsSync(dir)) {
     try {
       fs.mkdirSync(dir, { recursive: true });
-    } catch {}
+    } catch { }
   }
 }
 
 /**
- * Compare two semver-like strings: e.g. "1.0.5" vs "1.0.6"
+ * Compare two semver-like strings: e.g. "1.0.6" vs "1.0.6"
  * Returns true if clientVersion < requiredVersion or if clientVersion is missing/empty.
  */
 export function isVersionOutdated(clientVersion: string | null | undefined, requiredVersion: string): boolean {
@@ -89,7 +89,7 @@ export async function getMinLoaderVersion(): Promise<VersionConfig> {
       const parsed = JSON.parse(raw);
       if (parsed?.minVersion) return parsed;
     }
-  } catch {}
+  } catch { }
 
   return DEFAULT_CONFIG;
 }
