@@ -43,6 +43,9 @@
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 body {
@@ -4487,10 +4490,1704 @@ a {
   .vault-vouch-promo-card {
     flex-direction: column;
     align-items: stretch;
-    padding: 20px;
-    gap: 20px;
+    padding: 20px 16px;
+    gap: 16px;
   }
   .vault-vouch-promo-right {
     min-width: auto;
+    width: 100%;
+  }
+  .btn-vouch-action {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHAMELEON CHEATS — COMPREHENSIVE MOBILE RESPONSIVE ENGINE (v2.0)
+   Covers Viewport < 768px (Tablets & Mobile) and < 480px (Smartphones)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Keyframes & Animation Primitives ────────────────────────────────── */
+@keyframes slideDownDrawer {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ─── Duration Buttons & Badges ──────────────────────────────────────────── */
+
+.duration-btn {
+  position: relative;
+}
+
+.duration-badge-hot {
+  position: absolute;
+  top: -8px;
+  right: 6px;
+  background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
+.duration-badge-value {
+  position: absolute;
+  top: -8px;
+  right: 6px;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.modal-sheet-handle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only-logout {
+    display: none !important;
+  }
+
+  .modal-sheet-handle {
+    display: block;
+    width: 38px;
+    height: 4px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.22);
+    margin: 0 auto 16px;
+  }
+}
+
+/* ─── 2. Universal Navigation Drawer (Mobile <= 768px) ──────────────────── */
+.site-mobile-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .site-nav-links {
+    display: none !important;
+  }
+
+  .site-mobile-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: #0e1626;
+    border: 1px solid #1c2b42;
+    color: #ffffff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .site-mobile-toggle-btn:hover,
+  .site-mobile-toggle-btn:active {
+    background: #141f33;
+    border-color: #00d2ff;
+    color: #00d2ff;
+  }
+
+  .site-mobile-backdrop {
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(2, 4, 8, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 198;
+    animation: fadeInBackdrop 0.16s ease-out;
+  }
+
+  .site-mobile-drawer {
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 68px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #060911;
+    border-bottom: 1px solid #141f33;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9);
+    z-index: 199;
+    animation: slideDownDrawer 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .site-mobile-drawer-inner {
+    padding: 14px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .site-mobile-nav-group {
+    display: flex;
+    flex-direction: column;
+    background: #090e19;
+    border: 1px solid #141f33;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .site-mobile-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 15px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #cbd5e1;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .site-mobile-nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .site-mobile-nav-link:active {
+    background: rgba(0, 210, 255, 0.06);
+    color: #ffffff;
+  }
+
+  .site-mobile-nav-link.active {
+    color: #00d2ff;
+    font-weight: 700;
+    background: rgba(0, 210, 255, 0.07);
+  }
+
+  .mobile-nav-item-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .mobile-nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: color 0.15s ease;
+  }
+
+  .site-mobile-nav-link.active .mobile-nav-icon,
+  .site-mobile-nav-link:active .mobile-nav-icon {
+    color: #00d2ff;
+  }
+
+  .mobile-nav-text {
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-nav-arrow {
+    color: #475569;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .site-mobile-nav-link:active .mobile-nav-arrow {
+    transform: translateX(2px);
+    color: #00d2ff;
+  }
+
+  .mobile-nav-meta {
+    font-size: 11px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(0, 210, 255, 0.08);
+    border: 1px solid rgba(0, 210, 255, 0.22);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .mobile-nav-badge-pill {
+    font-size: 10px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  .site-mobile-auth-card {
+    background: #090e19;
+    border: 1px solid #141f33;
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .site-mobile-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .site-mobile-user-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .site-mobile-avatar-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .site-mobile-online-status {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid #090e19;
+  }
+
+  .site-mobile-user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .site-mobile-user-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .site-mobile-user-sub {
+    font-size: 11px;
+    color: #00d2ff;
+    font-weight: 600;
+  }
+
+  .site-mobile-auth-buttons {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .site-mobile-btn-profile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 13px;
+    background: rgba(0, 210, 255, 0.1);
+    border: 1px solid rgba(0, 210, 255, 0.28);
+    color: #00d2ff;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .site-mobile-btn-profile:active {
+    background: #00d2ff;
+    color: #040914;
+  }
+
+  .site-mobile-btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .site-mobile-btn-logout:active {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #f87171;
+  }
+
+  .site-mobile-login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .site-mobile-login-head {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .site-mobile-login-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .site-mobile-login-sub {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.45;
+  }
+
+  .site-mobile-discord-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    background: #5865f2;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .site-mobile-discord-login:active {
+    background: #4752c4;
+  }
+
+  .site-mobile-discord-community {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #090e19;
+    border: 1px solid #141f33;
+    border-radius: 12px;
+    color: #818cf8;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .site-mobile-discord-community:active {
+    border-color: #5865f2;
+  }
+
+  .site-mobile-community-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .site-mobile-community-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .site-mobile-community-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+
+  .site-mobile-community-desc {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .site-mobile-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 6px 0 2px;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .site-mobile-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+  }
+}
+
+/* ─── 3. Smartphone Header Refinement (<= 480px) ────────────────────────── */
+@media (max-width: 480px) {
+  .site-global-header {
+    height: 60px;
+  }
+  .site-mobile-backdrop {
+    top: 60px;
+  }
+  .site-mobile-drawer {
+    top: 60px;
+    max-height: calc(100vh - 60px);
+  }
+  .site-header-inner {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .site-brand-link {
+    gap: 8px;
+  }
+  .brand-logo-img {
+    width: 32px;
+    height: 32px;
+  }
+  .site-brand-name {
+    font-size: 13.5px;
+  }
+  .site-brand-tagline {
+    font-size: 9.5px;
+  }
+  .site-discord-btn {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+  .site-discord-btn-text {
+    display: none;
+  }
+  .site-discord-btn::after {
+    content: "Login";
+  }
+  .site-user-labels {
+    display: none;
+  }
+  .site-user-profile-pill {
+    padding: 3px 6px;
+    gap: 0;
+  }
+  .site-logout-action {
+    display: none;
+  }
+  .site-mobile-backdrop,
+  .site-mobile-drawer {
+    top: 60px;
+  }
+  .site-mobile-drawer {
+    max-height: calc(100vh - 60px);
+  }
+}
+
+/* ─── 4. Hero Section Mobile Optimization (<= 768px & <= 480px) ─────────── */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 36px var(--gutter, 16px) 30px;
+    gap: 28px;
+  }
+
+  .hero-title {
+    font-size: clamp(26px, 7.5vw, 38px);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    word-break: break-word;
+  }
+
+  .hero-desc {
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .hero-buttons a {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 14px;
+    min-height: 48px;
+  }
+
+  .hero-preview-box {
+    border-radius: 12px;
+  }
+
+  .hero-proof-selector {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+  .hero-proof-selector::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-proof-tab-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 11.5px;
+    padding: 8px 12px;
+    min-height: 38px;
+  }
+
+  .preview-meta-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .preview-meta-label {
+    font-size: 10px;
+  }
+
+  .preview-meta-val {
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 440px) {
+  .preview-meta-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .preview-meta-grid .preview-meta-item:last-child {
+    grid-column: span 2;
+  }
+}
+
+/* ─── 5. Feature Arsenal Mobile Optimization ────────────────────────────── */
+@media (max-width: 768px) {
+  .features-container {
+    padding: 0 16px;
+  }
+
+  .features-grid-summary {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-summary-card {
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+
+  .feature-card-heading {
+    font-size: 18px;
+  }
+
+  .feature-card-intro {
+    font-size: 13px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .feature-summary-list {
+    gap: 12px;
+  }
+
+  .feature-item-label {
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .feature-item-detail {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+}
+
+/* ─── 6. Proofs Gallery & Architecture Grid (<= 768px) ─────────────────── */
+@media (max-width: 768px) {
+  .proofs-gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 24px;
+  }
+
+  .proof-card-body {
+    padding: 16px 14px;
+  }
+
+  .proof-card-title {
+    font-size: 15.5px;
+  }
+
+  .proof-card-desc {
+    font-size: 12.5px;
+  }
+
+  .proof-spec-pill {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+
+  .arch-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .arch-col-detected,
+  .arch-col-safe {
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+
+  .arch-title {
+    font-size: 16px;
+  }
+
+  .arch-desc {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .arch-point-list {
+    gap: 12px;
+  }
+
+  .arch-point-item {
+    font-size: 12.5px;
+  }
+
+  .arch-metrics-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px 10px;
+  }
+
+  .arch-metric-num {
+    font-size: 18px;
+  }
+
+  .arch-metric-label {
+    font-size: 10px;
+  }
+}
+
+/* ─── 7. VIP Pricing & Single Product Checkout Box (<= 768px & <= 520px) ── */
+@media (max-width: 768px) {
+  .pricing-section {
+    padding: 40px 16px;
+  }
+
+  .pricing-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .pricing-info-col h2 {
+    font-size: clamp(24px, 6.5vw, 34px);
+    margin-bottom: 14px;
+  }
+
+  .pricing-info-col p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .checklist {
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .checklist li {
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .checkout-box {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  .checkout-box-top {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+  }
+
+  .product-tag-wrap h3 {
+    font-size: 16px;
+  }
+
+  .product-tag-wrap span {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 520px) {
+  .checkout-box {
+    padding: 16px 12px;
+  }
+
+  .duration-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .duration-btn {
+    padding: 10px 6px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .btn-duration-name {
+    font-size: 12px;
+  }
+
+  .btn-duration-price {
+    font-size: 13.5px;
+  }
+
+  .lifetime-btn {
+    padding: 10px 12px;
+    min-height: 52px;
+  }
+
+  .price-summary-box {
+    padding: 12px;
+    margin: 14px 0;
+  }
+
+  .price-summary-title {
+    font-size: 12px;
+  }
+
+  .price-tag-big {
+    font-size: 24px;
+  }
+
+  .buy-key-btn,
+  .btn-discord-checkout {
+    min-height: 48px;
+    font-size: 13.5px;
+    padding: 11px 14px;
+  }
+
+  .checkout-trust-row {
+    font-size: 10.5px;
+    gap: 6px;
+  }
+}
+
+/* ─── 8. GCash Payment, Profile & Order Lightbox Modals (<= 540px) ───────── */
+@media (max-width: 540px) {
+  .modal-overlay {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  .gcash-modal-card,
+  .profile-modal-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: 94vh;
+    padding: 20px 14px 28px;
+    border-radius: 16px 16px 8px 8px;
+    margin: 0;
+  }
+
+  .gcash-modal-title {
+    font-size: 19px;
+  }
+
+  .gcash-modal-sub {
+    font-size: 12px;
+  }
+
+  .gcash-amount-banner {
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+
+  .gcash-amount-val {
+    font-size: 22px;
+  }
+
+  .gcash-qr-box {
+    padding: 8px;
+    margin-bottom: 14px;
+  }
+
+  .gcash-qr-img {
+    width: 200px;
+    max-width: 100%;
+  }
+
+  .gcash-input {
+    font-size: 16px !important; /* Critical: Disables iOS Safari Auto-Zoom */
+    padding: 11px 13px;
+    min-height: 44px;
+  }
+
+  .gcash-receipt-dropzone {
+    padding: 14px 10px;
+    min-height: 76px;
+  }
+
+  .gcash-receipt-text {
+    font-size: 12.5px;
+  }
+
+  .gcash-receipt-sub {
+    font-size: 10.5px;
+  }
+
+  .gcash-btn-submit {
+    height: 48px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .modal-discord-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .modal-discord-banner-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    height: 38px;
+  }
+
+  .modal-actions-duo {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Profile Modal inside Home Page */
+  .profile-header-section {
+    gap: 12px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+  }
+
+  .profile-avatar-large {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .profile-user-info h3 {
+    font-size: 17px;
+  }
+
+  .key-display-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .license-secret-text {
+    word-break: break-all;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .btn-profile-copy {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+  }
+
+  .modal-approved-key-card {
+    padding: 14px 12px;
+  }
+
+  .modal-approved-key-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .modal-approved-key-text,
+  .modal-approved-key-masked {
+    word-break: break-all;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .btn-modal-copy-key {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+  }
+
+  .order-status-card {
+    padding: 12px;
+  }
+
+  .remaining-time-val {
+    font-size: 20px;
+  }
+}
+
+/* Proofs Lightbox Modal Mobile Refinement (<= 640px) */
+@media (max-width: 640px) {
+  .lightbox-overlay {
+    padding: 8px;
+  }
+
+  .lightbox-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .lightbox-title {
+    font-size: 13.5px;
+  }
+
+  .lightbox-close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .lightbox-footer {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .lightbox-desc {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .lightbox-specs {
+    gap: 4px;
+  }
+
+  .lightbox-specs .proof-spec-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+/* ─── 9. VIP Member Vault Profile Page (<= 768px & <= 480px) ────────────── */
+@media (max-width: 768px) {
+  .vault-container {
+    padding: 18px 14px 60px;
+  }
+
+  .vault-header {
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+  }
+
+  .vault-header-title h1 {
+    font-size: 21px;
+  }
+
+  .vault-header-title p {
+    font-size: 12.5px;
+  }
+
+  .vault-user-console {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .vault-user-info {
+    width: 100%;
+  }
+
+  .vault-header-actions {
+    width: 100%;
+    border-left: none;
+    padding-left: 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn-vault-subtle {
+    justify-content: center;
+    height: 38px;
+  }
+
+  .vault-tabs-nav {
+    background: #080d1a;
+    border: 1px solid #142034;
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    margin: 16px 0 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .vault-tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vault-tab-btn {
+    padding: 8px 12px;
+    font-size: 11.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .vault-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .vault-card {
+    padding: 18px 14px;
+  }
+
+  .vault-card-header h2 {
+    font-size: 15px;
+  }
+
+  .vault-key-container {
+    padding: 14px 12px;
+  }
+
+  .vault-key-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 10px;
+  }
+
+  .vault-key-code,
+  .vault-key-masked-code {
+    font-size: 13.5px;
+    word-break: break-all;
+    text-align: center;
+  }
+
+  .vault-key-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .btn-key-action,
+  .btn-key-copy {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  /* Referral Tab Mobile Optimization */
+  .vault-referral-card {
+    padding: 18px 14px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .vault-referral-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .vault-referral-link-box {
+    padding: 14px 12px;
+  }
+
+  .vault-referral-input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+  }
+
+  .vault-referral-input {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .btn-vault-copy-ref {
+    padding: 7px 12px;
+    font-size: 11.5px;
+    flex-shrink: 0;
+    min-height: 38px;
+  }
+
+  .btn-vault-copy-secondary {
+    font-size: 12px;
+    padding: 9px 12px;
+    min-height: 40px;
+  }
+
+  .vault-referral-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .vault-referral-kpi-card {
+    padding: 14px 16px;
+  }
+
+  .vault-referral-kpi-value {
+    font-size: 20px;
+  }
+
+  /* Vouch Promotional Box Mobile */
+  .vault-vouch-promo-card {
+    padding: 18px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .vault-vouch-promo-right {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .btn-vouch-action {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .vault-vouch-steps {
+    gap: 8px;
+  }
+
+  .vault-vouch-step-item {
+    font-size: 12px;
+  }
+
+  .vault-vouch-step-item code {
+    font-size: 11px;
+    word-break: break-all;
+  }
+
+  .vault-orders-card {
+    padding: 18px 14px;
+  }
+
+  .vault-orders-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+  }
+
+  .vault-table {
+    min-width: 560px;
+    font-size: 12px;
+  }
+
+  .vault-table th,
+  .vault-table td {
+    padding: 10px 8px;
+  }
+
+  .vault-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .vault-guest-station {
+    margin: 24px auto 50px;
+    padding: 24px 16px;
+  }
+
+  .vault-guest-station h1 {
+    font-size: 20px;
+  }
+}
+
+/* ─── 10. Universal Footer Optimization (<= 768px & <= 640px) ───────────── */
+@media (max-width: 768px) {
+  .site-global-footer {
+    padding: 40px 16px 0;
+  }
+
+  .site-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 32px;
+  }
+
+  .footer-giant-brand-row {
+    padding: 20px 0 6px;
+  }
+
+  .footer-giant-wordmark {
+    font-size: clamp(36px, 12vw, 76px);
+    line-height: 0.9;
+    text-align: center;
+  }
+
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+/* ─── 11. Ultra-Compact Smartphone Viewports (<= 380px) ─────────────────── */
+@media (max-width: 380px) {
+  .site-brand-tagline {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: 24px;
+  }
+
+  .duration-btn {
+    padding: 8px 4px;
+  }
+
+  .btn-duration-name {
+    font-size: 11px;
+  }
+
+  .btn-duration-price {
+    font-size: 12px;
+  }
+
+  .price-tag-big {
+    font-size: 22px;
+  }
+
+  .vault-referral-input-group {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .btn-vault-copy-ref {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+  }
+
+  .vault-header-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── 4. Chameleon Cheats Notification System ───────────────────────────── */
+.notif-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.notif-trigger-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: #0e1626;
+  border: 1px solid #1c2b42;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.notif-trigger-btn:hover,
+.notif-trigger-btn:active,
+.notif-trigger-btn.active {
+  background: #142034;
+  border-color: #00d2ff;
+  color: #00d2ff;
+}
+
+.notif-badge-counter {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: #00d2ff;
+  color: #040914;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.notif-flyout {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 20px);
+  background: #070c16;
+  border: 1px solid #1a273e;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+  z-index: 250;
+  overflow: hidden;
+  animation: slideDownDrawer 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #0b1220;
+  border-bottom: 1px solid #142034;
+}
+
+.notif-head-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.notif-head-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.notif-head-sub {
+  font-size: 10px;
+  color: #00d2ff;
+  font-weight: 600;
+}
+
+.notif-mark-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.notif-mark-all-btn:hover {
+  color: #00d2ff;
+  background: rgba(0, 210, 255, 0.06);
+}
+
+.notif-body {
+  max-height: 380px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notif-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 11px 13px;
+  background: #0d1524;
+  border: 1px solid #17243a;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.notif-card.unread {
+  border-color: rgba(0, 210, 255, 0.35);
+  background: #0f192b;
+}
+
+.notif-card.alert {
+  border-left: 3px solid #f59e0b;
+}
+
+.notif-card.announcement {
+  border-left: 3px solid #00d2ff;
+}
+
+.notif-card.update {
+  border-left: 3px solid #10b981;
+}
+
+.notif-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notif-sender-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #00d2ff;
+}
+
+.notif-sender-name {
+  letter-spacing: 0.01em;
+}
+
+.notif-dismiss-btn {
+  background: transparent;
+  border: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.notif-dismiss-btn:hover {
+  color: #cbd5e1;
+}
+
+.notif-card-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+}
+
+.notif-card-msg {
+  font-size: 11.5px;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.notif-card-action {
+  padding-top: 4px;
+}
+
+.notif-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #00d2ff;
+  background: rgba(0, 210, 255, 0.1);
+  border: 1px solid rgba(0, 210, 255, 0.28);
+  padding: 5px 11px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.notif-action-link:hover,
+.notif-action-link:active {
+  background: #00d2ff;
+  color: #040914;
+}
+
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  gap: 6px;
+  color: #475569;
+}
+
+.notif-empty-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.notif-empty-text {
+  font-size: 11px;
+  color: #475569;
+}
+
+.notif-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #080d17;
+  border-top: 1px solid #121c2d;
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.notif-foot-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+@media (max-width: 480px) {
+  .notif-flyout {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* ─── 5. VIP Vault Discord Alert Banner ─────────────────────────────────── */
+.vault-discord-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #09101d;
+  border: 1px solid #192842;
+  border-left: 4px solid #00d2ff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.vault-discord-alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vault-discord-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #00d2ff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.vault-discord-alert-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.vault-discord-alert-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 680px;
+}
+
+.vault-discord-alert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #5865f2;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.vault-discord-alert-btn:hover {
+  background: #4752c4;
+}
+
+@media (max-width: 768px) {
+  .vault-discord-alert-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+  .vault-discord-alert-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+
+

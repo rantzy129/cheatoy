@@ -116,12 +116,33 @@ function IconKey({ size = 18, className }: { size?: number; className?: string }
   );
 }
 
+function IconBell({ size = 16, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+function IconGift({ size = 16, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polyline points="20 12 20 22 4 22 4 12" />
+      <rect x="2" y="7" width="20" height="5" />
+      <line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+    </svg>
+  );
+}
+
 export default function ProfilePage() {
   const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
   const [activeLicense, setActiveLicense] = useState<any | null>(null);
   const [userOrders, setUserOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Taste-Skill requirement: Key is DEFAULT AS HIDDEN
   const [isKeyRevealed, setIsKeyRevealed] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -131,8 +152,12 @@ export default function ProfilePage() {
   const [attachingOrderId, setAttachingOrderId] = useState<string | null>(null);
   const [attachStatus, setAttachStatus] = useState<{ id: string; msg: string; isError?: boolean } | null>(null);
 
-  // Active Vault Tab: "license" | "referrals" | "orders"
-  const [activeTab, setActiveTab] = useState<"license" | "referrals" | "orders">("license");
+  // Discord Guild Membership & Chameleon Cheats Notifications
+  const [isInGuild, setIsInGuild] = useState<boolean | null>(null);
+  const [profileNotifs, setProfileNotifs] = useState<any[]>([]);
+
+  // Active Vault Tab: "license" | "referrals" | "orders" | "notices"
+  const [activeTab, setActiveTab] = useState<"license" | "referrals" | "orders" | "notices">("license");
   const [isClanPitchCopied, setIsClanPitchCopied] = useState(false);
 
   // Referral State
@@ -274,7 +299,7 @@ export default function ProfilePage() {
     try {
       const cleanUser = (user.username || "").replace(/#0+$/, "").trim();
       const orConditions: string[] = [];
-      
+
       // Match by Discord ID (Snowflake or username fallback)
       if (user.id) {
         orConditions.push(`discord_id.eq.${user.id}`);
@@ -312,7 +337,7 @@ export default function ProfilePage() {
             .from("licenses")
             .update({ discord_id: user.id })
             .eq("id", licData[0].id)
-            .then(() => {});
+            .then(() => { });
         }
       } else {
         setActiveLicense(null);
@@ -348,7 +373,7 @@ export default function ProfilePage() {
                 .from("orders")
                 .update({ discord_id: user.id })
                 .eq("id", ord.id)
-                .then(() => {});
+                .then(() => { });
             }
           });
         }
@@ -501,6 +526,53 @@ export default function ProfilePage() {
       clearInterval(interval);
     };
   }, [userOrders, discordUser]);
+
+  // Check Discord Guild Membership
+  useEffect(() => {
+    if (!discordUser?.id && !discordUser?.username) {
+      setIsInGuild(null);
+      return;
+    }
+    const params = new URLSearchParams();
+    if (discordUser.id) params.set("discord_id", discordUser.id);
+    if (discordUser.username) params.set("username", discordUser.username);
+
+    fetch(`/api/discord/check-member?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && typeof data.in_guild === "boolean") {
+          setIsInGuild(data.in_guild);
+        }
+      })
+      .catch(() => { });
+  }, [discordUser]);
+
+  // Read URL tab query parameter if present
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const tabParam = new URLSearchParams(window.location.search).get("tab");
+    if (tabParam === "referrals" || tabParam === "orders" || tabParam === "notices") {
+      setActiveTab(tabParam as any);
+    }
+  }, []);
+
+  // Fetch Chameleon Cheats Notifications
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (discordUser?.id) params.set("discord_id", discordUser.id);
+    if (discordUser?.username) params.set("username", discordUser.username);
+    if (activeLicense) params.set("has_license", "true");
+    if (isInGuild !== null) params.set("in_guild", String(isInGuild));
+
+    fetch(`/api/notifications?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.notifications)) {
+          setProfileNotifs(data.notifications);
+        }
+      })
+      .catch(() => { });
+  }, [discordUser, activeLicense, isInGuild]);
 
   const handleCopyKey = (key: string) => {
     if (!key) return;
@@ -704,7 +776,7 @@ export default function ProfilePage() {
                 role="tab"
                 aria-selected={activeTab === "referrals"}
               >
-                <span>🎁</span>
+                <IconGift size={15} />
                 <span>Referral Program</span>
                 {referralStats.total_reward_days_earned > 0 ? (
                   <span className="vault-tab-badge">+{referralStats.total_reward_days_earned}D Earned</span>
@@ -727,280 +799,324 @@ export default function ProfilePage() {
                   <span className="vault-tab-badge-subtle">{userOrders.length}</span>
                 )}
               </button>
+
+              <button
+                type="button"
+                className={`vault-tab-btn ${activeTab === "notices" ? "active" : ""}`}
+                onClick={() => setActiveTab("notices")}
+                id="vault-tab-notices-btn"
+                role="tab"
+                aria-selected={activeTab === "notices"}
+              >
+                <IconBell size={16} />
+                <span>Notices</span>
+                {profileNotifs.length > 0 && (
+                  <span className="vault-tab-badge-subtle">{profileNotifs.length}</span>
+                )}
+              </button>
             </div>
+
+            {/* Official Alert from Chameleon Cheats if Buyer has not joined Discord */}
+            {isVip && isInGuild === false && discordUser && (
+              <div className="vault-discord-alert-banner">
+                <div className="vault-discord-alert-content">
+                  <div className="vault-discord-alert-badge">
+                    <IconShieldCheck size={14} />
+                    <span>Official Notice from Chameleon Cheats</span>
+                  </div>
+                  <h3 className="vault-discord-alert-title">
+                    Action Required: Join the Official Discord Server
+                  </h3>
+                  <p className="vault-discord-alert-desc">
+                    Your VIP Pass is active, but your Discord account (@{discordUser.username}) has not joined our server yet.
+                    Join now to unlock automated VIP role verification, loader update alerts, and direct developer support.
+                  </p>
+                </div>
+                <a
+                  href="https://discord.gg/Whwxq9QAEN"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="vault-discord-alert-btn"
+                >
+                  <IconDiscord size={16} />
+                  <span>Join Official Discord Server</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            )}
 
             {/* TAB 1: VIP COMMAND DESK (LICENSE & LOADER) */}
             {activeTab === "license" && (
               isVip && activeLicense ? (
                 <>
-                {/* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */}
-                <div className="vault-grid">
-                {/* Left Column: Subscription Telemetry, Private Key, HWID */}
-                <div className="vault-card">
-                  <div className="vault-card-head">
-                    <div className="vault-card-title">
-                      <IconShieldCheck size={18} />
-                      <span>Active Subscription &amp; License Key</span>
+                  {/* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */}
+                  <div className="vault-grid">
+                    {/* Left Column: Subscription Telemetry, Private Key, HWID */}
+                    <div className="vault-card">
+                      <div className="vault-card-head">
+                        <div className="vault-card-title">
+                          <IconShieldCheck size={18} />
+                          <span>Active Subscription &amp; License Key</span>
+                        </div>
+
+                        <span className="subscription-status-badge status-active-pill">
+                          ● Active VIP
+                        </span>
+                      </div>
+
+                      {/* Live Remaining Time Box */}
+                      <div className="vault-telemetry-box">
+                        <div className="vault-telemetry-label">
+                          {activeLicense.tier || "VIP Pass"} • Remaining duration
+                        </div>
+                        <div className="vault-telemetry-value">
+                          {remaining ? remaining.text : "Calculating..."}
+                        </div>
+                        <div className="vault-telemetry-sub">
+                          {activeLicense.expires_at
+                            ? `Valid until ${new Date(activeLicense.expires_at).toLocaleString()}`
+                            : "Lifetime Access • Unlimited Duration"}
+                        </div>
+                      </div>
+
+                      {/* Private License Key Box */}
+                      <div className="vault-key-container">
+                        <div className="vault-key-header">
+                          <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, color: "#cbd5e1" }}>
+                            <IconKey size={14} />
+                            <span>Private Loader License Key</span>
+                          </span>
+                          <span>Bound to @{discordUser.username}</span>
+                        </div>
+
+                        <div className="vault-key-row">
+                          <div>
+                            {isKeyRevealed ? (
+                              <span className="vault-key-code" id="user-license-key-text">
+                                {activeLicense.license_key}
+                              </span>
+                            ) : (
+                              <span className="vault-key-masked-code" id="user-license-key-masked">
+                                {getMaskedKey(activeLicense.license_key)}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="vault-key-buttons">
+                            <button
+                              type="button"
+                              className="btn-key-action"
+                              onClick={() => setIsKeyRevealed(!isKeyRevealed)}
+                              id="toggle-license-visibility-btn"
+                              title={isKeyRevealed ? "Hide private license key" : "Click to view full license key"}
+                            >
+                              {isKeyRevealed ? (
+                                <>
+                                  <IconEyeOff size={15} />
+                                  <span>Hide Key</span>
+                                </>
+                              ) : (
+                                <>
+                                  <IconEye size={15} />
+                                  <span>Show Key</span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn-key-copy"
+                              onClick={() => handleCopyKey(activeLicense.license_key)}
+                              id="copy-license-key-btn"
+                              title="Copy license key to clipboard"
+                            >
+                              <IconCopy size={15} />
+                              <span>{isCopied ? "Copied!" : "Copy Key"}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="vault-key-hint">
+                          Keep this key private. It locks automatically to your PC motherboard on first injection.
+                        </div>
+                      </div>
+
+                      {/* HWID Binding Telemetry */}
+                      <div className="vault-hwid-box">
+                        <div className="vault-hwid-detail">
+                          <div className="vault-hwid-title">Machine HWID Binding</div>
+                          <div className="vault-hwid-status">
+                            {activeLicense.hwid ? (
+                              <span style={{ color: "#38bdf8", fontVariantNumeric: "tabular-nums" }}>
+                                Locked: {activeLicense.hwid.substring(0, 16)}...
+                              </span>
+                            ) : (
+                              <span style={{ color: "#10b981" }}>
+                                ● Unbound (Auto-locks on first loader launch)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="vault-hwid-discord">
+                          Need HWID reset?{" "}
+                          <a
+                            href="https://discord.gg/Whwxq9QAEN"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open a ticket in Discord ↗
+                          </a>
+                        </div>
+                      </div>
                     </div>
 
-                    <span className="subscription-status-badge status-active-pill">
-                      ● Active VIP
-                    </span>
-                  </div>
-
-                  {/* Live Remaining Time Box */}
-                  <div className="vault-telemetry-box">
-                    <div className="vault-telemetry-label">
-                      {activeLicense.tier || "VIP Pass"} • Remaining duration
-                    </div>
-                    <div className="vault-telemetry-value">
-                      {remaining ? remaining.text : "Calculating..."}
-                    </div>
-                    <div className="vault-telemetry-sub">
-                      {activeLicense.expires_at
-                        ? `Valid until ${new Date(activeLicense.expires_at).toLocaleString()}`
-                        : "Lifetime Access • Unlimited Duration"}
-                    </div>
-                  </div>
-
-                  {/* Private License Key Box */}
-                  <div className="vault-key-container">
-                    <div className="vault-key-header">
-                      <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, color: "#cbd5e1" }}>
-                        <IconKey size={14} />
-                        <span>Private Loader License Key</span>
-                      </span>
-                      <span>Bound to @{discordUser.username}</span>
-                    </div>
-
-                    <div className="vault-key-row">
+                    {/* Right Column: Loader Deployment & Setup Guide */}
+                    <div className="vault-card">
                       <div>
-                        {isKeyRevealed ? (
-                          <span className="vault-key-code" id="user-license-key-text">
-                            {activeLicense.license_key}
-                          </span>
-                        ) : (
-                          <span className="vault-key-masked-code" id="user-license-key-masked">
-                            {getMaskedKey(activeLicense.license_key)}
-                          </span>
-                        )}
+                        <div className="vault-loader-status-banner">
+                          <h3>
+                            <IconShield size={16} />
+                            <span>Chameleon V1.0.4</span>
+                          </h3>
+                          <p>
+                            Official memory virtualization loader for Assault Fire PH (Legacy &amp; Reborn).
+                          </p>
+                        </div>
+
+                        <a
+                          href="/downloads/Chameleon_VIP.zip"
+                          download="Chameleon_VIP.zip"
+                          className="btn-vault-download"
+                          id="download-loader-profile-btn"
+                        >
+                          <IconDownload size={18} />
+                          <span>Download Loader (ZIP)</span>
+                        </a>
+
+                        <div className="vault-instructions-block">
+                          <div className="vault-instructions-title">Setup Guide</div>
+
+                          <ol className="vault-instructions-list">
+                            <li>
+                              <strong>Extract</strong>: Extract archive to a secure folder.
+                            </li>
+                            <li>
+                              <strong>Run as Admin</strong>: Launch <code>ChameleonLoader.exe</code>.
+                            </li>
+                            <li>
+                              <strong>Activate</strong>: Paste license key and press <kbd>INSERT</kbd> in-game.
+                            </li>
+                          </ol>
+
+                          <div className="vault-keybinds-row">
+                            <span>Menu keybind:</span>
+                            <kbd>INSERT</kbd>
+                            <span style={{ color: "#94a3b8", marginLeft: "auto", fontSize: 11 }}>
+                              Toggles In-Game VIP Overlay
+                            </span>
+                          </div>
+
+                          {/* Real In-Game Menu Capture */}
+                          <div style={{ marginTop: 12, borderRadius: 6, overflow: "hidden", border: "1px solid var(--border-subtle)", background: "#000000" }}>
+                            <Image
+                              src="/proofs/proof2.png"
+                              alt="Chameleon VIP in-game menu overlay preview"
+                              width={480}
+                              height={270}
+                              style={{ width: "100%", height: "auto", display: "block" }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="vault-key-buttons">
-                        <button
-                          type="button"
-                          className="btn-key-action"
-                          onClick={() => setIsKeyRevealed(!isKeyRevealed)}
-                          id="toggle-license-visibility-btn"
-                          title={isKeyRevealed ? "Hide private license key" : "Click to view full license key"}
-                        >
-                          {isKeyRevealed ? (
-                            <>
-                              <IconEyeOff size={15} />
-                              <span>Hide Key</span>
-                            </>
-                          ) : (
-                            <>
-                              <IconEye size={15} />
-                              <span>Show Key</span>
-                            </>
-                          )}
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn-key-copy"
-                          onClick={() => handleCopyKey(activeLicense.license_key)}
-                          id="copy-license-key-btn"
-                          title="Copy license key to clipboard"
-                        >
-                          <IconCopy size={15} />
-                          <span>{isCopied ? "Copied!" : "Copy Key"}</span>
-                        </button>
+                      <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#64748b" }}>
+                        <span style={{ color: "#00ff87", fontWeight: 600 }}>Status: Undetected ●</span>
+                        <span style={{ fontVariantNumeric: "tabular-nums" }}>Patch: 2026.10</span>
                       </div>
-                    </div>
-
-                    <div className="vault-key-hint">
-                      Keep this key private. It locks automatically to your PC motherboard on first injection.
                     </div>
                   </div>
 
-                  {/* HWID Binding Telemetry */}
-                  <div className="vault-hwid-box">
-                    <div className="vault-hwid-detail">
-                      <div className="vault-hwid-title">Machine HWID Binding</div>
-                      <div className="vault-hwid-status">
-                        {activeLicense.hwid ? (
-                          <span style={{ color: "#38bdf8", fontVariantNumeric: "tabular-nums" }}>
-                            Locked: {activeLicense.hwid.substring(0, 16)}...
-                          </span>
-                        ) : (
-                          <span style={{ color: "#10b981" }}>
-                            ● Unbound (Auto-locks on first loader launch)
-                          </span>
-                        )}
+                  {/* ─── VOUCH FOR +1 FREE DAY PROMOTION CARD ─── */}
+                  <div className="vault-vouch-promo-card">
+                    <div className="vault-vouch-promo-left">
+                      <div className="vault-vouch-badge">
+                        <span>🌟 VIP COMMUNITY PROMOTION</span>
+                      </div>
+                      <h3 className="vault-vouch-title">
+                        Vouch in Discord &amp; Get +1 Extra Free VIP Day!
+                      </h3>
+                      <p className="vault-vouch-desc">
+                        Loving your Chameleon VIP features in Assault Fire PH? Drop a quick review and in-game screenshot in our Discord <strong>#vouches</strong> channel. Staff will verify your post and credit an extra <strong>+1 VIP Day (+24 Hours)</strong> directly onto your pass!
+                      </p>
+                      <div className="vault-vouch-steps">
+                        <div className="vault-vouch-step-item">
+                          <span className="step-num">1</span>
+                          <span>Join official Discord</span>
+                        </div>
+                        <div className="vault-vouch-step-item">
+                          <span className="step-num">2</span>
+                          <span>Post review &amp; gameplay screenshot in <code>#vouches</code></span>
+                        </div>
+                        <div className="vault-vouch-step-item">
+                          <span className="step-num">3</span>
+                          <span>Staff verifies and adds +1 Extra Day to your key!</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="vault-hwid-discord">
-                      Need HWID reset?{" "}
+                    <div className="vault-vouch-promo-right">
                       <a
                         href="https://discord.gg/Whwxq9QAEN"
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="btn-vouch-action"
                       >
-                        Open a ticket in Discord ↗
+                        <IconDiscord size={18} />
+                        <span>Post Vouch in #vouches ↗</span>
                       </a>
+                      <span className="vault-vouch-note">
+                        ⚡ Bonus day extends your active license automatically
+                      </span>
                     </div>
                   </div>
-                </div>
-
-                {/* Right Column: Loader Deployment & Setup Guide */}
-                <div className="vault-card">
-                  <div>
-                    <div className="vault-loader-status-banner">
-                      <h3>
-                        <IconShield size={16} />
-                        <span>Chameleon v1.0.3</span>
-                      </h3>
-                      <p>
-                        Official memory virtualization loader for Assault Fire PH (Legacy &amp; Reborn).
-                      </p>
+                </>
+              ) : (
+                /* NON-VIP OR EXPIRED: Clean, dignified empty state without slop */
+                <div className="vault-card" style={{ marginBottom: 28 }}>
+                  <div className="vault-card-head">
+                    <div className="vault-card-title">
+                      <IconShieldCheck size={18} />
+                      <span>VIP License Status</span>
                     </div>
 
-                    <a
-                      href="/downloads/Chameleon_VIP.zip"
-                      download="Chameleon_VIP.zip"
-                      className="btn-vault-download"
-                      id="download-loader-profile-btn"
+                    <span className="subscription-status-badge status-none-pill">
+                      ● {remaining?.isExpired ? "Pass Expired" : "Free Member"}
+                    </span>
+                  </div>
+
+                  <div style={{ padding: "32px 20px", textAlign: "center", maxWidth: 540, margin: "0 auto" }}>
+                    <h2 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", marginBottom: 8, letterSpacing: "-0.015em" }}>
+                      {remaining?.isExpired ? "VIP Pass Expired" : "No Active VIP License"}
+                    </h2>
+
+                    <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, marginBottom: 20 }}>
+                      {remaining?.isExpired
+                        ? "Your VIP pass has expired. Extend your pass to immediately re-unlock private loader downloads and license key generation."
+                        : "This Discord account does not currently hold an active VIP pass. Acquire a pass below to generate your private key and download the loader."}
+                    </p>
+
+                    <Link
+                      href="/#pricing"
+                      className="btn-key-copy"
+                      style={{ textDecoration: "none", display: "inline-flex", padding: "10px 24px", fontSize: 13 }}
                     >
-                      <IconDownload size={18} />
-                      <span>Download Loader (ZIP)</span>
-                    </a>
-
-                    <div className="vault-instructions-block">
-                      <div className="vault-instructions-title">Setup Guide</div>
-
-                      <ol className="vault-instructions-list">
-                        <li>
-                          <strong>Extract</strong>: Extract archive to a secure folder.
-                        </li>
-                        <li>
-                          <strong>Run as Admin</strong>: Launch <code>ChameleonLoader.exe</code>.
-                        </li>
-                        <li>
-                          <strong>Activate</strong>: Paste license key and press <kbd>INSERT</kbd> in-game.
-                        </li>
-                      </ol>
-
-                      <div className="vault-keybinds-row">
-                        <span>Menu keybind:</span>
-                        <kbd>INSERT</kbd>
-                        <span style={{ color: "#94a3b8", marginLeft: "auto", fontSize: 11 }}>
-                          Toggles In-Game VIP Overlay
-                        </span>
-                      </div>
-
-                      {/* Real In-Game Menu Capture */}
-                      <div style={{ marginTop: 12, borderRadius: 6, overflow: "hidden", border: "1px solid var(--border-subtle)", background: "#000000" }}>
-                        <Image
-                          src="/proofs/proof2.png"
-                          alt="Chameleon VIP in-game menu overlay preview"
-                          width={480}
-                          height={270}
-                          style={{ width: "100%", height: "auto", display: "block" }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#64748b" }}>
-                    <span style={{ color: "#00ff87", fontWeight: 600 }}>Status: Undetected ●</span>
-                    <span style={{ fontVariantNumeric: "tabular-nums" }}>Patch: 2026.10</span>
+                      {remaining?.isExpired ? "Extend VIP Pass" : "Browse Passes (From ₱150)"}
+                    </Link>
                   </div>
                 </div>
-              </div>
-
-              {/* ─── VOUCH FOR +1 FREE DAY PROMOTION CARD ─── */}
-              <div className="vault-vouch-promo-card">
-                <div className="vault-vouch-promo-left">
-                  <div className="vault-vouch-badge">
-                    <span>🌟 VIP COMMUNITY PROMOTION</span>
-                  </div>
-                  <h3 className="vault-vouch-title">
-                    Vouch in Discord &amp; Get +1 Extra Free VIP Day!
-                  </h3>
-                  <p className="vault-vouch-desc">
-                    Loving your Chameleon VIP features in Assault Fire PH? Drop a quick review and in-game screenshot in our Discord <strong>#vouches</strong> channel. Staff will verify your post and credit an extra <strong>+1 VIP Day (+24 Hours)</strong> directly onto your pass!
-                  </p>
-                  <div className="vault-vouch-steps">
-                    <div className="vault-vouch-step-item">
-                      <span className="step-num">1</span>
-                      <span>Join official Discord</span>
-                    </div>
-                    <div className="vault-vouch-step-item">
-                      <span className="step-num">2</span>
-                      <span>Post review &amp; gameplay screenshot in <code>#vouches</code></span>
-                    </div>
-                    <div className="vault-vouch-step-item">
-                      <span className="step-num">3</span>
-                      <span>Staff verifies and adds +1 Extra Day to your key!</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="vault-vouch-promo-right">
-                  <a
-                    href="https://discord.gg/Whwxq9QAEN"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-vouch-action"
-                  >
-                    <IconDiscord size={18} />
-                    <span>Post Vouch in #vouches ↗</span>
-                  </a>
-                  <span className="vault-vouch-note">
-                    ⚡ Bonus day extends your active license automatically
-                  </span>
-                </div>
-              </div>
-              </>
-            ) : (
-              /* NON-VIP OR EXPIRED: Clean, dignified empty state without slop */
-              <div className="vault-card" style={{ marginBottom: 28 }}>
-                <div className="vault-card-head">
-                  <div className="vault-card-title">
-                    <IconShieldCheck size={18} />
-                    <span>VIP License Status</span>
-                  </div>
-
-                  <span className="subscription-status-badge status-none-pill">
-                    ● {remaining?.isExpired ? "Pass Expired" : "Free Member"}
-                  </span>
-                </div>
-
-                <div style={{ padding: "32px 20px", textAlign: "center", maxWidth: 540, margin: "0 auto" }}>
-                  <h2 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", marginBottom: 8, letterSpacing: "-0.015em" }}>
-                    {remaining?.isExpired ? "VIP Pass Expired" : "No Active VIP License"}
-                  </h2>
-
-                  <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.55, marginBottom: 20 }}>
-                    {remaining?.isExpired
-                      ? "Your VIP pass has expired. Extend your pass to immediately re-unlock private loader downloads and license key generation."
-                      : "This Discord account does not currently hold an active VIP pass. Acquire a pass below to generate your private key and download the loader."}
-                  </p>
-
-                  <Link
-                    href="/#pricing"
-                    className="btn-key-copy"
-                    style={{ textDecoration: "none", display: "inline-flex", padding: "10px 24px", fontSize: 13 }}
-                  >
-                    {remaining?.isExpired ? "Extend VIP Pass" : "Browse Passes (From ₱150)"}
-                  </Link>
-                </div>
-              </div>
-            )
-          )}
+              )
+            )}
 
             {/* TAB 2: CLANMATE REFERRAL & AFFILIATE REWARDS */}
             {activeTab === "referrals" && (
@@ -1240,150 +1356,209 @@ export default function ProfilePage() {
             {/* TAB 3: ORDER & PAYMENT HISTORY */}
             {activeTab === "orders" && (
               <section className="vault-orders-card" aria-label="Order History">
-              <div className="vault-card-head">
-                <div className="vault-card-title">
-                  <IconDocument size={16} />
-                  <span>Your Order &amp; Payment History</span>
+                <div className="vault-card-head">
+                  <div className="vault-card-title">
+                    <IconDocument size={16} />
+                    <span>Your Order &amp; Payment History</span>
+                  </div>
+                  <span style={{ fontSize: 12, color: "#64748b", fontVariantNumeric: "tabular-nums" }}>
+                    {userOrders.length} transaction{userOrders.length !== 1 ? "s" : ""}
+                  </span>
                 </div>
-                <span style={{ fontSize: 12, color: "#64748b", fontVariantNumeric: "tabular-nums" }}>
-                  {userOrders.length} transaction{userOrders.length !== 1 ? "s" : ""}
-                </span>
-              </div>
 
-              {userOrders.length > 0 ? (
-                <div className="vault-orders-table-wrapper">
-                  <table className="vault-table">
-                    <thead>
-                      <tr>
-                        <th>Order ID</th>
-                        <th>Tier</th>
-                        <th>Amount</th>
-                        <th>Payment method</th>
-                        <th>Reference / TXN</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>License key</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {userOrders.map((order) => {
-                        const hasSlip = order.payment_method?.includes("[receipt:");
-                        const isPending = order.status === "pending";
+                {userOrders.length > 0 ? (
+                  <div className="vault-orders-table-wrapper">
+                    <table className="vault-table">
+                      <thead>
+                        <tr>
+                          <th>Order ID</th>
+                          <th>Tier</th>
+                          <th>Amount</th>
+                          <th>Payment method</th>
+                          <th>Reference / TXN</th>
+                          <th>Date</th>
+                          <th>Status</th>
+                          <th>License key</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {userOrders.map((order) => {
+                          const hasSlip = order.payment_method?.includes("[receipt:");
+                          const isPending = order.status === "pending";
 
-                        return (
-                          <tr key={order.id || order.order_id}>
-                            <td style={{ fontVariantNumeric: "tabular-nums", color: "#00d2ff", fontWeight: 600 }}>
-                              {order.order_id}
-                            </td>
-                            <td style={{ fontWeight: 700 }}>{order.tier}</td>
-                            <td style={{ fontVariantNumeric: "tabular-nums" }}>
-                              {formatOrderPrice(order.price, order.tier)}
-                            </td>
-                            <td>
-                              <span style={{ color: "#007dfe", fontWeight: 700 }}>
-                                {(order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "")}
-                              </span>
-                            </td>
-                            <td style={{ fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>
-                              <div>{order.reference_no || order.gcash_ref_no || "N/A"}</div>
-                              {hasSlip ? (
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#10b981", fontSize: 11, marginTop: 4 }}>
-                                  ● Slip Attached
+                          return (
+                            <tr key={order.id || order.order_id}>
+                              <td style={{ fontVariantNumeric: "tabular-nums", color: "#00d2ff", fontWeight: 600 }}>
+                                {order.order_id}
+                              </td>
+                              <td style={{ fontWeight: 700 }}>{order.tier}</td>
+                              <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                                {formatOrderPrice(order.price, order.tier)}
+                              </td>
+                              <td>
+                                <span style={{ color: "#007dfe", fontWeight: 700 }}>
+                                  {(order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "")}
                                 </span>
-                              ) : isPending ? (
-                                <div style={{ marginTop: 4 }}>
-                                  <label
-                                    htmlFor={`attach-slip-${order.order_id}`}
-                                    style={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: 4,
-                                      background: "rgba(56, 189, 248, 0.12)",
-                                      color: "#38bdf8",
-                                      padding: "3px 8px",
-                                      borderRadius: 4,
-                                      fontSize: 11,
-                                      cursor: attachingOrderId === order.order_id ? "wait" : "pointer",
-                                      border: "1px solid rgba(56, 189, 248, 0.3)",
-                                      userSelect: "none",
-                                    }}
-                                  >
-                                    <span>{attachingOrderId === order.order_id ? "Uploading..." : "📎 Attach Slip"}</span>
-                                    <input
-                                      id={`attach-slip-${order.order_id}`}
-                                      type="file"
-                                      accept="image/png,image/jpeg,image/jpg,image/webp"
-                                      style={{ display: "none" }}
-                                      disabled={attachingOrderId === order.order_id}
-                                      onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                          handleAttachSlipToOrder(order.order_id, e.target.files[0]);
-                                        }
+                              </td>
+                              <td style={{ fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>
+                                <div>{order.reference_no || order.gcash_ref_no || "N/A"}</div>
+                                {hasSlip ? (
+                                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#10b981", fontSize: 11, marginTop: 4 }}>
+                                    ● Slip Attached
+                                  </span>
+                                ) : isPending ? (
+                                  <div style={{ marginTop: 4 }}>
+                                    <label
+                                      htmlFor={`attach-slip-${order.order_id}`}
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 4,
+                                        background: "rgba(56, 189, 248, 0.12)",
+                                        color: "#38bdf8",
+                                        padding: "3px 8px",
+                                        borderRadius: 4,
+                                        fontSize: 11,
+                                        cursor: attachingOrderId === order.order_id ? "wait" : "pointer",
+                                        border: "1px solid rgba(56, 189, 248, 0.3)",
+                                        userSelect: "none",
                                       }}
-                                    />
-                                  </label>
-                                  {attachStatus && attachStatus.id === order.order_id && (
-                                    <span style={{ display: "block", fontSize: 10, color: attachStatus.isError ? "#ef4444" : "#38bdf8", marginTop: 2 }}>
-                                      {attachStatus.msg}
-                                    </span>
-                                  )}
-                                </div>
-                              ) : null}
-                            </td>
-                            <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
-                              {new Date(order.created_at).toLocaleDateString()}
-                            </td>
-                            <td>
-                              {order.status === "approved" ? (
-                                <span className="subscription-status-badge status-active-pill">
-                                  Approved
-                                </span>
-                              ) : order.status === "rejected" ? (
-                                <span
-                                  className="subscription-status-badge"
-                                  style={{ background: "rgba(239, 68, 68, 0.15)", color: "#ef4444" }}
-                                >
-                                  Rejected
-                                </span>
-                              ) : (
-                                <span className="subscription-status-badge status-pending-pill">
-                                  Pending approval
-                                </span>
-                              )}
-                            </td>
-                            <td style={{ fontVariantNumeric: "tabular-nums" }}>
-                              {order.license_key ? (
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyKey(order.license_key)}
-                                  style={{
-                                    background: "transparent",
-                                    border: "none",
-                                    color: "#38bdf8",
-                                    cursor: "pointer",
-                                    fontSize: 12,
-                                    textDecoration: "underline",
-                                  }}
-                                  title="Click to copy key"
-                                >
-                                  Copy key
-                                </button>
-                              ) : (
-                                <span style={{ color: "#64748b" }}>—</span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                                    >
+                                      <span>{attachingOrderId === order.order_id ? "Uploading..." : "📎 Attach Slip"}</span>
+                                      <input
+                                        id={`attach-slip-${order.order_id}`}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                                        style={{ display: "none" }}
+                                        disabled={attachingOrderId === order.order_id}
+                                        onChange={(e) => {
+                                          if (e.target.files && e.target.files[0]) {
+                                            handleAttachSlipToOrder(order.order_id, e.target.files[0]);
+                                          }
+                                        }}
+                                      />
+                                    </label>
+                                    {attachStatus && attachStatus.id === order.order_id && (
+                                      <span style={{ display: "block", fontSize: 10, color: attachStatus.isError ? "#ef4444" : "#38bdf8", marginTop: 2 }}>
+                                        {attachStatus.msg}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : null}
+                              </td>
+                              <td style={{ color: "#94a3b8", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>
+                                {new Date(order.created_at).toLocaleDateString()}
+                              </td>
+                              <td>
+                                {order.status === "approved" ? (
+                                  <span className="subscription-status-badge status-active-pill">
+                                    Approved
+                                  </span>
+                                ) : order.status === "rejected" ? (
+                                  <span
+                                    className="subscription-status-badge"
+                                    style={{ background: "rgba(239, 68, 68, 0.15)", color: "#ef4444" }}
+                                  >
+                                    Rejected
+                                  </span>
+                                ) : (
+                                  <span className="subscription-status-badge status-pending-pill">
+                                    Pending approval
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                                {order.license_key ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyKey(order.license_key)}
+                                    style={{
+                                      background: "transparent",
+                                      border: "none",
+                                      color: "#38bdf8",
+                                      cursor: "pointer",
+                                      fontSize: 12,
+                                      textDecoration: "underline",
+                                    }}
+                                    title="Click to copy key"
+                                  >
+                                    Copy key
+                                  </button>
+                                ) : (
+                                  <span style={{ color: "#64748b" }}>—</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "30px", color: "#64748b", fontSize: 13 }}>
+                    No payment orders found for this Discord user yet.
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* TAB 4: OFFICIAL NOTICES FROM CHAMELEON CHEATS */}
+            {activeTab === "notices" && (
+              <section className="vault-card" aria-label="Official Notices from Chameleon Cheats">
+                <div className="vault-card-head">
+                  <div className="vault-card-title">
+                    <IconBell size={18} />
+                    <span>Official Announcements &amp; Notices</span>
+                  </div>
+                  <span className="notif-sender-pill">
+                    <IconShieldCheck size={12} />
+                    <span>Sender: Chameleon Cheats</span>
+                  </span>
                 </div>
-              ) : (
-                <div style={{ textAlign: "center", padding: "30px", color: "#64748b", fontSize: 13 }}>
-                  No payment orders found for this Discord user yet.
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
+                  {profileNotifs.length === 0 ? (
+                    <div className="notif-empty">
+                      <IconShieldCheck size={24} />
+                      <span className="notif-empty-title">All caught up</span>
+                      <span className="notif-empty-text">No active alerts or announcements from Chameleon Cheats.</span>
+                    </div>
+                  ) : (
+                    profileNotifs.map((n) => (
+                      <div key={n.id} className={`notif-card ${n.type}`} style={{ padding: "16px 18px" }}>
+                        <div className="notif-card-header">
+                          <div className="notif-sender-pill">
+                            <IconShieldCheck size={13} />
+                            <span className="notif-sender-name">Chameleon Cheats</span>
+                          </div>
+                          <span style={{ fontSize: 11, color: "#64748b" }}>
+                            {new Date(n.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h4 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", margin: "6px 0 3px" }}>
+                          {n.title}
+                        </h4>
+                        <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.5, margin: 0 }}>
+                          {n.message}
+                        </p>
+                        {n.actionUrl && (
+                          <div style={{ marginTop: 10 }}>
+                            <a
+                              href={n.actionUrl}
+                              target={n.actionUrl.startsWith("http") ? "_blank" : undefined}
+                              rel={n.actionUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+                              className="notif-action-link"
+                            >
+                              <span>{n.actionLabel || "View Action"}</span>
+                              <span>↗</span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
-              )}
-            </section>
+              </section>
             )}
           </>
         )}

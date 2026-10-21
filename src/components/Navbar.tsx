@@ -14,6 +14,7 @@ import {
   signOut,
   DiscordUser,
 } from "@/lib/supabase";
+import NotificationBell from "@/components/NotificationBell";
 
 function IconDiscord({ size = 18 }: { size?: number }) {
   return (
@@ -33,18 +34,133 @@ function IconLogout({ size = 14 }: { size?: number }) {
   );
 }
 
+function IconMenu({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function IconClose({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function IconHome({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  );
+}
+
+function IconTag({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  );
+}
+
+function IconCrosshair({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="22" y1="12" x2="18" y2="12" />
+      <line x1="6" y1="12" x2="2" y2="12" />
+      <line x1="12" y1="6" x2="12" y2="2" />
+      <line x1="12" y1="22" x2="12" y2="18" />
+    </svg>
+  );
+}
+
+function IconShield({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function IconGift({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12" />
+      <rect x="2" y="7" width="20" height="5" />
+      <line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+    </svg>
+  );
+}
+
+function IconKey({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="7.5" cy="15.5" r="5.5" />
+      <path d="M21 2l-9.6 9.6" />
+      <path d="M15.5 7.5l3 3L22 7l-3-3" />
+    </svg>
+  );
+}
+
+function IconChevronRight({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
+function IconExternalLink({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Automatically close mobile menu on page transition
   useEffect(() => {
-    // 1. Initial cached user
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Handle ESC key to close mobile menu
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    if (isMobileMenuOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMobileMenuOpen]);
+
+  // Auth synchronization
+  useEffect(() => {
     const cached = getStoredUser();
     if (cached) {
       setDiscordUser(cached);
     }
 
-    // 2. Live Supabase session
     if (supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
@@ -77,6 +193,7 @@ export default function Navbar() {
     await signOut();
     setDiscordUser(null);
     clearStoredUser();
+    setIsMobileMenuOpen(false);
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/profile")) {
       window.location.reload();
     }
@@ -86,7 +203,7 @@ export default function Navbar() {
     <header className="site-global-header" id="main-navigation-bar">
       <div className="site-header-inner">
         {/* Brand identity */}
-        <Link href="/" className="site-brand-link" title="Chameleon Cheats — Assault Fire PH">
+        <Link href="/" className="site-brand-link" title="Chameleon Cheats — Assault Fire PH" onClick={() => setIsMobileMenuOpen(false)}>
           <Image
             src="/logo.png"
             alt="Chameleon Cheats Logo"
@@ -101,7 +218,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Streamlined & Focused Navigation links */}
+        {/* Desktop Navigation Links */}
         <nav className="site-nav-links" aria-label="Main Navigation">
           <Link
             href="/"
@@ -120,7 +237,6 @@ export default function Navbar() {
             className="site-nav-referral-highlight"
             title="Earn Free VIP Days by inviting clanmates"
           >
-            <span>🎁</span>
             <span>Referrals</span>
             <span className="site-nav-referral-badge">+3 Days</span>
           </Link>
@@ -132,8 +248,11 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Right action section */}
+        {/* Right Action Section */}
         <div className="site-header-actions">
+          {/* Chameleon Cheats Official Notifications */}
+          <NotificationBell currentUser={discordUser} />
+
           {discordUser ? (
             <div className="site-user-auth-wrap">
               <Link
@@ -163,7 +282,7 @@ export default function Navbar() {
               </Link>
               <button
                 type="button"
-                className="site-logout-action"
+                className="site-logout-action desktop-only-logout"
                 onClick={handleLogout}
                 title="Log out of Discord"
               >
@@ -179,11 +298,200 @@ export default function Navbar() {
               id="header-discord-login-btn"
             >
               <IconDiscord size={18} />
-              <span>Login with Discord</span>
+              <span className="site-discord-btn-text">Login with Discord</span>
             </button>
           )}
+
+          {/* Mobile Navigation Toggle Button */}
+          <button
+            type="button"
+            className="site-mobile-toggle-btn"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <IconClose size={22} /> : <IconMenu size={22} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Slide-Down Drawer Navigation */}
+      {isMobileMenuOpen && (
+        <>
+          <div
+            className="site-mobile-backdrop"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <nav className="site-mobile-drawer" aria-label="Mobile Navigation Drawer">
+            <div className="site-mobile-drawer-inner">
+              {/* Navigation Items Group */}
+              <div className="site-mobile-nav-group">
+                <Link
+                  href="/"
+                  className={`site-mobile-nav-link ${pathname === "/" ? "active" : ""}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconHome size={16} /></span>
+                    <span className="mobile-nav-text">Home</span>
+                  </div>
+                  <IconChevronRight size={14} className="mobile-nav-arrow" />
+                </Link>
+
+                <Link
+                  href="/#pricing"
+                  className="site-mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconTag size={16} /></span>
+                    <span className="mobile-nav-text">VIP Pass Pricing</span>
+                  </div>
+                  <span className="mobile-nav-meta">From ₱150</span>
+                </Link>
+
+                <Link
+                  href="/#features"
+                  className="site-mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconCrosshair size={16} /></span>
+                    <span className="mobile-nav-text">Feature Arsenal</span>
+                  </div>
+                  <IconChevronRight size={14} className="mobile-nav-arrow" />
+                </Link>
+
+                <Link
+                  href="/#proofs"
+                  className="site-mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconShield size={16} /></span>
+                    <span className="mobile-nav-text">In-Game Combat Proofs</span>
+                  </div>
+                  <IconChevronRight size={14} className="mobile-nav-arrow" />
+                </Link>
+
+                <Link
+                  href="/profile?tab=referrals"
+                  className="site-mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconGift size={16} /></span>
+                    <span className="mobile-nav-text">Referral Program</span>
+                  </div>
+                  <span className="mobile-nav-badge-pill">+3 Days VIP</span>
+                </Link>
+
+                <Link
+                  href="/profile"
+                  className={`site-mobile-nav-link ${pathname === "/profile" ? "active" : ""}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-icon"><IconKey size={16} /></span>
+                    <span className="mobile-nav-text">VIP Key Vault</span>
+                  </div>
+                  <IconChevronRight size={14} className="mobile-nav-arrow" />
+                </Link>
+              </div>
+
+              {/* Mobile Auth / Profile Action Card */}
+              <div className="site-mobile-auth-card">
+                {discordUser ? (
+                  <div className="site-mobile-user-details">
+                    <div className="site-mobile-user-row">
+                      <div className="site-mobile-avatar-wrap">
+                        {discordUser.avatar_url ? (
+                          <img
+                            src={discordUser.avatar_url}
+                            alt={discordUser.username}
+                            className="site-avatar-thumb"
+                          />
+                        ) : (
+                          <div className="site-avatar-fallback">
+                            {discordUser.username.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="site-mobile-online-status" title="Discord Connected" />
+                      </div>
+                      <div className="site-mobile-user-meta">
+                        <div className="site-mobile-user-name">{discordUser.username}</div>
+                        <div className="site-mobile-user-sub">Discord Connected • VIP Access</div>
+                      </div>
+                    </div>
+                    <div className="site-mobile-auth-buttons">
+                      <Link
+                        href="/profile"
+                        className="site-mobile-btn-profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <IconKey size={14} />
+                        <span>Open VIP Vault</span>
+                      </Link>
+                      <button
+                        type="button"
+                        className="site-mobile-btn-logout"
+                        onClick={handleLogout}
+                      >
+                        <IconLogout size={14} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="site-mobile-login-box">
+                    <div className="site-mobile-login-head">
+                      <span className="site-mobile-login-title">VIP Access &amp; License Keys</span>
+                      <span className="site-mobile-login-sub">
+                        Connect with Discord to retrieve your active VIP license key, loader download link, and clan referral earnings.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="site-mobile-discord-login"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        signInWithDiscord();
+                      }}
+                    >
+                      <IconDiscord size={18} />
+                      <span>Connect with Discord</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Community Link */}
+              <a
+                href="https://discord.gg/Whwxq9QAEN"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-mobile-discord-community"
+              >
+                <div className="site-mobile-community-left">
+                  <IconDiscord size={18} />
+                  <div className="site-mobile-community-text">
+                    <span className="site-mobile-community-name">Official Discord Server</span>
+                    <span className="site-mobile-community-desc">Combat proofs, updates &amp; live support</span>
+                  </div>
+                </div>
+                <IconExternalLink size={14} />
+              </a>
+
+              {/* Status & Version Footer */}
+              <div className="site-mobile-drawer-footer">
+                <span className="site-mobile-status-dot" />
+                <span className="site-mobile-status-text">Chameleon VIP v4.2 • Undetected on AFPH</span>
+              </div>
+            </div>
+          </nav>
+        </>
+      )}
     </header>
   );
 }

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "notif-1792585687711-nvv8z",
+    "sender": "Chameleon Cheats",
+    "title": "Chameleon Cheat Loader v1.0.3 Undetected & Live",
+    "message": "Latest kernel bypass patch applied for Assault Fire PH. Download the fresh build from your VIP Key Vault or Discord.",
+    "type": "update",
+    "target": "buyers",
+    "actionLabel": "Open VIP Vault",
+    "actionUrl": "/profile",
+    "createdAt": "2026-10-21T12:28:07.711Z"
+  },
+  {
+    "id": "cham-system-welcome",
+    "sender": "Chameleon Cheats",
+    "title": "Official Discord Community & Support",
+    "message": "Welcome to Chameleon Cheats! Join our official Discord server to receive automated VIP role verification, loader download builds, and priority technical support.",
+    "type": "announcement",
+    "actionLabel": "Join Official Discord",
+    "actionUrl": "https://discord.gg/Whwxq9QAEN",
+    "target": "all",
+    "createdAt": "2026-10-20T12:00:44.961Z"
+  }
+]

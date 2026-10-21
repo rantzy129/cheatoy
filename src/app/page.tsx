@@ -1009,6 +1009,7 @@ export default function Home() {
             </div>
 
             {/* ═══ 3 Summary Cards (Taste-Skill Anti-Slop Discipline) ═══ */}
+            {/* ═══ 3 Summary Cards (Taste-Skill Anti-Slop Discipline) ═══ */}
             <div className="features-grid-summary">
 
               {/* ──────── Card 1: Visual Features ──────── */}
@@ -1357,6 +1358,8 @@ export default function Home() {
                     className={`duration-btn ${selectedTier.id === tier.id ? "active" : ""}`}
                     onClick={() => setSelectedTier(tier)}
                   >
+                    {tier.id === "7days" && <span className="duration-badge-hot">POPULAR</span>}
+                    {tier.id === "1month" && <span className="duration-badge-value">BEST VALUE</span>}
                     <span className="btn-duration-name">{tier.duration}</span>
                     <span className="btn-duration-price">{tier.pricePhp}</span>
                   </button>
@@ -1528,6 +1531,7 @@ export default function Home() {
       {isGcashModalOpen && (
         <div className="modal-overlay" onClick={() => setIsGcashModalOpen(false)}>
           <div className="gcash-modal-card" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="modal-sheet-handle" aria-hidden="true" />
             <button
               className="modal-close"
               onClick={() => setIsGcashModalOpen(false)}
@@ -1970,6 +1974,7 @@ export default function Home() {
       {isProfileOpen && discordUser && (
         <div className="modal-overlay" onClick={() => setIsProfileOpen(false)}>
           <div className="profile-modal-card" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="modal-sheet-handle" aria-hidden="true" />
             <button
               className="modal-close"
               onClick={() => setIsProfileOpen(false)}
@@ -2082,7 +2087,7 @@ export default function Home() {
                   style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
                   id="download-loader-home-btn"
                 >
-                  <span>Download Loader v1.0.3</span>
+                  <span>Download Loader V1.0.4</span>
                   <IconArrowUpRight size={16} />
                 </a>
               </div>

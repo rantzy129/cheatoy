@@ -48,6 +48,15 @@ function IconKeyMint({ size = 18 }: { size?: number }) {
   );
 }
 
+function IconBell({ size = 17 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
 function IconOverview({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -236,7 +245,117 @@ interface License {
 
 export default function AdminPage() {
   // Navigation View State
-  const [activeTab, setActiveTab] = useState<"orders" | "licenses" | "generator" | "overview">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "licenses" | "generator" | "overview" | "notifications">("orders");
+
+  // Chameleon Cheats Notification System State
+  const [adminNotifs, setAdminNotifs] = useState<any[]>([]);
+  const [notifTitle, setNotifTitle] = useState("");
+  const [notifMessage, setNotifMessage] = useState("");
+  const [notifType, setNotifType] = useState<"alert" | "announcement" | "update">("alert");
+  const [notifTarget, setNotifTarget] = useState<string>("buyers_not_discord");
+  const [notifActionLabel, setNotifActionLabel] = useState("Join Official Discord");
+  const [notifActionUrl, setNotifActionUrl] = useState("https://discord.gg/Whwxq9QAEN");
+  const [isSendingNotif, setIsSendingNotif] = useState(false);
+  const [notifStatusMsg, setNotifStatusMsg] = useState<string | null>(null);
+
+  const fetchAdminNotifications = async () => {
+    try {
+      const res = await fetch("/api/notifications");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.notifications)) {
+          setAdminNotifs(data.notifications);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed fetching notifications:", err);
+    }
+  };
+
+  const handleSendNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifTitle.trim() || !notifMessage.trim()) {
+      alert("Please provide both a title and a message body.");
+      return;
+    }
+    setIsSendingNotif(true);
+    setNotifStatusMsg(null);
+    try {
+      const res = await fetch("/api/notifications", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: notifTitle,
+          message: notifMessage,
+          type: notifType,
+          target: notifTarget,
+          actionLabel: notifActionLabel,
+          actionUrl: notifActionUrl,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setNotifStatusMsg(data.message || "Notification sent from Chameleon Cheats!");
+        setNotifTitle("");
+        setNotifMessage("");
+        fetchAdminNotifications();
+        setTimeout(() => setNotifStatusMsg(null), 5000);
+      } else {
+        alert(data.error || "Failed to broadcast notification");
+      }
+    } catch {
+      alert("Network error sending notification");
+    } finally {
+      setIsSendingNotif(false);
+    }
+  };
+
+  const handleDeleteNotification = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this notification?")) return;
+    try {
+      const res = await fetch("/api/notifications", {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        fetchAdminNotifications();
+      } else {
+        alert(data.error || "Failed to delete notification");
+      }
+    } catch {
+      alert("Network error deleting notification");
+    }
+  };
+
+  // Quick preset helper
+  const applyNotifPreset = (preset: "discord_join" | "build_update" | "maintenance") => {
+    if (preset === "discord_join") {
+      setNotifTitle("Action Required: Join Official Discord Server");
+      setNotifMessage("We noticed your VIP Pass is active, but you have not joined our Discord server. Join now to claim your VIP role and get live loader updates.");
+      setNotifType("alert");
+      setNotifTarget("buyers_not_discord");
+      setNotifActionLabel("Join Official Discord");
+      setNotifActionUrl("https://discord.gg/Whwxq9QAEN");
+    } else if (preset === "build_update") {
+      setNotifTitle("Chameleon Cheat Loader v4.2 Undetected & Live");
+      setNotifMessage("Latest kernel bypass patch applied for Assault Fire PH. Download the fresh build from your VIP Key Vault or Discord.");
+      setNotifType("update");
+      setNotifTarget("buyers");
+      setNotifActionLabel("Open VIP Vault");
+      setNotifActionUrl("/profile");
+    } else if (preset === "maintenance") {
+      setNotifTitle("Scheduled Game Maintenance Alert");
+      setNotifMessage("AFPH game servers are currently undergoing maintenance. Avoid injecting until our official Discord marks servers as clear.");
+      setNotifType("alert");
+      setNotifTarget("all");
+      setNotifActionLabel("Check Discord Status");
+      setNotifActionUrl("https://discord.gg/Whwxq9QAEN");
+    }
+  };
 
   // Authentication State (100% HTTP-Only Cookie, Zero Frontend Storage)
   const [pin, setPin] = useState("");
@@ -349,6 +468,7 @@ export default function AdminPage() {
   const loadAllData = () => {
     fetchOrders();
     fetchLicenses();
+    fetchAdminNotifications();
   };
 
   const fetchOrders = async () => {
@@ -882,6 +1002,20 @@ export default function AdminPage() {
                 <IconOverview size={17} />
                 <span>Analytics Overview</span>
               </div>
+            </button>
+
+            <button
+              type="button"
+              className={`admin-nav-item ${activeTab === "notifications" ? "active" : ""}`}
+              onClick={() => setActiveTab("notifications")}
+            >
+              <div className="admin-nav-item-left">
+                <IconBell size={17} />
+                <span>Broadcast &amp; Notices</span>
+              </div>
+              {adminNotifs.length > 0 && (
+                <span className="admin-nav-badge">{adminNotifs.length}</span>
+              )}
             </button>
           </div>
         </div>
@@ -1583,6 +1717,280 @@ export default function AdminPage() {
                     <span className="admin-arch-item-sub">15-minute brute-force lockout</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ─── TAB 5: BROADCAST & NOTIFICATIONS (CHAMELEON CHEATS) ─── */}
+          {activeTab === "notifications" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {/* Header */}
+              <div className="admin-view-header">
+                <div>
+                  <h1 className="admin-view-title">Broadcast &amp; Notifications</h1>
+                  <span className="admin-view-sub">
+                    Dispatch official messages stamped from &quot;Chameleon Cheats&quot; directly to buyers who haven&apos;t joined Discord, VIP pass holders, or all storefront visitors.
+                  </span>
+                </div>
+              </div>
+
+              {notifStatusMsg && (
+                <div style={{ padding: "12px 16px", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 8, color: "#10b981", fontSize: 13, fontWeight: 600 }}>
+                  ✓ {notifStatusMsg}
+                </div>
+              )}
+
+              {/* 2-Column Grid: Form + Live Preview */}
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 20 }}>
+                {/* Left: Compose Form */}
+                <div className="admin-mint-card">
+                  <div className="admin-card-head">
+                    <h3 className="admin-card-title">Compose Official Message</h3>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#00d2ff", background: "rgba(0, 210, 255, 0.1)", border: "1px solid rgba(0, 210, 255, 0.3)", padding: "3px 8px", borderRadius: 4 }}>
+                      <IconCheck size={12} />
+                      <span>Sender: Chameleon Cheats</span>
+                    </div>
+                  </div>
+
+                  {/* Preset Buttons */}
+                  <div style={{ marginBottom: 16 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", display: "block", marginBottom: 6 }}>
+                      QUICK FILL PRESETS
+                    </span>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      <button
+                        type="button"
+                        onClick={() => applyNotifPreset("discord_join")}
+                        className="admin-tab-btn"
+                        style={{ padding: "6px 10px", fontSize: 11 }}
+                      >
+                        Join Discord Reminder
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => applyNotifPreset("build_update")}
+                        className="admin-tab-btn"
+                        style={{ padding: "6px 10px", fontSize: 11 }}
+                      >
+                        Loader v4.2 Update
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => applyNotifPreset("maintenance")}
+                        className="admin-tab-btn"
+                        style={{ padding: "6px 10px", fontSize: 11 }}
+                      >
+                        AFPH Maintenance Alert
+                      </button>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleSendNotification} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    {/* Target Audience */}
+                    <div>
+                      <label className="admin-form-label">Target Audience</label>
+                      <select
+                        value={notifTarget}
+                        onChange={(e) => setNotifTarget(e.target.value)}
+                        className="admin-form-select"
+                      >
+                        <option value="buyers_not_discord">Buyers Who Haven&apos;t Joined Discord Server (Recommended)</option>
+                        <option value="all">All Storefront Visitors &amp; Users (Broadcast)</option>
+                        <option value="buyers">All Active VIP Pass Holders</option>
+                      </select>
+                    </div>
+
+                    {/* Notification Type */}
+                    <div>
+                      <label className="admin-form-label">Category</label>
+                      <select
+                        value={notifType}
+                        onChange={(e) => setNotifType(e.target.value as any)}
+                        className="admin-form-select"
+                      >
+                        <option value="alert">Action Required / Priority Alert (Amber Accent)</option>
+                        <option value="announcement">Official Announcement (Cyan Accent)</option>
+                        <option value="update">Cheat Build &amp; Loader Update (Green Accent)</option>
+                      </select>
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <label className="admin-form-label">Notice Title</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Action Required: Join Official Discord Server"
+                        value={notifTitle}
+                        onChange={(e) => setNotifTitle(e.target.value)}
+                        className="admin-form-input"
+                        required
+                      />
+                    </div>
+
+                    {/* Message */}
+                    <div>
+                      <label className="admin-form-label">Message Content</label>
+                      <textarea
+                        rows={4}
+                        placeholder="Type the message that buyers will see in their notification center..."
+                        value={notifMessage}
+                        onChange={(e) => setNotifMessage(e.target.value)}
+                        className="admin-form-input"
+                        style={{ resize: "vertical", fontFamily: "inherit" }}
+                        required
+                      />
+                    </div>
+
+                    {/* Call to Action Button */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label className="admin-form-label">Action Button Label</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Join Official Discord"
+                          value={notifActionLabel}
+                          onChange={(e) => setNotifActionLabel(e.target.value)}
+                          className="admin-form-input"
+                        />
+                      </div>
+                      <div>
+                        <label className="admin-form-label">Action Destination URL</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. https://discord.gg/Whwxq9QAEN"
+                          value={notifActionUrl}
+                          onChange={(e) => setNotifActionUrl(e.target.value)}
+                          className="admin-form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSendingNotif}
+                      className="admin-btn-mint-submit"
+                      style={{ marginTop: 6 }}
+                    >
+                      {isSendingNotif ? "Broadcasting..." : "Broadcast from Chameleon Cheats"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Right: Live Preview */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div className="admin-architecture-card">
+                    <h3 className="admin-architecture-title">Recipient View Preview</h3>
+                    <span style={{ fontSize: 11, color: "#64748b", display: "block", marginBottom: 12 }}>
+                      How customers will see this notice in their Notification Center:
+                    </span>
+
+                    <div className={`notif-card ${notifType}`} style={{ background: "#080e1a" }}>
+                      <div className="notif-card-header">
+                        <div className="notif-sender-pill">
+                          <IconCheck size={12} />
+                          <span className="notif-sender-name">Chameleon Cheats</span>
+                        </div>
+                        <span style={{ fontSize: 10, color: "#64748b" }}>Just now</span>
+                      </div>
+                      <div className="notif-card-title">{notifTitle || "Notice Title Preview"}</div>
+                      <div className="notif-card-msg">
+                        {notifMessage || "This is a preview of the message content dispatched from Chameleon Cheats."}
+                      </div>
+                      {notifActionUrl && (
+                        <div className="notif-card-action">
+                          <span className="notif-action-link" style={{ pointerEvents: "none" }}>
+                            <span>{notifActionLabel || "Open Action"}</span>
+                            <span>↗</span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="admin-architecture-card">
+                    <h3 className="admin-architecture-title">Why Web Notifications?</h3>
+                    <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5, margin: 0 }}>
+                      When buyers haven&apos;t joined your Discord server yet, Discord Bot API calls return <code style={{ color: "#f87171" }}>404 Unknown Member</code> and Direct Messages are blocked.
+                      By using this in-app Notification Center, 100% of buyers receive your alert when they log in to retrieve their license key or download the loader.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Active Broadcasts History */}
+              <div className="admin-orders-card">
+                <div className="admin-card-head">
+                  <h3 className="admin-card-title">Active Dispatched Notifications ({adminNotifs.length})</h3>
+                  <button
+                    type="button"
+                    onClick={fetchAdminNotifications}
+                    className="admin-refresh-btn"
+                  >
+                    <IconRefresh size={13} />
+                    <span>Refresh List</span>
+                  </button>
+                </div>
+
+                {adminNotifs.length === 0 ? (
+                  <div style={{ padding: "30px", textAlign: "center", color: "#64748b", fontSize: 13 }}>
+                    No dispatched notifications found in store.
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "16px 20px" }}>
+                    {adminNotifs.map((item) => (
+                      <div
+                        key={item.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          padding: "14px 16px",
+                          background: "#080e1a",
+                          border: "1px solid #142034",
+                          borderRadius: 8,
+                          gap: 16,
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "#00d2ff" }}>
+                              Chameleon Cheats
+                            </span>
+                            <span style={{ fontSize: 10, background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 4, color: "#94a3b8" }}>
+                              Target: {item.target}
+                            </span>
+                            <span style={{ fontSize: 10, color: "#64748b" }}>
+                              {new Date(item.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "#ffffff" }}>
+                            {item.title}
+                          </span>
+                          <span style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.4 }}>
+                            {item.message}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteNotification(item.id)}
+                          style={{
+                            background: "rgba(239, 68, 68, 0.1)",
+                            border: "1px solid rgba(239, 68, 68, 0.3)",
+                            color: "#f87171",
+                            padding: "6px 10px",
+                            borderRadius: 6,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            flexShrink: 0,
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
