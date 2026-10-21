@@ -6100,14 +6100,68 @@ a {
   background: #10b981;
 }
 
-@media (max-width: 480px) {
+/* ─── Modern Arrow Icon Micro-Interactions ───────────────────────────────── */
+.btn-arrow-external,
+.btn-arrow-right,
+.btn-arrow-left,
+.btn-arrow-down {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a:hover .btn-arrow-external,
+button:hover .btn-arrow-external {
+  transform: translate(2.5px, -2.5px);
+}
+
+a:hover .btn-arrow-right,
+button:hover .btn-arrow-right {
+  transform: translateX(3px);
+}
+
+a:hover .btn-arrow-left,
+button:hover .btn-arrow-left {
+  transform: translateX(-3px);
+}
+
+a:hover .btn-arrow-down,
+button:hover .btn-arrow-down {
+  transform: translateY(2.5px);
+}
+
+@media (max-width: 640px) {
   .notif-flyout {
     position: fixed;
-    top: 60px;
-    left: 10px;
-    right: 10px;
+    top: 66px;
+    left: 12px;
+    right: 12px;
     width: auto;
-    max-width: none;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+    z-index: 500;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.98), 0 0 0 1px rgba(0, 210, 255, 0.15);
+  }
+
+  .notif-body {
+    max-height: calc(80vh - 120px);
+  }
+
+  .notif-card-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .notif-card-action {
+    width: 100%;
+  }
+
+  .notif-action-link {
+    width: 100%;
+    justify-content: center;
+    min-height: 38px;
+    box-sizing: border-box;
   }
 }
 

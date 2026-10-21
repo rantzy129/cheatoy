@@ -137,6 +137,41 @@ function IconGift({ size = 16, className }: { size?: number; className?: string 
   );
 }
 
+function IconArrowUpRight({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
+function IconArrowRight({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
+
+function IconArrowLeft({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
+function IconZap({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+
 export default function ProfilePage() {
   const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
   const [activeLicense, setActiveLicense] = useState<any | null>(null);
@@ -673,19 +708,23 @@ export default function ProfilePage() {
             </button>
 
             <div className="vault-guest-actions-bar">
-              <Link href="/" className="btn-vault-action-secondary">
-                <span>← Return to Storefront</span>
+              <Link href="/" className="btn-vault-action-secondary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <IconArrowLeft size={13} className="btn-arrow-left" />
+                <span>Return to Storefront</span>
               </Link>
-              <Link href="/#pricing" className="btn-vault-action-secondary">
-                <span>Browse Passes (₱150+) →</span>
+              <Link href="/#pricing" className="btn-vault-action-secondary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <span>Browse Passes (₱150+)</span>
+                <IconArrowRight size={13} className="btn-arrow-right" />
               </Link>
               <a
                 href="https://discord.gg/Whwxq9QAEN"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-vault-action-secondary"
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
               >
-                <span>Discord Support ↗</span>
+                <span>Discord Support</span>
+                <IconArrowUpRight size={13} className="btn-arrow-external" />
               </a>
             </div>
           </div>
@@ -840,7 +879,7 @@ export default function ProfilePage() {
                 >
                   <IconDiscord size={16} />
                   <span>Join Official Discord Server</span>
-                  <span>↗</span>
+                  <IconArrowUpRight size={14} className="btn-arrow-external" />
                 </a>
               </div>
             )}
@@ -964,8 +1003,10 @@ export default function ProfilePage() {
                             href="https://discord.gg/Whwxq9QAEN"
                             target="_blank"
                             rel="noopener noreferrer"
+                            style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
                           >
-                            Open a ticket in Discord ↗
+                            <span>Open a ticket in Discord</span>
+                            <IconArrowUpRight size={12} className="btn-arrow-external" />
                           </a>
                         </div>
                       </div>
@@ -1073,10 +1114,12 @@ export default function ProfilePage() {
                         className="btn-vouch-action"
                       >
                         <IconDiscord size={18} />
-                        <span>Post Vouch in #vouches ↗</span>
+                        <span>Post Vouch in #vouches</span>
+                        <IconArrowUpRight size={14} className="btn-arrow-external" />
                       </a>
-                      <span className="vault-vouch-note">
-                        ⚡ Bonus day extends your active license automatically
+                      <span className="vault-vouch-note" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                        <IconZap size={13} />
+                        <span>Bonus day extends your active license automatically</span>
                       </span>
                     </div>
                   </div>
@@ -1550,7 +1593,7 @@ export default function ProfilePage() {
                               className="notif-action-link"
                             >
                               <span>{n.actionLabel || "View Action"}</span>
-                              <span>↗</span>
+                              <IconArrowUpRight size={12} className="btn-arrow-external" />
                             </a>
                           </div>
                         )}

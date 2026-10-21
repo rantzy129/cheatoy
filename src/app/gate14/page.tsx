@@ -115,6 +115,24 @@ function IconExternalLink({ size = 13 }: { size?: number }) {
   );
 }
 
+function IconArrowLeft({ size = 13, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
+function IconArrowUpRight({ size = 13, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
 function IconLogout({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -937,8 +955,9 @@ export default function AdminPage() {
           </form>
 
           <div className="admin-login-footer">
-            <Link href="/" className="admin-return-link">
-              ← Return to Storefront
+            <Link href="/" className="admin-return-link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconArrowLeft size={13} className="btn-arrow-left" />
+              <span>Return to Storefront</span>
             </Link>
             <span className="admin-security-badge">
               HTTP-Only Encrypted
@@ -1840,7 +1859,7 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
               )}
 
               {/* 2-Column Grid: Form + Live Preview */}
-              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 20 }}>
+              <div className="admin-broadcast-grid">
                 {/* Left: Compose Form */}
                 <div className="admin-mint-card">
                   <div className="admin-card-head">
@@ -1965,7 +1984,7 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                     </div>
 
                     {/* Call to Action Button */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div className="admin-dual-inputs">
                       <div>
                         <label className="admin-form-label">Action Button Label</label>
                         <input
@@ -2021,9 +2040,9 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                       </div>
                       {notifActionUrl && (
                         <div className="notif-card-action">
-                          <span className="notif-action-link" style={{ pointerEvents: "none" }}>
+                          <span className="notif-action-link" style={{ pointerEvents: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
                             <span>{notifActionLabel || "Open Action"}</span>
-                            <span>↗</span>
+                            <IconArrowUpRight size={12} />
                           </span>
                         </div>
                       )}
@@ -2176,9 +2195,10 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                       target="_blank"
                       rel="noopener noreferrer"
                       className="admin-receipt-toolbar-btn"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
                     >
                       <IconExternalLink size={12} />
-                      <span>Open Original ↗</span>
+                      <span>Open Original</span>
                     </a>
                   </div>
                 </div>

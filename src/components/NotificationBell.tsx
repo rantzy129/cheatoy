@@ -28,12 +28,20 @@ function IconVerifiedShield({ size = 13 }: { size?: number }) {
   );
 }
 
-function IconExternal({ size = 12 }: { size?: number }) {
+function IconArrowUpRight({ size = 12, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-      <polyline points="15 3 21 3 21 9" />
-      <line x1="10" y1="14" x2="21" y2="3" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
+function IconArrowRight({ size = 12, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
     </svg>
   );
 }
@@ -263,7 +271,7 @@ export default function NotificationBell({ currentUser, hasActiveLicense }: Noti
                             }}
                           >
                             <span>{item.actionLabel || "Open Action"}</span>
-                            <IconExternal size={11} />
+                            <IconArrowUpRight size={12} className="btn-arrow-external" />
                           </a>
                         ) : (
                           <Link
@@ -275,7 +283,7 @@ export default function NotificationBell({ currentUser, hasActiveLicense }: Noti
                             }}
                           >
                             <span>{item.actionLabel || "View Details"}</span>
-                            <span>→</span>
+                            <IconArrowRight size={12} className="btn-arrow-right" />
                           </Link>
                         )}
                       </div>

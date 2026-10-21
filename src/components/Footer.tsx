@@ -20,6 +20,15 @@ function IconCheck({ size = 14 }: { size?: number }) {
   );
 }
 
+function IconArrowUpRight({ size = 12, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
 export default function Footer() {
   return (
     <footer className="site-global-footer">
@@ -63,9 +72,10 @@ export default function Footer() {
                 href="https://discord.gg/Whwxq9QAEN"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#5865F2", fontWeight: 700 }}
+                style={{ color: "#5865F2", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}
               >
-                Join Discord Server ↗
+                <span>Join Discord Server</span>
+                <IconArrowUpRight size={12} className="btn-arrow-external" />
               </a>
             </li>
           </ul>

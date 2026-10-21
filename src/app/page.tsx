@@ -68,6 +68,15 @@ function IconArrowUpRight({ size = 16, className = "" }: { size?: number; classN
   );
 }
 
+function IconArrowDown({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <polyline points="19 12 12 19 5 12" />
+    </svg>
+  );
+}
+
 function IconRefresh({ size = 14, className = "" }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
@@ -916,11 +925,11 @@ export default function Home() {
             <div className="hero-buttons">
               <a href="#features" className="btn-primary" id="hero-get-access">
                 <span>View Features</span>
-                <span>↓</span>
+                <IconArrowDown size={14} className="btn-arrow-down" />
               </a>
               <a href="#pricing" className="btn-secondary">
                 <span>VIP Pricing (₱150+)</span>
-                <span>↗</span>
+                <IconArrowUpRight size={14} className="btn-arrow-external" />
               </a>
             </div>
           </div>
@@ -1479,8 +1488,10 @@ export default function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="discord-banner-link"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
                     >
-                      Join Server ↗
+                      <span>Join Server</span>
+                      <IconArrowUpRight size={12} className="btn-arrow-external" />
                     </a>
                   </div>
                 </div>
@@ -1663,9 +1674,10 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-modal-new-order"
-                    style={{ textDecoration: "none" }}
+                    style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
                   >
-                    <span>Discord Support ↗</span>
+                    <span>Discord Support</span>
+                    <IconArrowUpRight size={13} className="btn-arrow-external" />
                   </a>
                 </div>
               </div>
@@ -1733,8 +1745,10 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="modal-discord-banner-btn"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 5, justifyContent: "center" }}
                   >
-                    Join Server ↗
+                    <span>Join Server</span>
+                    <IconArrowUpRight size={12} className="btn-arrow-external" />
                   </a>
                 </div>
 
@@ -1935,8 +1949,10 @@ export default function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="modal-discord-banner-btn"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 5, justifyContent: "center" }}
                     >
-                      Join Server ↗
+                      <span>Join Server</span>
+                      <IconArrowUpRight size={12} className="btn-arrow-external" />
                     </a>
                   </div>
 
