@@ -3958,104 +3958,81 @@ a {
   white-space: nowrap;
 }
 
-.features-grid-quad {
+/* ─── VIP Feature Summary Cards (Taste-Skill Anti-Slop System) ─── */
+.features-grid-summary {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: stretch;
 }
 
-@media (max-width: 768px) {
-  .features-grid-quad {
+@media (max-width: 1024px) {
+  .features-grid-summary {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
-.feature-quad-card {
-  background: #070c18;
-  border: 1px solid #142136;
-  border-radius: var(--radius-md, 12px);
-  padding: 24px;
+.feature-summary-card {
+  background: #090e18;
+  border: 1px solid #142034;
+  border-radius: 10px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.feature-quad-card:hover {
-  border-color: #223854;
-  background: #091020;
+.feature-summary-card:hover {
+  border-color: #243550;
+  background: #0c1320;
 }
 
-.feature-quad-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.feature-quad-icon-wrap {
-  width: 42px;
-  height: 42px;
-  border-radius: 8px;
-  background: #0d1729;
-  border: 1px solid #1c2e4a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #38bdf8;
-}
-
-.feature-quad-badge {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.feature-quad-title {
+.feature-card-heading {
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: #f8fafc;
+  color: #ffffff;
   margin: 0 0 8px 0;
+  line-height: 1.25;
 }
 
-.feature-quad-desc {
+.feature-card-intro {
   font-size: 13.5px;
   color: #94a3b8;
   line-height: 1.5;
-  margin: 0 0 18px 0;
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #142034;
 }
 
-.feature-quad-specs {
+.feature-summary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 14px;
-  border-top: 1px solid #101a2c;
-  font-size: 11.5px;
-  color: #64748b;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
 }
 
-.feature-quad-spec-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #cbd5e1;
+.feature-summary-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.feature-quad-spec-pill::before {
-  content: "";
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #38bdf8;
+.feature-item-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.35;
+}
+
+.feature-item-detail {
+  font-size: 13px;
+  color: #7d8ea5;
+  line-height: 1.5;
 }
 
 /* ==========================================================================

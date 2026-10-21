@@ -189,6 +189,84 @@ function IconSliders({ size = 18, className = "" }: { size?: number; className?:
   );
 }
 
+function IconTarget({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function IconActivity({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  );
+}
+
+function IconUser({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function IconGun({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M2 5h16l4 4H6l-4-4z" />
+      <path d="M6 9v4h2l2 6h2l-1-6h5v-4" />
+    </svg>
+  );
+}
+
+function IconLayers({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+}
+
+function IconPalette({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z" />
+    </svg>
+  );
+}
+
+function IconSettings({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+function IconUsers({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 /* ─── Product Tiers (Assault Fire PH Chams) ───────────────── */
 const TIERS = [
   {
@@ -897,29 +975,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ─── 2. Trust Metric Strip ────────────────────────────── */}
-        <div className="trust-tape">
-          <div className="trust-tape-inner">
-            <div className="trust-item">
-              <IconShield size={18} />
-              <span>100% Kernel Memory Virtualization</span>
-            </div>
-            <div className="trust-item">
-              <IconZap size={18} />
-              <span>Zero Lag (60–240+ FPS Maintained)</span>
-            </div>
-            <div className="trust-item">
-              <IconSliders size={18} />
-              <span>Menu Controlled via [INSERT] Key</span>
-            </div>
-            <div className="trust-item">
-              <IconCrosshair size={18} />
-              <span>PlayPark Official Server Ready</span>
-            </div>
-          </div>
-        </div>
 
-        {/* ─── 2.5 Feature Arsenal: Wallhack, Chams, Health & 2D Box ─ */}
+
+        {/* ─── 2.5 Feature Arsenal: Visual ESP, Wallhack Chams, Utility & Menu ─── */}
         <section className="section" id="features">
           <div className="features-container">
             <div className="section-header-clean">
@@ -927,114 +985,112 @@ export default function Home() {
                 VIP Feature Arsenal
               </h2>
               <p className="section-subtext">
-                Four precision direct-memory modules engineered specifically for Assault Fire Philippines. Complete live control inside the game via interactive overlay.
+                Precision-engineered direct-memory modules built exclusively for Assault Fire Philippines. Fully customizable via our interactive in-game ImGui overlay.
               </p>
             </div>
 
-            {/* In-Game Menu Hotkey Banner */}
-            <div className="hotkey-control-banner">
-              <div className="hotkey-control-left">
-                <div className="hotkey-key-box">
-                  KEY: [INSERT]
-                </div>
-                <div className="hotkey-control-text">
-                  <h3>Full In-Game Menu Control — Press INSERT</h3>
-                  <p>
-                    Toggle the live configuration menu at any second during combat. Turn modules on/off, switch color schemes, and calibrate ESP visual parameters on the fly.
-                  </p>
-                </div>
-              </div>
-              <div className="hotkey-control-status">
-                <span className="live-pulse-dot" />
-                <span>Live Menu Hook Ready</span>
-              </div>
-            </div>
+            {/* ═══ 3 Summary Cards (Taste-Skill Anti-Slop Discipline) ═══ */}
+            <div className="features-grid-summary">
 
-            {/* 4 Feature Quad Cards */}
-            <div className="features-grid-quad">
-              {/* Card 1: Wallhack */}
-              <div className="feature-quad-card">
-                <div>
-                  <div className="feature-quad-top">
-                    <div className="feature-quad-icon-wrap">
-                      <IconEye size={22} />
-                    </div>
-                    <span className="feature-quad-badge">Memory Hookless</span>
-                  </div>
-                  <h3 className="feature-quad-title">Direct-Memory Wallhack</h3>
-                  <p className="feature-quad-desc">
-                    Reveals crystal-clear enemy player silhouettes through every solid wall, container, crate, and terrain barrier across all official Assault Fire maps with zero screen tear.
-                  </p>
-                </div>
-                <div className="feature-quad-specs">
-                  <span className="feature-quad-spec-pill">Full Map Penetration</span>
-                  <span className="feature-quad-spec-pill">Zero Visual Latency</span>
-                  <span className="feature-quad-spec-pill">OBS / Stream Proof</span>
-                </div>
-              </div>
+              {/* ──────── Card 1: Visual Features ──────── */}
+              <div className="feature-summary-card">
+                <h3 className="feature-card-heading">Visual Features</h3>
+                <p className="feature-card-intro">
+                  Direct-memory visual tracking with bone alignment and real-time enemy telemetry.
+                </p>
 
-              {/* Card 2: Chams */}
-              <div className="feature-quad-card">
-                <div>
-                  <div className="feature-quad-top">
-                    <div className="feature-quad-icon-wrap">
-                      <IconCrosshair size={22} />
-                    </div>
-                    <span className="feature-quad-badge">Dual Shading</span>
-                  </div>
-                  <h3 className="feature-quad-title">Customizable Player Chams</h3>
-                  <p className="feature-quad-desc">
-                    High-contrast solid colored textures applied directly to enemy player models. Dynamically differentiates between enemies hidden behind cover and targets in direct line of fire.
-                  </p>
-                </div>
-                <div className="feature-quad-specs">
-                  <span className="feature-quad-spec-pill">Visible vs. Occluded</span>
-                  <span className="feature-quad-spec-pill">Team Identification</span>
-                  <span className="feature-quad-spec-pill">High-Contrast Glow</span>
-                </div>
+                <ul className="feature-summary-list">
+                  <li>
+                    <span className="feature-item-label">Skeleton-accurate 2D boxes</span>
+                    <span className="feature-item-detail">
+                      Tracks actual head and feet bones, scaling precisely as enemies crouch, jump, or peek.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Dynamic health bars</span>
+                    <span className="feature-item-detail">
+                      Smooth vertical indicator transitioning from green to yellow to red based on remaining HP.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Player name ESP</span>
+                    <span className="feature-item-detail">
+                      Displays the enemy&apos;s actual in-game name directly above their bounding box.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Weapon ESP</span>
+                    <span className="feature-item-detail">
+                      Identifies the exact weapon the enemy is currently holding (e.g. AK-47, AWM).
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Directional snaplines</span>
+                    <span className="feature-item-detail">
+                      Screen-to-target lines with customizable thickness (1.0–6.0px), color, and screen origin.
+                    </span>
+                  </li>
+                </ul>
               </div>
 
-              {/* Card 3: Health ESP */}
-              <div className="feature-quad-card">
-                <div>
-                  <div className="feature-quad-top">
-                    <div className="feature-quad-icon-wrap">
-                      <IconHeart size={22} />
-                    </div>
-                    <span className="feature-quad-badge">Telemetry ESP</span>
-                  </div>
-                  <h3 className="feature-quad-title">Real-Time Health ESP</h3>
-                  <p className="feature-quad-desc">
-                    Live dynamic health indicators displayed alongside every enemy player. Accurately reveals exact enemy HP bars and damage readiness so you never walk into an ambush blind.
-                  </p>
-                </div>
-                <div className="feature-quad-specs">
-                  <span className="feature-quad-spec-pill">Live HP Bar Overlay</span>
-                  <span className="feature-quad-spec-pill">Armor Status Readout</span>
-                  <span className="feature-quad-spec-pill">Real-Time Sync</span>
-                </div>
+              {/* ──────── Card 2: Chams ──────── */}
+              <div className="feature-summary-card">
+                <h3 className="feature-card-heading">Chams</h3>
+                <p className="feature-card-intro">
+                  DirectX model illumination making enemy players clearly visible behind walls and cover.
+                </p>
+
+                <ul className="feature-summary-list">
+                  <li>
+                    <span className="feature-item-label">3D model wallhack</span>
+                    <span className="feature-item-detail">
+                      Forces enemy player models to render through walls, crates, containers, and terrain.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Six color presets</span>
+                    <span className="feature-item-detail">
+                      Choose from skyblue, red, green, pink, yellow, or white, with an option to turn off.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Instant target contrast</span>
+                    <span className="feature-item-detail">
+                      Solid high-contrast textures distinguish hostiles from background geometry at any distance.
+                    </span>
+                  </li>
+                </ul>
               </div>
 
-              {/* Card 4: 2D Box ESP */}
-              <div className="feature-quad-card">
-                <div>
-                  <div className="feature-quad-top">
-                    <div className="feature-quad-icon-wrap">
-                      <IconBox size={22} />
-                    </div>
-                    <span className="feature-quad-badge">Precision Framing</span>
-                  </div>
-                  <h3 className="feature-quad-title">Dynamic 2D Box ESP</h3>
-                  <p className="feature-quad-desc">
-                    Clean 2D bounding boxes dynamically calculated from target player matrices. Accurately frames enemy hitboxes and scales smoothly across any distance for lightning-fast crosshair placement.
-                  </p>
-                </div>
-                <div className="feature-quad-specs">
-                  <span className="feature-quad-spec-pill">Distance Auto-Scale</span>
-                  <span className="feature-quad-spec-pill">Hitbox Alignment</span>
-                  <span className="feature-quad-spec-pill">Anti-Clutter Filter</span>
-                </div>
+              {/* ──────── Card 3: Utility and Menu ──────── */}
+              <div className="feature-summary-card">
+                <h3 className="feature-card-heading">Utility and Menu</h3>
+                <p className="feature-card-intro">
+                  In-game configuration overlay and team filtering for a clean, distraction-free screen.
+                </p>
+
+                <ul className="feature-summary-list">
+                  <li>
+                    <span className="feature-item-label">Team filtering</span>
+                    <span className="feature-item-detail">
+                      Automatically reads your team affiliation and hides friendly ESP to prevent visual clutter.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Custom ImGui menu</span>
+                    <span className="feature-item-detail">
+                      Draggable dark-mode overlay with live sliders and color pickers for on-the-fly adjustment.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Configurable menu keybind</span>
+                    <span className="feature-item-detail">
+                      Toggle the menu with INSERT by default, or rebind directly to any keyboard key or mouse button.
+                    </span>
+                  </li>
+                </ul>
               </div>
+
             </div>
           </div>
         </section>
@@ -1066,7 +1122,7 @@ export default function Home() {
                     className="proof-card-img"
                   />
                   <div className="proof-card-zoom-badge">
-                    <span>🔍 Full HD</span>
+                    <span>Full HD Capture</span>
                   </div>
                   <span className="proof-card-badge">{proof.badge}</span>
                 </div>
