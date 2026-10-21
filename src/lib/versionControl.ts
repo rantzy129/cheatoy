@@ -112,7 +112,9 @@ export async function setMinLoaderVersion(
 
   // 1. Persist to Supabase
   try {
-    await supabase.from("notifications").upsert({
+    // Delete existing record first to satisfy RLS policies that disallow UPDATE on public
+    await supabase.from("notifications").delete().eq("id", "system-loader-version");
+    await supabase.from("notifications").insert({
       id: "system-loader-version",
       sender: "Chameleon Cheats",
       title: cleanVer,

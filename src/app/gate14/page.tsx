@@ -468,7 +468,11 @@ export default function AdminPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ minVersion: minLoaderVersion.trim(), downloadUrl: downloadPageUrl.trim() }),
+        body: JSON.stringify({
+          minVersion: minLoaderVersion.trim(),
+          downloadUrl: downloadPageUrl.trim(),
+          pin: pin || undefined,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
