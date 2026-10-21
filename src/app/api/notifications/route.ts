@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { verifyAdminSession, getAdminTokenFromRequest } from "@/lib/adminAuth";
 import {
   NotificationItem,
-  getLocalNotifications,
-  saveLocalNotification,
-  deleteLocalNotification,
+  fetchAllNotifications,
+  saveNotification,
+  deleteNotification,
   getNotificationsForUser,
 } from "@/lib/notifications";
 
@@ -17,20 +17,23 @@ export async function GET(request: Request) {
     const inGuildParam = searchParams.get("in_guild");
     const inGuild = inGuildParam !== null ? inGuildParam === "true" : undefined;
 
-    // If query parameters provided, filter specifically for this user
-    if (discordId || username || hasLicense) {
-      const userNotifications = await getNotificationsForUser({
-        discordId,
-        username,
-        hasActiveLicense: hasLicense,
-        inGuild,
-      });
-      return NextResponse.json({ success: true, notifications: userNotifications });
+    const token = getAdminTokenFromRequest(request);
+    const isAdmin = verifyAdminSession(token);
+
+    // If request comes from an authenticated admin console and without specific user filters, return all
+    if (isAdmin && !discordId && !username && !hasLicense) {
+      const { notifications, inDatabase, dbError } = await fetchAllNotifications();
+      return NextResponse.json({ success: true, notifications, inDatabase, dbError });
     }
 
-    // Otherwise return all active notifications (for admin or general index)
-    const all = getLocalNotifications();
-    return NextResponse.json({ success: true, notifications: all });
+    // Filter notifications for this specific visitor/user
+    const userNotifications = await getNotificationsForUser({
+      discordId,
+      username,
+      hasActiveLicense: hasLicense,
+      inGuild,
+    });
+    return NextResponse.json({ success: true, notifications: userNotifications });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, error: err.message || "Failed to load notifications" },
@@ -77,11 +80,13 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    saveLocalNotification(newNotification);
+    const result = await saveNotification(newNotification);
 
     return NextResponse.json({
       success: true,
       notification: newNotification,
+      inDatabase: result.inDatabase,
+      dbError: result.dbError,
       message: `Notification successfully broadcasted from Chameleon Cheats!`,
     });
   } catch (err: any) {
@@ -107,7 +112,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, error: "Notification ID is required" }, { status: 400 });
     }
 
-    const success = deleteLocalNotification(id);
+    const success = await deleteNotification(id);
     return NextResponse.json({ success, message: "Notification deleted" });
   } catch (err: any) {
     return NextResponse.json(
@@ -116,3 +121,4 @@ export async function DELETE(request: Request) {
     );
   }
 }
+

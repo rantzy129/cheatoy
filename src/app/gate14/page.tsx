@@ -252,11 +252,14 @@ export default function AdminPage() {
   const [notifTitle, setNotifTitle] = useState("");
   const [notifMessage, setNotifMessage] = useState("");
   const [notifType, setNotifType] = useState<"alert" | "announcement" | "update">("alert");
-  const [notifTarget, setNotifTarget] = useState<string>("buyers_not_discord");
+  const [notifTarget, setNotifTarget] = useState<string>("all");
   const [notifActionLabel, setNotifActionLabel] = useState("Join Official Discord");
   const [notifActionUrl, setNotifActionUrl] = useState("https://discord.gg/Whwxq9QAEN");
   const [isSendingNotif, setIsSendingNotif] = useState(false);
   const [notifStatusMsg, setNotifStatusMsg] = useState<string | null>(null);
+  const [notifInDatabase, setNotifInDatabase] = useState<boolean | null>(null);
+  const [notifDbError, setNotifDbError] = useState<string | null>(null);
+  const [copiedSql, setCopiedSql] = useState(false);
 
   const fetchAdminNotifications = async () => {
     try {
@@ -265,6 +268,12 @@ export default function AdminPage() {
         const data = await res.json();
         if (Array.isArray(data.notifications)) {
           setAdminNotifs(data.notifications);
+        }
+        if (typeof data.inDatabase === "boolean") {
+          setNotifInDatabase(data.inDatabase);
+        }
+        if (data.dbError) {
+          setNotifDbError(data.dbError);
         }
       }
     } catch (err) {
@@ -296,11 +305,18 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setNotifStatusMsg(data.message || "Notification sent from Chameleon Cheats!");
+        if (data.inDatabase === false) {
+          setNotifStatusMsg("Broadcast saved! Note: Supabase table is not yet created, so notice is held in memory. Run the SQL script below to sync to all Vercel users.");
+        } else {
+          setNotifStatusMsg(data.message || "Notification sent from Chameleon Cheats!");
+        }
+        if (typeof data.inDatabase === "boolean") {
+          setNotifInDatabase(data.inDatabase);
+        }
         setNotifTitle("");
         setNotifMessage("");
         fetchAdminNotifications();
-        setTimeout(() => setNotifStatusMsg(null), 5000);
+        setTimeout(() => setNotifStatusMsg(null), 8000);
       } else {
         alert(data.error || "Failed to broadcast notification");
       }
@@ -344,7 +360,7 @@ export default function AdminPage() {
       setNotifTitle("Chameleon Cheat Loader v4.2 Undetected & Live");
       setNotifMessage("Latest kernel bypass patch applied for Assault Fire PH. Download the fresh build from your VIP Key Vault or Discord.");
       setNotifType("update");
-      setNotifTarget("buyers");
+      setNotifTarget("all");
       setNotifActionLabel("Open VIP Vault");
       setNotifActionUrl("/profile");
     } else if (preset === "maintenance") {
@@ -1734,6 +1750,89 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Database Connection Status / SQL Migration helper for Vercel */}
+              {notifInDatabase === false && (
+                <div style={{
+                  padding: "16px 20px",
+                  background: "rgba(245, 158, 11, 0.08)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  borderRadius: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+                    <div style={{ flex: 1, minWidth: 280 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b" }}>
+                          Supabase Cloud Persistence Setup (Required for Vercel)
+                        </span>
+                        <span style={{ fontSize: 10, background: "rgba(245, 158, 11, 0.2)", color: "#fbbf24", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
+                          1-STEP SETUP
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 12, color: "#cbd5e1", marginTop: 4, marginBottom: 0, lineHeight: 1.5 }}>
+                        On Vercel, serverless containers do not persist local files across visits. Run this 1-click SQL script in your Supabase SQL Editor to store notifications globally so all users receive them instantly.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sql = `CREATE TABLE IF NOT EXISTS public.notifications (
+  id TEXT PRIMARY KEY,
+  sender TEXT NOT NULL DEFAULT 'Chameleon Cheats',
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'announcement',
+  target TEXT NOT NULL DEFAULT 'all',
+  action_label TEXT,
+  action_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ
+);
+
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read" ON public.notifications FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.notifications FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (true);`;
+                        navigator.clipboard.writeText(sql);
+                        setCopiedSql(true);
+                        setTimeout(() => setCopiedSql(false), 3000);
+                      }}
+                      className="admin-tab-btn"
+                      style={{
+                        background: copiedSql ? "#10b981" : "#f59e0b",
+                        color: "#000000",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        padding: "8px 14px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {copiedSql ? "Copied SQL to Clipboard!" : "Copy Supabase SQL Script"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {notifInDatabase === true && (
+                <div style={{
+                  padding: "10px 16px",
+                  background: "rgba(16, 185, 129, 0.08)",
+                  border: "1px solid rgba(16, 185, 129, 0.25)",
+                  borderRadius: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 12,
+                  color: "#10b981",
+                  fontWeight: 600
+                }}>
+                  <IconCheck size={14} />
+                  <span>Supabase Cloud Database connected: All broadcasts sync across Vercel production and all user devices in real-time.</span>
+                </div>
+              )}
+
               {notifStatusMsg && (
                 <div style={{ padding: "12px 16px", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 8, color: "#10b981", fontSize: 13, fontWeight: 600 }}>
                   ✓ {notifStatusMsg}
@@ -1772,7 +1871,7 @@ export default function AdminPage() {
                         className="admin-tab-btn"
                         style={{ padding: "6px 10px", fontSize: 11 }}
                       >
-                        Loader v4.2 Update
+                        Loader v4.2 Update (Global)
                       </button>
                       <button
                         type="button"
@@ -1788,16 +1887,40 @@ export default function AdminPage() {
                   <form onSubmit={handleSendNotification} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     {/* Target Audience */}
                     <div>
-                      <label className="admin-form-label">Target Audience</label>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                        <label className="admin-form-label" style={{ margin: 0 }}>Target Audience</label>
+                        {notifTarget === "buyers" && (
+                          <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 600 }}>
+                            VIP Pass Holders only (Excludes Free Members)
+                          </span>
+                        )}
+                        {notifTarget === "all" && (
+                          <span style={{ fontSize: 11, color: "#10b981", fontWeight: 600 }}>
+                            100% of Users &amp; Free Members
+                          </span>
+                        )}
+                        {notifTarget === "buyers_not_discord" && (
+                          <span style={{ fontSize: 11, color: "#00d2ff", fontWeight: 600 }}>
+                            VIP buyers not in Discord only
+                          </span>
+                        )}
+                      </div>
                       <select
                         value={notifTarget}
                         onChange={(e) => setNotifTarget(e.target.value)}
                         className="admin-form-select"
                       >
-                        <option value="buyers_not_discord">Buyers Who Haven&apos;t Joined Discord Server (Recommended)</option>
-                        <option value="all">All Storefront Visitors &amp; Users (Broadcast)</option>
-                        <option value="buyers">All Active VIP Pass Holders</option>
+                        <option value="all">All Storefront Visitors &amp; Free Members (Global Broadcast)</option>
+                        <option value="buyers_not_discord">Buyers Who Haven&apos;t Joined Discord Server</option>
+                        <option value="buyers">All Active VIP Pass Holders Only (Excludes Free Members)</option>
                       </select>
+                      <p style={{ fontSize: 11, color: "#64748b", margin: "4px 0 0 0" }}>
+                        {notifTarget === "all"
+                          ? "Every visitor and registered Discord account (including Free Members like @somaris1) will see this announcement."
+                          : notifTarget === "buyers"
+                          ? "Only accounts with an unexpired VIP License will receive this. Accounts marked as 'Free Member' are excluded."
+                          : "Only users with an active VIP license whose Discord snowflake is not found in your server will see this."}
+                      </p>
                     </div>
 
                     {/* Notification Type */}
