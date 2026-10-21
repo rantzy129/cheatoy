@@ -8,7 +8,9 @@ import { assignDiscordVipRoleAndSendDm } from "@/lib/discordBot";
 function calculateExpiry(tier: string) {
   const now = new Date();
   const lower = tier.toLowerCase();
-  if (lower.includes("3 day")) {
+  if (lower.includes("1 day") || lower.includes("24 hour")) {
+    return new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000).toISOString();
+  } else if (lower.includes("3 day")) {
     return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
   } else if (lower.includes("7 day") || lower.includes("week")) {
     return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();

@@ -675,5 +675,58 @@ export async function sendUserListWebhook(
   await sendDiscordEmbed(USER_LIST_WEBHOOK_URL, embed, "Chameleon Member Directory");
 }
 
+/**
+ * Sends a webhook notification when bonus days are added to a license (e.g. Vouch reward)
+ */
+export async function sendLicenseExtendedWebhook(data: {
+  license_key: string;
+  discord_id?: string;
+  discord_username?: string;
+  daysAdded: number;
+  new_expires_at: string | null;
+  reason?: string;
+}) {
+  const embed = {
+    title: "🌟 VIP PASS EXTENDED — PROMO REWARD",
+    description: `Staff credited bonus VIP access to **@${data.discord_username || "VIP Customer"}**.`,
+    color: 0x10b981, // Emerald Green
+    fields: [
+      {
+        name: "👤 VIP Customer",
+        value: `**@${data.discord_username || "Customer"}**${data.discord_id ? ` (<@${data.discord_id}>)` : ""}`,
+        inline: true,
+      },
+      {
+        name: "🎁 Bonus Added",
+        value: `**+${data.daysAdded} Extra Day (${data.daysAdded * 24}h)**`,
+        inline: true,
+      },
+      {
+        name: "⏳ Updated Expiry",
+        value: data.new_expires_at ? new Date(data.new_expires_at).toLocaleString() : "Permanent Lifetime VIP",
+        inline: true,
+      },
+      {
+        name: "🔑 License Key",
+        value: `\`${data.license_key}\``,
+        inline: true,
+      },
+      {
+        name: "📝 Reason",
+        value: data.reason || "Discord Vouch Promotion",
+        inline: true,
+      },
+    ],
+    footer: {
+      text: "Chameleon Cheats • Community & Marketing Promotions",
+    },
+    timestamp: new Date().toISOString(),
+  };
+
+  await sendDiscordEmbed(USER_ACTIVITY_WEBHOOK_URL, embed, "Chameleon Vault").catch((e) =>
+    console.warn("License extended webhook notice:", e)
+  );
+}
+
 
 

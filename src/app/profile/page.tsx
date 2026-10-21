@@ -731,7 +731,8 @@ export default function ProfilePage() {
             {/* TAB 1: VIP COMMAND DESK (LICENSE & LOADER) */}
             {activeTab === "license" && (
               isVip && activeLicense ? (
-                /* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */
+                <>
+                {/* VIP MEMBERS ONLY: 2-Column Command Desk with Active License & Loader Download */}
                 <div className="vault-grid">
                 {/* Left Column: Subscription Telemetry, Private Key, HWID */}
                 <div className="vault-card">
@@ -918,6 +919,51 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {/* ─── VOUCH FOR +1 FREE DAY PROMOTION CARD ─── */}
+              <div className="vault-vouch-promo-card">
+                <div className="vault-vouch-promo-left">
+                  <div className="vault-vouch-badge">
+                    <span>🌟 VIP COMMUNITY PROMOTION</span>
+                  </div>
+                  <h3 className="vault-vouch-title">
+                    Vouch in Discord &amp; Get +1 Extra Free VIP Day!
+                  </h3>
+                  <p className="vault-vouch-desc">
+                    Loving your Chameleon VIP features in Assault Fire PH? Drop a quick review and in-game screenshot in our Discord <strong>#vouches</strong> channel. Staff will verify your post and credit an extra <strong>+1 VIP Day (+24 Hours)</strong> directly onto your pass!
+                  </p>
+                  <div className="vault-vouch-steps">
+                    <div className="vault-vouch-step-item">
+                      <span className="step-num">1</span>
+                      <span>Join official Discord</span>
+                    </div>
+                    <div className="vault-vouch-step-item">
+                      <span className="step-num">2</span>
+                      <span>Post review &amp; gameplay screenshot in <code>#vouches</code></span>
+                    </div>
+                    <div className="vault-vouch-step-item">
+                      <span className="step-num">3</span>
+                      <span>Staff verifies and adds +1 Extra Day to your key!</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="vault-vouch-promo-right">
+                  <a
+                    href="https://discord.gg/Whwxq9QAEN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-vouch-action"
+                  >
+                    <IconDiscord size={18} />
+                    <span>Post Vouch in #vouches ↗</span>
+                  </a>
+                  <span className="vault-vouch-note">
+                    ⚡ Bonus day extends your active license automatically
+                  </span>
+                </div>
+              </div>
+              </>
             ) : (
               /* NON-VIP OR EXPIRED: Clean, dignified empty state without slop */
               <div className="vault-card" style={{ marginBottom: 28 }}>

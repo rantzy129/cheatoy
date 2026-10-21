@@ -567,6 +567,59 @@ export default function AdminPage() {
     }
   };
 
+  // Extend License Duration (+1 Day / Custom Days)
+  const handleExtendDays = async (lic: License, days: number = 1) => {
+    if (lic.expires_at === null) {
+      alert("This license has Lifetime VIP (Permanent) and does not expire.");
+      return;
+    }
+    const userLabel = lic.discord_username || lic.discord_id || lic.license_key;
+    if (!confirm(`Credit +${days} Extra VIP Day (Vouch Promotion) to @${userLabel}?`)) return;
+
+    setActionLoading(lic.id);
+    try {
+      const res = await fetch("/api/admin/licenses", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: lic.id,
+          action: "add_days",
+          days,
+          reason: "Discord Vouch Promotion (+1 Day)",
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.new_expires_at) {
+        setLicenses((prev) =>
+          prev.map((l) =>
+            l.id === lic.id
+              ? {
+                  ...l,
+                  expires_at: data.new_expires_at,
+                  tier: data.tier || l.tier,
+                  is_banned: false,
+                }
+              : l
+          )
+        );
+        let alertMsg = `🎉 +${days} Day credited successfully to @${userLabel}!\n\nNew Expiration: ${new Date(data.new_expires_at).toLocaleString()}`;
+        if (data.discord_dm?.dmSent) {
+          alertMsg += "\n✓ Automated Discord DM sent to customer.";
+        } else if (data.discord_dm?.dmError) {
+          alertMsg += `\n(Customer DMs were closed, but license was successfully extended in database)`;
+        }
+        alert(alertMsg);
+        fetchLicenses();
+      } else {
+        alert("Failed to extend license: " + (data.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Mint VIP Key Handler
   const handleMintKey = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1268,7 +1321,14 @@ export default function AdminPage() {
                           </td>
 
                           <td>
-                            <span style={{ fontSize: 12, color: "#8da0b8" }}>{lic.tier || "Standard Pass"}</span>
+                            <div style={{ fontSize: 12, color: "#cbd5e1", fontWeight: 600 }}>
+                              {lic.tier || "Standard Pass"}
+                            </div>
+                            {lic.tier && (lic.tier.includes("Vouch") || lic.tier.includes("Bonus")) && (
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3, fontSize: 10.5, color: "#34d399", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 4, padding: "1px 6px", fontWeight: 700 }}>
+                                <span>🎁 Vouch Bonus Active</span>
+                              </div>
+                            )}
                           </td>
 
                           <td>
@@ -1284,8 +1344,24 @@ export default function AdminPage() {
                             )}
                           </td>
 
-                          <td style={{ fontSize: 12, color: "#8da0b8" }}>
-                            {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString() : "Permanent VIP"}
+                          <td>
+                            {lic.expires_at ? (
+                              <div>
+                                <div style={{ fontSize: 12, color: "#ffffff", fontWeight: 600, fontFamily: "monospace" }}>
+                                  {new Date(lic.expires_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}{" "}
+                                  <span style={{ color: "#70849e", fontSize: 11 }}>
+                                    {new Date(lic.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: 10.5, color: new Date(lic.expires_at).getTime() > Date.now() ? "#10b981" : "#ef4444", marginTop: 2, fontWeight: 700 }}>
+                                  {new Date(lic.expires_at).getTime() > Date.now()
+                                    ? `● ${Math.max(1, Math.ceil((new Date(lic.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining`
+                                    : "● Expired"}
+                                </div>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: 12, color: "#00d2ff", fontWeight: 700 }}>Permanent VIP</span>
+                            )}
                           </td>
 
                           <td>
@@ -1296,6 +1372,17 @@ export default function AdminPage() {
 
                           <td style={{ textAlign: "right" }}>
                             <div style={{ display: "inline-flex", gap: 6 }}>
+                              {lic.expires_at !== null && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleExtendDays(lic, 1)}
+                                  disabled={actionLoading === lic.id}
+                                  className="admin-btn-extend-day"
+                                  title="Add +1 Extra Day for Discord Vouch"
+                                >
+                                  {actionLoading === lic.id ? "Adding..." : "+1 Day"}
+                                </button>
+                              )}
                               {lic.hwid && (
                                 <button
                                   type="button"
@@ -1352,6 +1439,7 @@ export default function AdminPage() {
                       onChange={(e) => setGenTier(e.target.value)}
                       className="admin-form-select"
                     >
+                      <option value="1 Day Pass">1 Day Pass (24 Hours Promo / Vouch)</option>
                       <option value="3 Days Pass">3 Days Pass (₱150)</option>
                       <option value="7 Days Pass">7 Days Pass (₱300)</option>
                       <option value="15 Days Pass">15 Days Pass (₱550)</option>

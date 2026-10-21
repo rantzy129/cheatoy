@@ -226,3 +226,141 @@ export async function assignDiscordVipRoleAndSendDm(
 
   return result;
 }
+
+/**
+ * Sends an automated DM to a customer when bonus time is credited (e.g. for vouching)
+ */
+export async function sendVouchBonusDm(params: {
+  discordUserId: string;
+  discordUsername?: string;
+  licenseKey: string;
+  daysAdded: number;
+  newExpiresAt: string | null;
+  reason?: string;
+}): Promise<{ dmSent: boolean; dmError?: string }> {
+  const result = { dmSent: false, dmError: undefined as string | undefined };
+  const token = DISCORD_BOT_TOKEN.trim();
+  const guildId = DISCORD_GUILD_ID.trim();
+  const rawUserId = (params.discordUserId || "").trim();
+
+  if (!token) {
+    result.dmError = "DISCORD_BOT_TOKEN not configured";
+    return result;
+  }
+
+  let targetUserId = rawUserId;
+  let isSnowflake = /^\d{17,20}$/.test(targetUserId);
+
+  if (!isSnowflake && guildId) {
+    const candidateName = (params.discordUsername || rawUserId).replace(/#.*$/, "").trim();
+    if (candidateName) {
+      try {
+        const searchRes = await fetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members/search?query=${encodeURIComponent(candidateName)}&limit=5`,
+          {
+            headers: {
+              Authorization: `Bot ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (searchRes.ok) {
+          const members = await searchRes.json();
+          const cleanQ = candidateName.toLowerCase();
+          const match = members.find((m: any) =>
+            m.user?.username?.toLowerCase() === cleanQ ||
+            m.user?.global_name?.toLowerCase() === cleanQ ||
+            m.nick?.toLowerCase() === cleanQ
+          ) || members[0];
+
+          if (match?.user?.id) {
+            targetUserId = match.user.id;
+            isSnowflake = true;
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[Discord Bot] Guild member resolution failed:`, err);
+      }
+    }
+  }
+
+  if (!isSnowflake) {
+    result.dmError = `User ID "${rawUserId}" is not a valid snowflake.`;
+    return result;
+  }
+
+  try {
+    const dmChannelRes = await fetch("https://discord.com/api/v10/users/@me/channels", {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipient_id: targetUserId }),
+    });
+
+    if (!dmChannelRes.ok) {
+      result.dmError = "User has closed DMs or is not in server.";
+      return result;
+    }
+
+    const channelData = await dmChannelRes.json();
+    const dmChannelId = channelData.id;
+
+    const expiryText = params.newExpiresAt
+      ? `<t:${Math.floor(new Date(params.newExpiresAt).getTime() / 1000)}:R> (${new Date(params.newExpiresAt).toLocaleDateString()})`
+      : "♾️ **Permanent Lifetime Access**";
+
+    const embedPayload = {
+      content: `🎉 Hello <@${targetUserId}>! An extra **+${params.daysAdded} VIP Day** has been added to your Chameleon VIP pass!`,
+      embeds: [
+        {
+          title: "🌟 VOUCH REWARD CREDITED — CHAMELEON CHEATS",
+          description: `Thank you for supporting **Chameleon Cheats**! Your ${params.reason || "Discord Vouch"} has been verified by staff, and your VIP pass has been extended.`,
+          color: 0x10b981, // Emerald Green
+          fields: [
+            {
+              name: "🎁 Reward Added",
+              value: `**+${params.daysAdded} Extra Day (${params.daysAdded * 24} Hours)**`,
+              inline: true,
+            },
+            {
+              name: "⏳ Updated Expiration",
+              value: expiryText,
+              inline: true,
+            },
+            {
+              name: "🔑 Your License Key",
+              value: `\`\`\`${params.licenseKey}\`\`\``,
+              inline: false,
+            },
+          ],
+          footer: {
+            text: "Chameleon Cheats • Assault Fire PH VIP • Community Promotion",
+            icon_url: "https://chameleon-cheats.vercel.app/logo.png",
+          },
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    };
+
+    const msgRes = await fetch(`https://discord.com/api/v10/channels/${dmChannelId}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(embedPayload),
+    });
+
+    if (msgRes.ok) {
+      result.dmSent = true;
+    } else {
+      result.dmError = "Failed to deliver DM (User may have DMs disabled).";
+    }
+  } catch (e: any) {
+    result.dmError = e.message;
+  }
+
+  return result;
+}

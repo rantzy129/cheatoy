@@ -633,6 +633,8 @@ namespace ChameleonAuth
                         std::cout << "    Plan    : " << auth.tier << "\n";
                     if (!auth.discordUser.empty())
                         std::cout << "    Account : @" << auth.discordUser << "\n";
+                    if (!auth.expiresAt.empty())
+                        std::cout << "    Expires : " << auth.expiresAt << "\n";
                     std::cout << "--------------------------------------------------------\n\n";
                     return true;
                 }
@@ -678,6 +680,8 @@ namespace ChameleonAuth
                         std::cout << "    Plan    : " << auth.tier << "\n";
                     if (!auth.discordUser.empty())
                         std::cout << "    Account : @" << auth.discordUser << "\n";
+                    if (!auth.expiresAt.empty())
+                        std::cout << "    Expires : " << auth.expiresAt << "\n";
                     std::cout << "--------------------------------------------------------\n\n";
                     return true;
                 }
