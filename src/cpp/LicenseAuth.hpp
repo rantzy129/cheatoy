@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==============================================================================
  * CHAMELEON CHEATS — CLIENT LICENSE, ANTI-TAMPER & CRYPTOGRAPHIC AUTH MODULE
  * ==============================================================================
@@ -31,6 +31,9 @@
 
 #pragma comment(lib, "wininet.lib")
 #pragma comment(lib, "bcrypt.lib")
+#pragma comment(lib, "shell32.lib")
+
+#define CHAMELEON_LOADER_VERSION "1.0.6"
 
 namespace ChameleonSec
 {
@@ -428,7 +431,7 @@ namespace ChameleonAuth
         jsonBuilder << "{"
                     << "\"" << _XOR_A("license_key") << "\":\"" << licenseKey << "\","
                     << "\"" << _XOR_A("discord_id")  << "\":\"" << discordId  << "\","
-                    << "\"" << _XOR_A("hwid")        << "\":\"" << hwid       << "\""
+                    << "\"" << _XOR_A("hwid")        << "\":\"" << hwid       << "\",\n"                    << "\"" << _XOR_A("version")     << "\":\"" << CHAMELEON_LOADER_VERSION << "\""
                     << "}";
         std::string jsonPayload = jsonBuilder.str();
 
@@ -584,6 +587,23 @@ namespace ChameleonAuth
             result.isValid = false;
             std::string err = ExtractJsonValue(responseString, "error");
             result.errorMessage = !err.empty() ? err : "License verification rejected by server.";
+
+            // If loader is outdated, alert user with Windows dialog and open download link
+            if (responseString.find("\"outdated\":true") != std::string::npos ||
+                responseString.find("\"outdated\": true") != std::string::npos)
+            {
+                std::string downloadUrl = ExtractJsonValue(responseString, "download_url");
+                if (downloadUrl.empty()) downloadUrl = "https://chameleon-cheats.vercel.app/profile";
+
+                std::string alertMsg = "A new update for Chameleon Cheats is available!\n\n" +
+                                       result.errorMessage + "\n\n" +
+                                       "Click OK to open the website and download the latest version.";
+
+                MessageBoxA(NULL, alertMsg.c_str(), "Chameleon Cheats - Update Required", MB_OK | MB_ICONWARNING);
+                ShellExecuteA(NULL, "open", downloadUrl.c_str(), NULL, NULL, SW_SHOWNORMAL);
+                ExitProcess(0);
+            }
+
             return result;
         }
     }

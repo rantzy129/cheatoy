@@ -100,7 +100,10 @@ export async function fetchAllNotifications(): Promise<{ notifications: Notifica
       .order("created_at", { ascending: false });
 
     if (!error && Array.isArray(data)) {
-      const mapped: NotificationItem[] = data.map((row: any) => ({
+      const filtered = data.filter(
+        (row: any) => row.target !== "system_version" && !String(row.id).startsWith("system-")
+      );
+      const mapped: NotificationItem[] = filtered.map((row: any) => ({
         id: String(row.id),
         sender: "Chameleon Cheats",
         title: row.title || "Notification",

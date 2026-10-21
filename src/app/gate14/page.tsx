@@ -88,6 +88,14 @@ function IconRefresh({ size = 14 }: { size?: number }) {
   );
 }
 
+function IconZap({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+
 function IconCheck({ size = 13 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -434,6 +442,48 @@ export default function AdminPage() {
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
   const [syncCooldown, setSyncCooldown] = useState<number>(0);
 
+  // Loader Version Control & Kill-Switch State
+  const [minLoaderVersion, setMinLoaderVersion] = useState("1.0.6");
+  const [downloadPageUrl, setDownloadPageUrl] = useState("https://chameleon-cheats.vercel.app/profile");
+  const [isSavingVersion, setIsSavingVersion] = useState(false);
+  const [versionStatusMsg, setVersionStatusMsg] = useState<string | null>(null);
+
+  const fetchLoaderVersion = async () => {
+    try {
+      const res = await fetch("/api/admin/version");
+      const data = await res.json();
+      if (res.ok && data.success && data.minVersion) {
+        setMinLoaderVersion(data.minVersion);
+        if (data.downloadUrl) setDownloadPageUrl(data.downloadUrl);
+      }
+    } catch {}
+  };
+
+  const handleSaveLoaderVersion = async () => {
+    if (!minLoaderVersion.trim()) return;
+    setIsSavingVersion(true);
+    setVersionStatusMsg(null);
+    try {
+      const res = await fetch("/api/admin/version", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ minVersion: minLoaderVersion.trim(), downloadUrl: downloadPageUrl.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setVersionStatusMsg(`Enforced v${data.minVersion}! All older versions blocked.`);
+        setTimeout(() => setVersionStatusMsg(null), 6000);
+      } else {
+        alert(data.error || "Failed to update loader version");
+      }
+    } catch {
+      alert("Network error updating version");
+    } finally {
+      setIsSavingVersion(false);
+    }
+  };
+
   // Active countdown timer for Discord sync cooldown
   useEffect(() => {
     if (syncCooldown <= 0) return;
@@ -503,6 +553,7 @@ export default function AdminPage() {
     fetchOrders();
     fetchLicenses();
     fetchAdminNotifications();
+    fetchLoaderVersion();
   };
 
   const fetchOrders = async () => {
@@ -1430,6 +1481,186 @@ export default function AdminPage() {
           {/* ─── TAB 2: LICENSE VAULT & HWID MANAGER ─── */}
           {activeTab === "licenses" && (
             <>
+              {/* Loader Version & Remote Kill-Switch Card */}
+              <div
+                style={{
+                  background: "rgba(10, 16, 26, 0.75)",
+                  backdropFilter: "blur(14px)",
+                  border: "1px solid rgba(0, 210, 255, 0.22)",
+                  borderRadius: 14,
+                  padding: "18px 22px",
+                  marginBottom: 18,
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.35)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 12,
+                    marginBottom: 12,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 6,
+                          background: "rgba(0, 210, 255, 0.15)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#00d2ff",
+                        }}
+                      >
+                        <IconZap size={14} />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 13,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          color: "#00d2ff",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Loader Version Control & Remote Kill-Switch
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          background: "rgba(0, 210, 255, 0.12)",
+                          color: "#00d2ff",
+                          padding: "2px 8px",
+                          borderRadius: 6,
+                          fontWeight: 700,
+                          border: "1px solid rgba(0, 210, 255, 0.25)",
+                        }}
+                      >
+                        v{minLoaderVersion} Enforced
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "rgba(255, 255, 255, 0.6)",
+                        margin: "4px 0 0 0",
+                      }}
+                    >
+                      Loaders below this version are blocked on launch and prompted to download the latest update.
+                    </p>
+                  </div>
+
+                  {versionStatusMsg && (
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "#10b981",
+                        background: "rgba(16, 185, 129, 0.12)",
+                        padding: "5px 12px",
+                        borderRadius: 6,
+                        border: "1px solid rgba(16, 185, 129, 0.3)",
+                      }}
+                    >
+                      ✓ {versionStatusMsg}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 150 }}>
+                    <label
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "rgba(255, 255, 255, 0.5)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      Minimum Version
+                    </label>
+                    <input
+                      type="text"
+                      value={minLoaderVersion}
+                      onChange={(e) => setMinLoaderVersion(e.target.value)}
+                      placeholder="e.g. 1.0.6"
+                      style={{
+                        background: "rgba(0, 0, 0, 0.45)",
+                        border: "1px solid rgba(255, 255, 255, 0.14)",
+                        borderRadius: 8,
+                        padding: "7px 11px",
+                        color: "#ffffff",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        outline: "none",
+                        fontFamily: "monospace",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 240 }}>
+                    <label
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "rgba(255, 255, 255, 0.5)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      Update Download Page URL
+                    </label>
+                    <input
+                      type="text"
+                      value={downloadPageUrl}
+                      onChange={(e) => setDownloadPageUrl(e.target.value)}
+                      placeholder="https://chameleon-cheats.vercel.app/profile"
+                      style={{
+                        background: "rgba(0, 0, 0, 0.45)",
+                        border: "1px solid rgba(255, 255, 255, 0.14)",
+                        borderRadius: 8,
+                        padding: "7px 11px",
+                        color: "#ffffff",
+                        fontSize: 12,
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ alignSelf: "flex-end" }}>
+                    <button
+                      type="button"
+                      onClick={handleSaveLoaderVersion}
+                      disabled={isSavingVersion}
+                      style={{
+                        background: "linear-gradient(135deg, #00d2ff 0%, #0077ff 100%)",
+                        color: "#000000",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "9px 16px",
+                        cursor: isSavingVersion ? "wait" : "pointer",
+                        opacity: isSavingVersion ? 0.7 : 1,
+                        boxShadow: "0 4px 14px rgba(0, 210, 255, 0.25)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <span>{isSavingVersion ? "Saving..." : "Save & Enforce Version"}</span>
+                      <IconArrowRight size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="admin-toolbar">
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                   <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: "#ffffff" }}>

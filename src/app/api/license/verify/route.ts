@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { sendUserAuthWebhook } from "@/lib/discordWebhook";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import { getClientIp, checkRateLimit, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
+import { getMinLoaderVersion, isVersionOutdated } from "@/lib/versionControl";
 
 const SIGNING_SECRET =
   process.env.LICENSE_SIGNING_SECRET ||
@@ -60,8 +61,24 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { license_key, discord_id, hwid } = body;
+    const body = await request.json().catch(() => ({}));
+    const { license_key, discord_id, hwid, version } = body;
+
+    // Mandatory Loader Version Enforcement (Forces outdated loaders to update)
+    const { minVersion, downloadUrl } = await getMinLoaderVersion();
+    if (isVersionOutdated(version, minVersion)) {
+      return NextResponse.json(
+        {
+          valid: false,
+          outdated: true,
+          current_version: version || "legacy",
+          required_version: minVersion,
+          download_url: downloadUrl || "https://chameleon-cheats.vercel.app/profile",
+          error: `UPDATE REQUIRED: Your version (${version || "outdated build"}) is no longer supported. Please download the latest update (v${minVersion}) from the website.`,
+        },
+        { status: 403 }
+      );
+    }
 
     if (!license_key) {
       return NextResponse.json({ valid: false, error: "License key is required" }, { status: 400 });
