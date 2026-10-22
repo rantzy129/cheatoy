@@ -11,31 +11,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.chameleon-cheats.tech"),
   title: {
-    default: "Assault Fire Cheat & Wallhack — Undetected AFPH Chams, Health & 2D Box | Chameleon",
+    default: "Assault Fire PH Cheat, Wallhack & Aimbot | Chameleon",
     template: "%s | Chameleon Cheats",
   },
   description:
-    "The #1 undetected Assault Fire cheat and wallhack for AFPH. Chameleon VIP provides direct-memory Wallhack, Chams, real-time Health ESP, dynamic 2D Box, and full in-game menu control toggled by [INSERT].",
-  keywords: [
-    "assault fire cheat",
-    "assault fire wallhack",
-    "assault fire cheats",
-    "assault fire ph cheat",
-    "assault fire ph wallhack",
-    "assault fire chams",
-    "assault fire esp",
-    "assault fire health esp",
-    "assault fire 2d box",
-    "assault fire menu insert",
-    "assault fire ph chams",
-    "af ph wallhack",
-    "af ph cheat",
-    "assault fire hack",
-    "assault fire reborn cheat",
-    "chameleon cheats",
-    "undetected assault fire cheat",
-    "assault fire philippines cheat",
-  ],
+    "Explore Chameleon VIP for Assault Fire PH and Legacy: wallhack, chams, ESP, aimbot options, supported clients, setup details, and current plans.",
   authors: [{ name: "Chameleon Cheats" }],
   creator: "Chameleon Cheats",
   publisher: "Chameleon Cheats",
@@ -43,9 +23,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Assault Fire Cheat & Wallhack (AFPH) — Chameleon VIP Suite",
+    title: "Assault Fire PH Cheat, Wallhack & Aimbot | Chameleon",
     description:
-      "Dominate Assault Fire PH with Chameleon VIP. 100% Undetected Wallhack, customizable Chams, real-time Health ESP, dynamic 2D Box, and interactive in-game menu with [INSERT].",
+      "Chameleon VIP for Assault Fire PH and Legacy includes wallhack, player chams, health ESP, 2D boxes, and aimbot options. Check compatibility, setup, and plans.",
     url: "https://www.chameleon-cheats.tech",
     siteName: "Chameleon Cheats",
     images: [
@@ -61,8 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Assault Fire Cheat & Wallhack — Chameleon VIP",
-    description: "Undetected Assault Fire PH Wallhack, Chams, Health ESP, and 2D Box with [INSERT] in-game menu.",
+    title: "Assault Fire PH Cheat, Wallhack & Aimbot | Chameleon",
+    description: "Chameleon VIP for Assault Fire PH and Legacy: wallhack, player chams, ESP, aimbot options, compatibility, setup, and plans.",
     images: ["/proof.png"],
   },
   robots: {
@@ -101,54 +81,8 @@ export default function RootLayout({
       offerCount: "5",
       availability: "https://schema.org/InStock",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      reviewCount: "148",
-      bestRating: "5",
-      worstRating: "1",
-    },
     description:
-      "Premier undetected Assault Fire cheat and wallhack. Features direct-memory Wallhack, customizable player Chams, real-time Health ESP, dynamic 2D Box hitboxes, and an interactive in-game menu toggled by INSERT.",
-  };
-
-  const jsonLdFaq = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "What is the best Assault Fire cheat and wallhack?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Chameleon VIP is the premier undetected Assault Fire cheat and wallhack for Assault Fire PH. It provides direct-memory Wallhack, dual-tone Chams, real-time Health ESP, dynamic 2D Box hitboxes, zero FPS drop, and full in-game menu control toggled by pressing INSERT.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "How do I control the cheat modules in-game?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Press the INSERT key on your keyboard while in-game to toggle the floating VIP menu overlay. From there, you have complete control to toggle Wallhack, Chams, Health bars, and 2D Box indicators in real time.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Is this Assault Fire wallhack undetected?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Yes, Chameleon VIP uses external memory virtualization without modifying core game files, keeping it 100% undetected by the official Assault Fire PH anti-cheat.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "How do I download and activate the Assault Fire cheat?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Log in with your Discord account, choose your VIP pass (7 Days, 15 Days, 1 Month, or Lifetime), pay via GCash QR Ph, and your license key will be instantly activated in your profile.",
-        },
-      },
-    ],
+      "Windows loader for supported Assault Fire PH and Legacy clients, with wallhack, player chams, health ESP, 2D boxes, aimbot options, and an in-game menu.",
   };
 
   return (
@@ -161,14 +95,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        {/* Structured Data for Google Rich Snippets */}
+        {/* Structured data for the software listing */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
         />
       </head>
       <body>{children}</body>
