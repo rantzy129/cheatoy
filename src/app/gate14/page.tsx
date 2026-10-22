@@ -211,6 +211,13 @@ export default function AdminPage() {
               handleResetHWID={handleResetHWID}
               handleToggleBan={handleToggleBan}
               handleExtendDays={handleExtendDays}
+              minLoaderVersion={minLoaderVersion}
+              setMinLoaderVersion={setMinLoaderVersion}
+              downloadPageUrl={downloadPageUrl}
+              setDownloadPageUrl={setDownloadPageUrl}
+              isSavingVersion={isSavingVersion}
+              versionStatusMsg={versionStatusMsg}
+              handleSaveLoaderVersion={handleSaveLoaderVersion}
             />
           )}
 

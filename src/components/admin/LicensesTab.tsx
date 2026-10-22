@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { IconHardware, IconCopy } from "./Icons";
+import { IconHardware, IconCopy, IconShieldLock, IconArrowRight } from "./Icons";
 import { License } from "./types";
 import PaginationBar from "./PaginationBar";
 
@@ -14,6 +14,13 @@ interface LicensesTabProps {
   handleResetHWID: (licenseId: string) => Promise<void>;
   handleToggleBan: (licenseId: string) => Promise<void>;
   handleExtendDays: (lic: License, days?: number) => Promise<void>;
+  minLoaderVersion?: string;
+  setMinLoaderVersion?: (v: string) => void;
+  downloadPageUrl?: string;
+  setDownloadPageUrl?: (v: string) => void;
+  isSavingVersion?: boolean;
+  versionStatusMsg?: string | null;
+  handleSaveLoaderVersion?: (e?: React.FormEvent, customVersion?: string) => Promise<void>;
 }
 
 export default function LicensesTab({
@@ -25,6 +32,13 @@ export default function LicensesTab({
   handleResetHWID,
   handleToggleBan,
   handleExtendDays,
+  minLoaderVersion = "1.0.6",
+  setMinLoaderVersion,
+  downloadPageUrl = "https://chameleon-cheats.vercel.app/profile",
+  setDownloadPageUrl,
+  isSavingVersion = false,
+  versionStatusMsg = null,
+  handleSaveLoaderVersion,
 }: LicensesTabProps) {
   const [licensesPage, setLicensesPage] = useState(1);
   const [licensesPerPage, setLicensesPerPage] = useState(10);
@@ -50,8 +64,206 @@ export default function LicensesTab({
     return filteredLicenses.slice(start, start + licensesPerPage);
   }, [filteredLicenses, licensesPage, licensesPerPage]);
 
+  const onEmergencyKill = () => {
+    if (window.confirm("⚠️ WARNING: This will immediately enforce version 99.9.9, causing ALL active loaders in circulation to terminate (ExitProcess) on their next heartbeat. Proceed?")) {
+      handleSaveLoaderVersion?.(undefined, "99.9.9");
+    }
+  };
+
+  const onResetDefault = () => {
+    handleSaveLoaderVersion?.(undefined, "1.0.6");
+  };
+
   return (
     <div className="admin-licenses-wrapper">
+      {/* ─── Remote Version Control & Kill Switch Card ─── */}
+      <div style={{
+        background: "rgba(9, 14, 24, 0.85)",
+        border: "1px solid rgba(0, 210, 255, 0.25)",
+        borderRadius: 12,
+        padding: "18px 20px",
+        marginBottom: 20,
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+        backdropFilter: "blur(12px)",
+      }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 12,
+          flexWrap: "wrap",
+          marginBottom: 16,
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          paddingBottom: 12,
+        }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <div style={{
+                color: "#00d2ff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0, 210, 255, 0.12)",
+                padding: 6,
+                borderRadius: 8,
+              }}>
+                <IconShieldLock size={18} />
+              </div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#ffffff", letterSpacing: "-0.01em" }}>
+                Remote Loader Version Control &amp; Killswitch
+              </h3>
+              <span style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: minLoaderVersion === "99.9.9" ? "#ef4444" : "#00d2ff",
+                background: minLoaderVersion === "99.9.9" ? "rgba(239, 68, 68, 0.15)" : "rgba(0, 210, 255, 0.12)",
+                border: minLoaderVersion === "99.9.9" ? "1px solid rgba(239, 68, 68, 0.4)" : "1px solid rgba(0, 210, 255, 0.3)",
+                padding: "2px 8px",
+                borderRadius: 9999,
+                fontFamily: "monospace",
+              }}>
+                {minLoaderVersion === "99.9.9" ? "🚨 ALL BUILDS KILLED (v99.9.9)" : `v${minLoaderVersion} Enforced`}
+              </span>
+            </div>
+            <p style={{ fontSize: 12, color: "#94a3b8", margin: "6px 0 0 0", lineHeight: 1.45 }}>
+              Enforces minimum loader version on every launch and background heartbeat check. Outdated builds return HTTP 403 and immediately execute <code>ExitProcess(0)</code>.
+            </p>
+          </div>
+
+          {versionStatusMsg && (
+            <div style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#10b981",
+              background: "rgba(16, 185, 129, 0.12)",
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid rgba(16, 185, 129, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}>
+              <span>✓</span>
+              <span>{versionStatusMsg}</span>
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSaveLoaderVersion} style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, minWidth: 150 }}>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Minimum Version
+            </label>
+            <input
+              type="text"
+              value={minLoaderVersion}
+              onChange={(e) => setMinLoaderVersion?.(e.target.value)}
+              placeholder="e.g. 1.0.6"
+              style={{
+                background: "rgba(0, 0, 0, 0.5)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: 8,
+                padding: "8px 12px",
+                color: "#ffffff",
+                fontSize: 13,
+                fontWeight: 700,
+                outline: "none",
+                fontFamily: "monospace",
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: 1, minWidth: 260 }}>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Update Download URL (Opened on Outdated Error)
+            </label>
+            <input
+              type="text"
+              value={downloadPageUrl}
+              onChange={(e) => setDownloadPageUrl?.(e.target.value)}
+              placeholder="https://chameleon-cheats.vercel.app/profile"
+              style={{
+                background: "rgba(0, 0, 0, 0.5)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: 8,
+                padding: "8px 12px",
+                color: "#ffffff",
+                fontSize: 12,
+                outline: "none",
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button
+              type="submit"
+              disabled={isSavingVersion}
+              style={{
+                background: "linear-gradient(135deg, #00d2ff 0%, #0077ff 100%)",
+                color: "#04070e",
+                fontWeight: 700,
+                fontSize: 12,
+                border: "none",
+                borderRadius: 8,
+                padding: "9px 16px",
+                cursor: isSavingVersion ? "wait" : "pointer",
+                opacity: isSavingVersion ? 0.7 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                height: 38,
+              }}
+            >
+              <span>{isSavingVersion ? "Enforcing..." : "Save & Enforce Version"}</span>
+              <IconArrowRight size={13} />
+            </button>
+
+            <button
+              type="button"
+              onClick={onResetDefault}
+              disabled={isSavingVersion}
+              style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                color: "#cbd5e1",
+                fontWeight: 600,
+                fontSize: 12,
+                borderRadius: 8,
+                padding: "9px 12px",
+                cursor: "pointer",
+                height: 38,
+              }}
+              title="Reset minimum version to standard default (1.0.6)"
+            >
+              Reset v1.0.6
+            </button>
+
+            <button
+              type="button"
+              onClick={onEmergencyKill}
+              disabled={isSavingVersion}
+              style={{
+                background: "rgba(239, 68, 68, 0.18)",
+                border: "1px solid rgba(239, 68, 68, 0.5)",
+                color: "#f87171",
+                fontWeight: 700,
+                fontSize: 12,
+                borderRadius: 8,
+                padding: "9px 14px",
+                cursor: "pointer",
+                height: 38,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+              title="Emergency: Immediately kill and block all circulating VIP loaders"
+            >
+              <span>🚨 Kill All (v99.9.9)</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
       <div className="admin-licenses-header">
         <h2 className="admin-licenses-title">License Vault</h2>
       </div>

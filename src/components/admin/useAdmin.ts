@@ -94,7 +94,7 @@ export interface UseAdminReturn {
   handleRejectOrder: (order: Order) => Promise<void>;
   handleSendNotification: (e: React.FormEvent) => Promise<void>;
   handleDeleteNotification: (id: string) => Promise<void>;
-  handleSaveLoaderVersion: (e: React.FormEvent) => Promise<void>;
+  handleSaveLoaderVersion: (e?: React.FormEvent, customVersion?: string) => Promise<void>;
   handleSyncUserListToDiscord: () => Promise<void>;
   handleMintKey: (e: React.FormEvent) => Promise<void>;
   handleResetHWID: (licenseId: string) => Promise<void>;
@@ -445,9 +445,12 @@ export default function useAdmin(): UseAdminReturn {
     }
   }, [fetchAdminNotifications]);
 
-  // ── Version control ──
-  const handleSaveLoaderVersion = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ── Version control & Remote Killswitch ──
+  const handleSaveLoaderVersion = useCallback(async (e?: React.FormEvent, customVersion?: string) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const targetVer = (customVersion || minLoaderVersion || "").trim();
+    if (!targetVer) return;
+
     setIsSavingVersion(true);
     setVersionStatusMsg(null);
     try {
@@ -455,10 +458,11 @@ export default function useAdmin(): UseAdminReturn {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ minVersion: minLoaderVersion, downloadUrl: downloadPageUrl }),
+        body: JSON.stringify({ minVersion: targetVer, downloadUrl: downloadPageUrl }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        if (customVersion) setMinLoaderVersion(customVersion);
         setVersionStatusMsg(data.message || `Minimum loader version set to v${data.minVersion}`);
         setTimeout(() => setVersionStatusMsg(null), 6000);
       } else {
