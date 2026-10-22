@@ -486,7 +486,7 @@ export default function Navbar() {
               {/* Status & Version Footer */}
               <div className="site-mobile-drawer-footer">
                 <span className="site-mobile-status-dot" />
-                <span className="site-mobile-status-text">Chameleon VIP v4.2 • Undetected on AFPH</span>
+                <span className="site-mobile-status-text">Chameleon VIP • Undetected on AFPH</span>
               </div>
             </div>
           </nav>

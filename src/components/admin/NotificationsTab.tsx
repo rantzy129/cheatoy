@@ -72,7 +72,7 @@ export default function NotificationsTab({
       setNotifActionLabel("Join Official Discord");
       setNotifActionUrl("https://discord.gg/Whwxq9QAEN");
     } else if (preset === "build_update") {
-      setNotifTitle("Chameleon Cheat Loader v4.2 Undetected & Live");
+      setNotifTitle("Chameleon Cheat Loader  Undetected & Live");
       setNotifMessage("Latest kernel bypass patch applied for Assault Fire PH. Download the fresh build from your VIP Key Vault or Discord.");
       setNotifType("update");
       setNotifTarget("all");
@@ -223,7 +223,7 @@ CREATE POLICY "Allow public delete" ON public.notifications FOR DELETE USING (tr
                 onClick={() => applyNotifPreset("build_update")}
                 className="admin-preset-btn"
               >
-                Loader v4.2 Update (Global)
+                Loader Update (Global)
               </button>
               <button
                 type="button"

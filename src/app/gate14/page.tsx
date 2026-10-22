@@ -31,6 +31,7 @@ export default function AdminPage() {
     orders,
     licenses,
     loading,
+    isRefreshingOrders,
     actionLoading,
     setActionLoading,
     adminNotifs,
@@ -195,6 +196,8 @@ export default function AdminPage() {
               handleRejectOrder={handleRejectOrder}
               handleAdminAttachSlip={handleAdminAttachSlip}
               handleCopy={handleCopy}
+              fetchOrders={fetchOrders}
+              isRefreshing={isRefreshingOrders}
             />
           )}
 

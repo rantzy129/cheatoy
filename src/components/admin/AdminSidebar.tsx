@@ -37,7 +37,7 @@ export default function AdminSidebar({
           </div>
           <div className="admin-brand-info">
             <h2>CHAMELEON</h2>
-            <span>Command Center v4.2</span>
+            <span>Command Center</span>
           </div>
         </div>
 

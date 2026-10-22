@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Order, License, AdminTab } from "./types";
+import { supabase } from "@/lib/supabase";
 
 export interface UseAdminReturn {
   // Tab state
@@ -20,6 +21,7 @@ export interface UseAdminReturn {
   orders: Order[];
   licenses: License[];
   loading: boolean;
+  isRefreshingOrders: boolean;
   actionLoading: string | null;
   setActionLoading: (id: string | null) => void;
 
@@ -109,7 +111,7 @@ export interface UseAdminReturn {
   totalRevenue: number;
   loadAllData: () => void;
   fetchAdminNotifications: () => Promise<void>;
-  fetchOrders: () => Promise<void>;
+  fetchOrders: (silent?: boolean) => Promise<void>;
   fetchLicenses: () => Promise<void>;
   fetchLoaderVersion: () => Promise<void>;
 }
@@ -129,6 +131,7 @@ export default function useAdmin(): UseAdminReturn {
   const [orders, setOrders] = useState<Order[]>([]);
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isRefreshingOrders, setIsRefreshingOrders] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // ── Notification state ──
@@ -194,8 +197,11 @@ export default function useAdmin(): UseAdminReturn {
     }
   }, []);
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchOrders = useCallback(async (silent = false) => {
+    if (!silent) {
+      setIsRefreshingOrders(true);
+      setLoading(true);
+    }
     try {
       const res = await fetch("/api/admin/orders");
       const data = await res.json();
@@ -207,7 +213,10 @@ export default function useAdmin(): UseAdminReturn {
     } catch (err) {
       console.error("Error fetching orders:", err);
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setIsRefreshingOrders(false);
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -235,7 +244,7 @@ export default function useAdmin(): UseAdminReturn {
   }, []);
 
   const loadAllData = useCallback(() => {
-    fetchOrders();
+    fetchOrders(false);
     fetchLicenses();
     fetchAdminNotifications();
     fetchLoaderVersion();
@@ -675,12 +684,48 @@ export default function useAdmin(): UseAdminReturn {
     return () => { isMounted = false; };
   }, []);
 
-  // ── Fetch data on authentication ──
+  // ── Auto-Sync & Real-Time Orders on authentication ──
   useEffect(() => {
-    if (isAuthenticated) {
-      loadAllData();
-    }
-  }, [isAuthenticated, loadAllData]);
+    if (!isAuthenticated) return;
+
+    // 1. Initial full fetch
+    loadAllData();
+
+    // 2. Real-time subscription to Supabase orders table
+    const channel = supabase
+      .channel("gate14-orders-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => {
+          fetchOrders(true);
+        }
+      )
+      .subscribe();
+
+    // 3. Heartbeat auto-poll every 8 seconds (when active in viewport)
+    const pollTimer = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        fetchOrders(true);
+      }
+    }, 8000);
+
+    // 4. Tab visibility / focus revalidation
+    const handleRevalidate = () => {
+      if (document.visibilityState === "visible") {
+        fetchOrders(true);
+      }
+    };
+    window.addEventListener("focus", handleRevalidate);
+    document.addEventListener("visibilitychange", handleRevalidate);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(pollTimer);
+      window.removeEventListener("focus", handleRevalidate);
+      document.removeEventListener("visibilitychange", handleRevalidate);
+    };
+  }, [isAuthenticated, loadAllData, fetchOrders]);
 
   // ── Sync cooldown timer ──
   useEffect(() => {
@@ -708,6 +753,7 @@ export default function useAdmin(): UseAdminReturn {
     orders,
     licenses,
     loading,
+    isRefreshingOrders,
     actionLoading,
     setActionLoading,
     // Notifications

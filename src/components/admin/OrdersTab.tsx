@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { IconReceipt, IconCopy } from "./Icons";
+import { IconReceipt, IconCopy, IconRefresh } from "./Icons";
 import { Order, License } from "./types";
 import PaginationBar from "./PaginationBar";
 
@@ -22,6 +22,8 @@ interface OrdersTabProps {
   handleRejectOrder: (order: Order) => Promise<void>;
   handleAdminAttachSlip: (orderId: string, file: File) => Promise<void>;
   handleCopy: (val: string) => void;
+  fetchOrders?: (silent?: boolean) => Promise<void>;
+  isRefreshing?: boolean;
 }
 
 export default function OrdersTab({
@@ -41,6 +43,8 @@ export default function OrdersTab({
   handleRejectOrder,
   handleAdminAttachSlip,
   handleCopy,
+  fetchOrders,
+  isRefreshing,
 }: OrdersTabProps) {
   const [ordersPage, setOrdersPage] = useState(1);
   const [ordersPerPage, setOrdersPerPage] = useState(10);
@@ -78,6 +82,11 @@ export default function OrdersTab({
       <div className="admin-orders-header">
         <h2 className="admin-orders-title">GCash Approvals</h2>
         <div className="admin-orders-controls">
+          <div className="admin-sync-badge" title="Real-time order synchronization active via Supabase & heartbeat">
+            <span className="admin-sync-dot" />
+            <span>Auto-Sync Active</span>
+          </div>
+
           <select
             value={orderFilter}
             onChange={(e) => setOrderFilter(e.target.value as any)}
@@ -88,6 +97,22 @@ export default function OrdersTab({
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
+
+          {fetchOrders && (
+            <button
+              type="button"
+              onClick={() => fetchOrders(false)}
+              disabled={isRefreshing}
+              className="admin-tab-btn"
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, padding: "6px 12px" }}
+              title="Force refresh orders from database"
+            >
+              <span className={isRefreshing ? "admin-spin" : ""}>
+                <IconRefresh size={13} />
+              </span>
+              <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+            </button>
+          )}
         </div>
       </div>
 

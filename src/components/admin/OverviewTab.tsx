@@ -67,7 +67,7 @@ export default function OverviewTab({
           <div className="admin-arch-item">
             <div className="admin-arch-item-title">Anti-Cheat Driver</div>
             <div className="admin-arch-item-val" style={{ color: "#00d2ff" }}>
-              Kernel Virtualization v4.2
+              Kernel Virtualization 
             </div>
             <span className="admin-arch-item-sub">100% Undetected (Patch 2026.10)</span>
           </div>
