@@ -3,7 +3,11 @@ import { checkRateLimit, recordFailedAttempt, resetRateLimit, generateAdminToken
 
 export async function POST(request: Request) {
   try {
-    const adminPin = (process.env.ADMIN_PIN || "chameleon2026").trim();
+    const adminPin = (process.env.ADMIN_PIN || "").trim();
+    if (!adminPin || !process.env.ADMIN_SECRET_KEY?.trim()) {
+      console.error("ADMIN_PIN or ADMIN_SECRET_KEY is not configured");
+      return NextResponse.json({ success: false, error: "Admin service configuration error" }, { status: 500 });
+    }
     const clientIp =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||

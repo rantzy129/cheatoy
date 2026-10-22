@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/admin", "/admin/", "/gate14", "/gate14/"],
       },
     ],
-    sitemap: "https://chameleon-cheats.tech/sitemap.xml",
+    sitemap: "https://www.chameleon-cheats.tech/sitemap.xml",
   };
 }

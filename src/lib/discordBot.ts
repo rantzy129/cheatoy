@@ -186,7 +186,7 @@ export async function assignDiscordVipRoleAndSendDm(
             {
               name: "📥 Quick Setup & Download",
               value:
-                "1. Download the loader from your [Profile Vault](https://chameleon-cheats.tech/profile)\n" +
+                "1. Download the loader from your [Profile Vault](https://www.chameleon-cheats.tech/profile)\n" +
                 "2. Extract the zip folder\n" +
                 "3. Right-click **`Chameleon.exe`** → **Run as Administrator**\n" +
                 "4. Paste your key and launch **Assault Fire PH**",
@@ -195,7 +195,7 @@ export async function assignDiscordVipRoleAndSendDm(
           ],
           footer: {
             text: "Chameleon Cheats • Assault Fire PH VIP • Hardware Bound",
-            icon_url: "https://chameleon-cheats.tech/logo.png",
+            icon_url: "https://www.chameleon-cheats.tech/logo.png",
           },
           timestamp: new Date().toISOString(),
         },
@@ -337,7 +337,7 @@ export async function sendVouchBonusDm(params: {
           ],
           footer: {
             text: "Chameleon Cheats • Assault Fire PH VIP • Community Promotion",
-            icon_url: "https://chameleon-cheats.tech/logo.png",
+            icon_url: "https://www.chameleon-cheats.tech/logo.png",
           },
           timestamp: new Date().toISOString(),
         },

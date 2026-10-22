@@ -9,7 +9,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://chameleon-cheats.tech"),
+  metadataBase: new URL("https://www.chameleon-cheats.tech"),
   title: {
     default: "Assault Fire Cheat & Wallhack — Undetected AFPH Chams, Health & 2D Box | Chameleon",
     template: "%s | Chameleon Cheats",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: "Assault Fire Cheat & Wallhack (AFPH) — Chameleon VIP Suite",
     description:
       "Dominate Assault Fire PH with Chameleon VIP. 100% Undetected Wallhack, customizable Chams, real-time Health ESP, dynamic 2D Box, and interactive in-game menu with [INSERT].",
-    url: "https://chameleon-cheats.tech",
+    url: "https://www.chameleon-cheats.tech",
     siteName: "Chameleon Cheats",
     images: [
       {

@@ -34,7 +34,7 @@ export default function LicensesTab({
   handleExtendDays,
   minLoaderVersion = "v1.0.7",
   setMinLoaderVersion,
-  downloadPageUrl = "https://chameleon-cheats.tech/profile",
+  downloadPageUrl = "https://www.chameleon-cheats.tech/profile",
   setDownloadPageUrl,
   isSavingVersion = false,
   versionStatusMsg = null,
@@ -181,7 +181,7 @@ export default function LicensesTab({
               type="text"
               value={downloadPageUrl}
               onChange={(e) => setDownloadPageUrl?.(e.target.value)}
-              placeholder="https://chameleon-cheats.tech/profile"
+              placeholder="https://www.chameleon-cheats.tech/profile"
               style={{
                 background: "rgba(0, 0, 0, 0.5)",
                 border: "1px solid rgba(255, 255, 255, 0.15)",

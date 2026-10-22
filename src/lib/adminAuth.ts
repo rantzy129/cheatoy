@@ -1,11 +1,11 @@
 import crypto from "crypto";
 
 function getAdminPin(): string {
-  return (process.env.ADMIN_PIN || "chameleon2026").trim();
+  return (process.env.ADMIN_PIN || "").trim();
 }
 
 function getAdminSecret(): string {
-  return (process.env.ADMIN_SECRET_KEY || "chameleon_secure_admin_key_2026_salt").trim();
+  return (process.env.ADMIN_SECRET_KEY || "").trim();
 }
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -53,9 +53,13 @@ export function resetRateLimit(clientIp: string): void {
  * Creates a cryptographically signed admin session token
  */
 export function generateAdminToken(): string {
-  const timestamp = Date.now().toString();
-  const secret = getAdminSecret();
   const pin = getAdminPin();
+  const secret = getAdminSecret();
+  if (!pin || !secret) {
+    throw new Error("ADMIN_PIN and ADMIN_SECRET_KEY must be configured");
+  }
+
+  const timestamp = Date.now().toString();
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(`${timestamp}:${pin}`);
   const signature = hmac.digest("hex");
@@ -70,6 +74,7 @@ export function verifyAdminSession(tokenOrPin?: string | null): boolean {
 
   const currentPin = getAdminPin();
   const currentSecret = getAdminSecret();
+  if (!currentPin || !currentSecret) return false;
 
   // Direct PIN check fallback for server-to-server or initial validation
   if (tokenOrPin === currentPin) {

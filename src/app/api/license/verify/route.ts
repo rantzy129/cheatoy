@@ -7,9 +7,7 @@ import { getClientIp, checkRateLimit, RATE_LIMIT_PRESETS } from "@/lib/rateLimit
 import { getMinLoaderVersion, isVersionOutdated } from "@/lib/versionControl";
 
 const SIGNING_SECRET =
-  process.env.LICENSE_SIGNING_SECRET ||
-  process.env.ADMIN_SECRET_KEY ||
-  "4f2e2368fc5f669483af135071a355d4130a9832f8b304024d6cddc7b28c9351";
+  process.env.LICENSE_SIGNING_SECRET;
 
 // Persistent session deduplication:
 // 1. In-memory cache for ultra-fast local checks
@@ -76,6 +74,11 @@ async function shouldDispatchSessionLaunchWebhook(
 
 export async function POST(request: Request) {
   try {
+    if (!SIGNING_SECRET) {
+      console.error("LICENSE_SIGNING_SECRET is not configured");
+      return NextResponse.json({ valid: false, error: "License service configuration error" }, { status: 500 });
+    }
+
     const clientIp = getClientIp(request);
     const rateCheck = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.LICENSE_VERIFY);
     if (!rateCheck.allowed) {
@@ -109,7 +112,7 @@ export async function POST(request: Request) {
           outdated: true,
           current_version: version || "legacy",
           required_version: minVersion,
-          download_url: downloadUrl || "https://chameleon-cheats.tech/profile",
+          download_url: downloadUrl || "https://www.chameleon-cheats.tech/profile",
           error: `UPDATE REQUIRED: Your version (${version || "outdated build"}) is no longer supported. Please download the latest update (v${minVersion}) from the website.`,
         },
         { status: 403 }

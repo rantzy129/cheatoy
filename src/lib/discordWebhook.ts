@@ -5,22 +5,18 @@
  */
 
 const ORDER_WEBHOOK_URL =
-  process.env.DISCORD_ORDER_WEBHOOK_URL ||
-  "https://discord.com/api/webhooks/1561414524576333895/Cidm6yTdcCV-qFZTxHDxwXc3F0FVEnFU57_-gJnAVpfVGiDSoNzoKI1fduykxkVRmsE1";
+  process.env.DISCORD_ORDER_WEBHOOK_URL || "";
 
 const USER_ACTIVITY_WEBHOOK_URL =
-  process.env.DISCORD_USER_WEBHOOK_URL ||
-  "https://discord.com/api/webhooks/1561418628979622011/5AZCipRSBBIG-NoWYGYGRmuhvaOg91IPbUh-DgsUjGHTPwigV_u05v_7Ug2PAoPuDIpF";
+  process.env.DISCORD_USER_WEBHOOK_URL || "";
 
 // Dedicated Webhook: LITERALLY THE USER LIST ONLY
 const USER_LIST_WEBHOOK_URL =
-  process.env.DISCORD_USER_LIST_WEBHOOK_URL ||
-  "https://discord.com/api/webhooks/1561427589262999702/nkwPzgtON8LsGD9nRlsxq7nww2LzGXdepfi1IUDCcpOLMXi0eHQuy2RfV7xocN14Ko3M";
+  process.env.DISCORD_USER_LIST_WEBHOOK_URL || "";
 
 // Dedicated Webhook: CURRENT USERS (COUNT ONLY — PUBLIC-SAFE CHANNEL)
 const CURRENT_USERS_WEBHOOK_URL =
-  process.env.DISCORD_CURRENT_USERS_WEBHOOK_URL ||
-  "https://discord.com/api/webhooks/1562463968822431756/V_mlQ4OBJ8rVRrq5bXvY8lAr_pBwqd_cdPGtwKWX92y4au0W_k67zO7hb-CuLXxqROti";
+  process.env.DISCORD_CURRENT_USERS_WEBHOOK_URL || "";
 
 interface OrderWebhookData {
   order_id: string;
@@ -74,7 +70,7 @@ async function sendDiscordEmbed(
   try {
     const payload = {
       username: botName,
-      avatar_url: "https://chameleon-cheats.tech/favicon.ico",
+      avatar_url: "https://www.chameleon-cheats.tech/favicon.ico",
       embeds: [embed],
     };
 
@@ -121,7 +117,7 @@ async function sendDiscordEmbedWithFile(
     const formData = new FormData();
     const payload = {
       username: botName,
-      avatar_url: "https://chameleon-cheats.tech/favicon.ico",
+      avatar_url: "https://www.chameleon-cheats.tech/favicon.ico",
       embeds: [
         {
           ...embed,
@@ -858,7 +854,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
     ],
     footer: {
       text: "Chameleon Cheats • Public Status Channel (Live Auto-Sync)",
-      icon_url: "https://chameleon-cheats.tech/favicon.ico",
+      icon_url: "https://www.chameleon-cheats.tech/favicon.ico",
     },
     timestamp: now.toISOString(),
   };
@@ -890,7 +886,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: "Chameleon VIP Live Status",
-        avatar_url: "https://chameleon-cheats.tech/favicon.ico",
+        avatar_url: "https://www.chameleon-cheats.tech/favicon.ico",
         embeds: [embed],
       }),
     });
