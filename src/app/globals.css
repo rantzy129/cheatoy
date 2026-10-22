@@ -3961,21 +3961,15 @@ a {
   white-space: nowrap;
 }
 
-/* ─── VIP Feature Summary Cards (Taste-Skill Anti-Slop System) ─── */
+/* ─── VIP Feature Summary Cards (Simple 2x2 Grid) ─── */
 .features-grid-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   align-items: stretch;
 }
 
-@media (max-width: 1280px) {
-  .features-grid-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .features-grid-summary {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -3986,7 +3980,7 @@ a {
   background: #090e18;
   border: 1px solid #142034;
   border-radius: 10px;
-  padding: 28px 24px;
+  padding: 22px 22px;
   display: flex;
   flex-direction: column;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -3997,22 +3991,74 @@ a {
   background: #0c1320;
 }
 
+.feature-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
 .feature-card-heading {
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 8px 0;
+  margin: 0;
   line-height: 1.25;
 }
 
-.feature-card-intro {
-  font-size: 13.5px;
+.feature-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
   color: #94a3b8;
-  line-height: 1.5;
-  margin: 0 0 20px 0;
-  padding-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.feature-card-badge.new {
+  background: rgba(0, 210, 255, 0.12);
+  color: #00d2ff;
+  border-color: rgba(0, 210, 255, 0.3);
+}
+
+.feature-card-intro {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.45;
+  margin: 0 0 14px 0;
+  padding-bottom: 12px;
   border-bottom: 1px solid #142034;
+}
+
+.feature-compact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.feature-compact-list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.feature-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #00d2ff;
+  flex-shrink: 0;
 }
 
 .feature-summary-list {

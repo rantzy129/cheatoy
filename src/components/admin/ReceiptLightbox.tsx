@@ -123,7 +123,7 @@ export default function ReceiptLightbox({
                     Referred by: @{selectedReceiptOrder.referred_by}
                   </div>
                   <div style={{ fontSize: 11, color: "#cbd5e1", marginTop: 2 }}>
-                    Perk: Buyer gets +1 Bonus Day. Referrer earns +3 Days if active VIP, or +1 Day if non-VIP / unbought (on 3+ day purchase).
+                    Perk: Buyer gets +1 Bonus Day. Referrer earns +1 Free Day (active VIP gets +1 day extended, non-VIP gets 1-day pass).
                   </div>
                 </div>
               )}

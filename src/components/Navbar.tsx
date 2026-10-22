@@ -238,7 +238,7 @@ export default function Navbar() {
             title="Earn Free VIP Days by inviting clanmates"
           >
             <span>Referrals</span>
-            <span className="site-nav-referral-badge">+3 Days</span>
+            <span className="site-nav-referral-badge">+1 Day</span>
           </Link>
           <Link
             href="/profile"
@@ -384,7 +384,7 @@ export default function Navbar() {
                     <span className="mobile-nav-icon"><IconGift size={16} /></span>
                     <span className="mobile-nav-text">Referral Program</span>
                   </div>
-                  <span className="mobile-nav-badge-pill">+3 Days VIP</span>
+                  <span className="mobile-nav-badge-pill">+1 Day VIP</span>
                 </Link>
 
                 <Link

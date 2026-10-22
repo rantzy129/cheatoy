@@ -325,7 +325,7 @@ export default function useAdmin(): UseAdminReturn {
         if (data.referral_reward?.referrer) {
           const rewardDays = data.referral_reward.daysAdded || 1;
           const statusDesc = data.referral_reward.isExistingVip
-            ? `Active VIP: +${rewardDays} Free VIP Days extended onto pass`
+            ? `Active VIP: +${rewardDays} Free VIP Day${rewardDays > 1 ? "s" : ""} extended onto pass`
             : `Non-VIP / Unbought: +${rewardDays} Free VIP Day pass awarded`;
           alert(`🎉 Order Approved!\nLicense Key: ${data.license_key}\n\n🎁 Clanmate Referral Credited:\n• Buyer (@${order.discord_username}): +1 Bonus Day\n• Referrer (@${data.referral_reward.referrer}): ${statusDesc}`);
         }

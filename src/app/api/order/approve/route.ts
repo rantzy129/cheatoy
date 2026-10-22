@@ -114,10 +114,10 @@ export async function POST(request: Request) {
     }
 
     // 2. Process Referrer Reward:
-    // User Rule:
-    // - If inviter has an ACTIVE VIP pass: gets +3 Free VIP Days extended onto their license.
-    // - If inviter is NOT VIP or hasn't bought (no license or expired): gets +1 Free VIP Day only,
-    //   provided the buyer purchases at least a 3-day pass.
+    // Rule:
+    // - NO ACTIVE VIP refer and buys it -> gets 1 day free.
+    // - WITH VIP refer and buys it -> gets the same 1 DAY.
+    // - ALL referrals give 1 DAY!
     let referralRewardStatus: {
       rewarded: boolean;
       referrer?: string;
@@ -127,106 +127,94 @@ export async function POST(request: Request) {
     } | null = null;
 
     if (referrerHandle) {
-      const isAtLeast3Days =
-        !order.tier.toLowerCase().includes("1 day") &&
-        !order.tier.toLowerCase().includes("trial");
+      try {
+        const { data: refLicenses } = await supabase
+          .from("licenses")
+          .select("*")
+          .ilike("discord_username", `%${referrerHandle}%`)
+          .eq("is_banned", false)
+          .order("created_at", { ascending: false })
+          .limit(1);
 
-      if (!isAtLeast3Days) {
-        referralRewardStatus = {
-          rewarded: false,
-          referrer: referrerHandle,
-          error: "Purchased tier must be at least 3 days to qualify for referral bonus.",
-        };
-      } else {
-        try {
-          const { data: refLicenses } = await supabase
-            .from("licenses")
-            .select("*")
-            .ilike("discord_username", `%${referrerHandle}%`)
-            .eq("is_banned", false)
-            .order("created_at", { ascending: false })
-            .limit(1);
+        const refLicense = refLicenses && refLicenses.length > 0 ? refLicenses[0] : null;
 
-          const refLicense = refLicenses && refLicenses.length > 0 ? refLicenses[0] : null;
+        // Check if referrer is currently an ACTIVE VIP
+        const isLifetime = Boolean(refLicense && refLicense.expires_at === null);
+        const isActiveTimedVip = Boolean(
+          refLicense &&
+          refLicense.expires_at &&
+          new Date(refLicense.expires_at).getTime() > Date.now()
+        );
+        const isActiveVip = isLifetime || isActiveTimedVip;
 
-          // Check if referrer is currently an ACTIVE VIP
-          const isLifetime = Boolean(refLicense && refLicense.expires_at === null);
-          const isActiveTimedVip = Boolean(
-            refLicense &&
-            refLicense.expires_at &&
-            new Date(refLicense.expires_at).getTime() > Date.now()
-          );
-          const isActiveVip = isLifetime || isActiveTimedVip;
+        if (isActiveVip) {
+          // Referrer is active VIP -> gets +1 Free VIP Day extended onto active license
+          if (isLifetime) {
+            referralRewardStatus = {
+              rewarded: true,
+              referrer: referrerHandle,
+              daysAdded: 1,
+              isExistingVip: true,
+            };
+          } else if (refLicense && refLicense.expires_at) {
+            const currentExpiryTime = new Date(refLicense.expires_at).getTime();
+            const newRefExpiry = new Date(currentExpiryTime + 1 * 24 * 60 * 60 * 1000).toISOString();
 
-          if (isActiveVip) {
-            // Referrer is active VIP -> gets +3 Free VIP Days
-            if (isLifetime) {
-              referralRewardStatus = {
-                rewarded: true,
-                referrer: referrerHandle,
-                daysAdded: 3,
-                isExistingVip: true,
-              };
-            } else if (refLicense && refLicense.expires_at) {
-              const currentExpiryTime = new Date(refLicense.expires_at).getTime();
-              const newRefExpiry = new Date(currentExpiryTime + 3 * 24 * 60 * 60 * 1000).toISOString();
+            await supabase
+              .from("licenses")
+              .update({ expires_at: newRefExpiry })
+              .eq("id", refLicense.id);
 
-              await supabase
-                .from("licenses")
-                .update({ expires_at: newRefExpiry })
-                .eq("id", refLicense.id);
-
-              referralRewardStatus = {
-                rewarded: true,
-                referrer: referrerHandle,
-                daysAdded: 3,
-                isExistingVip: true,
-              };
-            }
-          } else {
-            // Referrer is NOT VIP or hasn't bought (expired or never purchased) -> gets 1 Day only
-            if (refLicense) {
-              // Existing expired license: reactivate for +1 Day (24 hours) from now
-              const newRefExpiry = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
-              await supabase
-                .from("licenses")
-                .update({
-                  expires_at: newRefExpiry,
-                  tier: "1 Day Pass (Referral Reward)",
-                })
-                .eq("id", refLicense.id);
-
-              referralRewardStatus = {
-                rewarded: true,
-                referrer: referrerHandle,
-                daysAdded: 1,
-                isExistingVip: false,
-              };
-            } else {
-              // No previous license (never bought): mint a new 1-Day VIP reward key
-              const refBonusKey = `CHAM-AFPH-REF1-${hex()}`;
-              const newRefExpiry = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
-
-              await supabase.from("licenses").insert({
-                license_key: refBonusKey,
-                discord_username: referrerHandle,
-                tier: "1 Day Pass (Referral Reward)",
-                expires_at: newRefExpiry,
-                is_banned: false,
-              });
-
-              referralRewardStatus = {
-                rewarded: true,
-                referrer: referrerHandle,
-                daysAdded: 1,
-                isExistingVip: false,
-              };
-            }
+            referralRewardStatus = {
+              rewarded: true,
+              referrer: referrerHandle,
+              daysAdded: 1,
+              isExistingVip: true,
+            };
           }
-        } catch (refErr: any) {
-          console.warn("Notice crediting referrer bonus:", refErr);
-          referralRewardStatus = { rewarded: false, referrer: referrerHandle, error: refErr.message };
+        } else {
+          // Referrer is NOT VIP or hasn't bought (expired or never purchased) -> gets 1 Day free
+          if (refLicense) {
+            // Existing expired license: reactivate for +1 Day (24 hours) from now
+            const newRefExpiry = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
+            await supabase
+              .from("licenses")
+              .update({
+                expires_at: newRefExpiry,
+                tier: "1 Day Pass (Referral Reward)",
+              })
+              .eq("id", refLicense.id);
+
+            referralRewardStatus = {
+              rewarded: true,
+              referrer: referrerHandle,
+              daysAdded: 1,
+              isExistingVip: false,
+            };
+          } else {
+            // No previous license (never bought): mint a new 1-Day VIP reward key
+            const refBonusKey = `CHAM-AFPH-REF1-${hex()}`;
+            const newRefExpiry = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
+
+            await supabase.from("licenses").insert({
+              license_key: refBonusKey,
+              discord_username: referrerHandle,
+              tier: "1 Day Pass (Referral Reward)",
+              expires_at: newRefExpiry,
+              is_banned: false,
+            });
+
+            referralRewardStatus = {
+              rewarded: true,
+              referrer: referrerHandle,
+              daysAdded: 1,
+              isExistingVip: false,
+            };
+          }
         }
+      } catch (refErr: any) {
+        console.warn("Notice crediting referrer bonus:", refErr);
+        referralRewardStatus = { rewarded: false, referrer: referrerHandle, error: refErr.message };
       }
     }
 
@@ -281,7 +269,7 @@ export async function POST(request: Request) {
       expires_at: expiresAt,
       discord_bot: discordBotStatus,
       referral_reward: referralRewardStatus,
-      message: `Order ${order_id} approved.${hasReferral ? ` +1 Day applied to buyer. +3 Days credited to @${referrerHandle}.` : ""}`,
+      message: `Order ${order_id} approved.${hasReferral ? ` +1 Day applied to buyer. +1 Day credited to @${referrerHandle}.` : ""}`,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message || "Internal server error" }, { status: 500 });

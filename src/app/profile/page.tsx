@@ -1180,11 +1180,11 @@ export default function ProfilePage() {
 
                   <div className="vault-referral-kpi-card">
                     <span className="vault-referral-kpi-label">Reward Rate</span>
-                    <span className="vault-referral-kpi-value" style={{ fontSize: 18, color: isVip ? "#10b981" : "#38bdf8" }}>
-                      {isVip ? "+3 Days / Sale" : "+1 Day / Sale"}
+                    <span className="vault-referral-kpi-value" style={{ fontSize: 18, color: "#10b981" }}>
+                      +1 Day / Sale
                     </span>
                     <span className="vault-referral-kpi-sub">
-                      {isVip ? "Active VIP rate (Maximum)" : "Upgrade to VIP for +3 days/sale"}
+                      Universal 1 Day per verified referral
                     </span>
                   </div>
                 </div>
@@ -1208,11 +1208,7 @@ export default function ProfilePage() {
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <span style={{ color: "#f472b6", fontWeight: 700 }}>● Your Reward:</span>
                           <span>
-                            {isVip ? (
-                              <>Earn <strong style={{ color: "#ffffff" }}>+3 Free VIP Days</strong> extended onto your license per referral.</>
-                            ) : (
-                              <>Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> per referral (or <strong style={{ color: "#f472b6" }}>+3 Free Days</strong> with an active VIP pass).</>
-                            )}
+                            Earn <strong style={{ color: "#ffffff" }}>+1 Free VIP Day</strong> extended onto your license per referral purchase.
                           </span>
                         </div>
                       </div>
@@ -1370,7 +1366,7 @@ export default function ProfilePage() {
                                   </span>
                                 ) : item.status === "pending" ? (
                                   <span style={{ color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>
-                                    +{item.potential_reward_days} Days (Pending)
+                                    +{item.potential_reward_days} Day (Pending)
                                   </span>
                                 ) : (
                                   <span style={{ color: "#64748b", fontSize: 12 }}>—</span>

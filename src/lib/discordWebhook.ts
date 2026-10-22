@@ -295,7 +295,7 @@ export async function sendOrderApprovedWebhook(
   if (referralReward?.referrer) {
     const days = referralReward.daysAdded || 1;
     const referrerPerk = referralReward.isExistingVip
-      ? `+${days} Free VIP Days extended onto their active pass`
+      ? `+${days} Free VIP Day${days > 1 ? "s" : ""} extended onto their active pass`
       : `+${days} Free VIP Day pass awarded (Free/Non-VIP Member)`;
 
     fields.push({

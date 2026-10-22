@@ -89,8 +89,8 @@ export async function GET(request: Request) {
 
     const referrals = (rawOrders || []).map((ord) => {
       const isApproved = ord.status === "approved";
-      // Active VIP gets 3 days, free member gets 1 day
-      const rewardDays = isApproved ? (hasActiveVip ? 3 : 1) : 0;
+      // All referrals give 1 day free
+      const rewardDays = isApproved ? 1 : 0;
       if (isApproved) {
         approvedCount += 1;
         totalRewardDays += rewardDays;
@@ -106,7 +106,7 @@ export async function GET(request: Request) {
         created_at: ord.created_at,
         approved_at: ord.approved_at,
         reward_days: rewardDays,
-        potential_reward_days: hasActiveVip ? 3 : 1,
+        potential_reward_days: 1,
       };
     });
 

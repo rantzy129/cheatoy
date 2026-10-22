@@ -1044,146 +1044,74 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ═══ 3 Summary Cards (Taste-Skill Anti-Slop Discipline) ═══ */}
-            {/* ═══ 3 Summary Cards (Taste-Skill Anti-Slop Discipline) ═══ */}
+            {/* ═══ VIP Feature Arsenal: 2x2 Summary Grid ═══ */}
             <div className="features-grid-summary">
 
-              {/* ──────── Card 1: Visual Features ──────── */}
+              {/* ──────── Card 1: Visual ESP ──────── */}
               <div className="feature-summary-card">
-                <h3 className="feature-card-heading">Visual Features</h3>
-                <p className="feature-card-intro">
-                  Direct-memory visual tracking with bone alignment and real-time enemy telemetry.
-                </p>
-
-                <ul className="feature-summary-list">
-                  <li>
-                    <span className="feature-item-label">Skeleton-accurate 2D boxes</span>
-                    <span className="feature-item-detail">
-                      Tracks actual head and feet bones, scaling precisely as enemies crouch, jump, or peek.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Dynamic health bars</span>
-                    <span className="feature-item-detail">
-                      Smooth vertical indicator transitioning from green to yellow to red based on remaining HP.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Player name ESP</span>
-                    <span className="feature-item-detail">
-                      Displays the enemy&apos;s actual in-game name directly above their bounding box.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Weapon ESP</span>
-                    <span className="feature-item-detail">
-                      Identifies the exact weapon the enemy is currently holding (e.g. AK-47, AWM).
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Directional snaplines</span>
-                    <span className="feature-item-detail">
-                      Screen-to-target lines with customizable thickness (1.0–6.0px), color, and screen origin.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* ──────── Card 2: Precision Aimbot (NEW) ──────── */}
-              <div className="feature-summary-card">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                  <h3 className="feature-card-heading">Precision Aimbot</h3>
-                  <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(0, 210, 255, 0.12)", color: "#00d2ff", border: "1px solid rgba(0, 210, 255, 0.3)", padding: "2px 7px", borderRadius: 4 }}>
-                    NEW
-                  </span>
+                <div className="feature-card-header">
+                  <h3 className="feature-card-heading">Visual ESP</h3>
+                  <span className="feature-card-badge">CORE</span>
                 </div>
                 <p className="feature-card-intro">
-                  Direct-memory humanized aim assistance with smooth tracking and circular FOV lock.
+                  Skeleton-accurate enemy telemetry and dynamic HUD overlays.
                 </p>
-
-                <ul className="feature-summary-list">
-                  <li>
-                    <span className="feature-item-label">Target bone selection</span>
-                    <span className="feature-item-detail">
-                      Select Head, Neck, or Chest for instant target acquisition and lethal accuracy.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Humanized smoothing</span>
-                    <span className="feature-item-detail">
-                      Customizable smooth scale (1.0–10.0) creates natural crosshair movement to evade spectator bans.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Visual FOV radius circle</span>
-                    <span className="feature-item-detail">
-                      Draws a real-time circular constraint (e.g. 80px) ensuring only close targets are locked.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Configurable hold key</span>
-                    <span className="feature-item-detail">
-                      Engage lock-on effortlessly by holding your chosen hotkey (default: Left Alt) or mouse button.
-                    </span>
-                  </li>
+                <ul className="feature-compact-list">
+                  <li><span className="feature-bullet"></span><span><strong>2D Bounding Boxes:</strong> Head and feet bone alignment</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Dynamic Health Bars:</strong> Real-time color-shifting indicator</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Player &amp; Weapon ESP:</strong> Identifies enemy name and gun</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Directional Snaplines:</strong> Screen-to-target tracking</span></li>
                 </ul>
               </div>
 
-              {/* ──────── Card 3: Chams ──────── */}
+              {/* ──────── Card 2: Precision Aimbot ──────── */}
               <div className="feature-summary-card">
-                <h3 className="feature-card-heading">Chams</h3>
+                <div className="feature-card-header">
+                  <h3 className="feature-card-heading">Precision Aimbot</h3>
+                  <span className="feature-card-badge new">NEW</span>
+                </div>
                 <p className="feature-card-intro">
-                  DirectX model illumination making enemy players clearly visible behind walls and cover.
+                  Direct-memory target acquisition with humanized smooth lock.
                 </p>
-
-                <ul className="feature-summary-list">
-                  <li>
-                    <span className="feature-item-label">3D model wallhack</span>
-                    <span className="feature-item-detail">
-                      Forces enemy player models to render through walls, crates, containers, and terrain.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Six color presets</span>
-                    <span className="feature-item-detail">
-                      Choose from skyblue, red, green, pink, yellow, or white, with an option to turn off.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Instant target contrast</span>
-                    <span className="feature-item-detail">
-                      Solid high-contrast textures distinguish hostiles from background geometry at any distance.
-                    </span>
-                  </li>
+                <ul className="feature-compact-list">
+                  <li><span className="feature-bullet"></span><span><strong>Bone Selection:</strong> Lethal head, neck, or chest targeting</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Humanized Smoothing:</strong> Natural 1.0–10.0 crosshair movement</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Visual FOV Circle:</strong> Real-time 80px circular lock constraint</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Configurable Hold Key:</strong> Left Alt or custom hotkey</span></li>
                 </ul>
               </div>
 
-              {/* ──────── Card 3: Utility and Menu ──────── */}
+              {/* ──────── Card 3: Chams Wallhack ──────── */}
               <div className="feature-summary-card">
-                <h3 className="feature-card-heading">Utility and Menu</h3>
+                <div className="feature-card-header">
+                  <h3 className="feature-card-heading">Chams Wallhack</h3>
+                  <span className="feature-card-badge">DIRECTX</span>
+                </div>
                 <p className="feature-card-intro">
-                  In-game configuration overlay and team filtering for a clean, distraction-free screen.
+                  DirectX 3D model illumination through all walls and terrain.
                 </p>
+                <ul className="feature-compact-list">
+                  <li><span className="feature-bullet"></span><span><strong>3D Model Wallhack:</strong> Renders hostiles through obstacles</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>6 Color Presets:</strong> Skyblue, red, green, pink, yellow, white</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Instant Contrast:</strong> High-visibility textures at any distance</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Native Performance:</strong> Zero FPS drops or input lag</span></li>
+                </ul>
+              </div>
 
-                <ul className="feature-summary-list">
-                  <li>
-                    <span className="feature-item-label">Team filtering</span>
-                    <span className="feature-item-detail">
-                      Automatically reads your team affiliation and hides friendly ESP to prevent visual clutter.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Custom ImGui menu</span>
-                    <span className="feature-item-detail">
-                      Draggable dark-mode overlay with live sliders and color pickers for on-the-fly adjustment.
-                    </span>
-                  </li>
-                  <li>
-                    <span className="feature-item-label">Configurable menu keybind</span>
-                    <span className="feature-item-detail">
-                      Toggle the menu with INSERT by default, or rebind directly to any keyboard key or mouse button.
-                    </span>
-                  </li>
+              {/* ──────── Card 4: Utility & Menu ──────── */}
+              <div className="feature-summary-card">
+                <div className="feature-card-header">
+                  <h3 className="feature-card-heading">Utility &amp; Menu</h3>
+                  <span className="feature-card-badge">IMGUI</span>
+                </div>
+                <p className="feature-card-intro">
+                  Interactive in-game overlay with real-time team filtering.
+                </p>
+                <ul className="feature-compact-list">
+                  <li><span className="feature-bullet"></span><span><strong>Team Filtering:</strong> Automatically hides friendly teammates</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Custom ImGui Menu:</strong> Draggable dark-mode UI with live sliders</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Rebindable Hotkey:</strong> Toggle overlay via [INSERT] or custom</span></li>
+                  <li><span className="feature-bullet"></span><span><strong>Memory-Only:</strong> Clean execution with anti-crash safeguards</span></li>
                 </ul>
               </div>
 
