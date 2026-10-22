@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       return new NextResponse("Order not found", { status: 404 });
     }
 
-    const match = (order.payment_method || "").match(/\[receipt:(.*?)\]/);
+    const match = (order.payment_method || "").match(/\[receipt:([\s\S]*?)\]/);
     if (match && match[1]) {
       const receiptData = match[1];
       if (receiptData.startsWith("data:image/")) {

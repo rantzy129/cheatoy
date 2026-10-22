@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { IconReceipt, IconCopy, IconRefresh } from "./Icons";
+import { IconReceipt, IconCopy, IconRefresh, IconKey, IconCheck, IconDiscord } from "./Icons";
 import { Order, License } from "./types";
 import PaginationBar from "./PaginationBar";
 
@@ -48,6 +48,9 @@ export default function OrdersTab({
 }: OrdersTabProps) {
   const [ordersPage, setOrdersPage] = useState(1);
   const [ordersPerPage, setOrdersPerPage] = useState(10);
+  const [selectedKeyOrder, setSelectedKeyOrder] = useState<Order | null>(null);
+  const [copiedKeyOrder, setCopiedKeyOrder] = useState(false);
+  const [copiedDiscordMsg, setCopiedDiscordMsg] = useState(false);
 
   const q = searchQuery.toLowerCase().trim();
 
@@ -159,13 +162,175 @@ export default function OrdersTab({
           No orders found matching your filters.
         </div>
       )}
+
+      {/* ─── VIP License Key Modal ─── */}
+      {selectedKeyOrder && (
+        <div
+          className="admin-receipt-lightbox-overlay"
+          onClick={() => setSelectedKeyOrder(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="admin-key-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="admin-receipt-lightbox-header">
+              <div className="admin-receipt-lightbox-header-left">
+                <IconKey size={16} />
+                <h3 className="admin-receipt-lightbox-title">VIP License Key</h3>
+                <span className="admin-receipt-id-pill">{selectedKeyOrder.order_id}</span>
+                <span className="admin-status-badge admin-status-badge-approved">Issued</span>
+              </div>
+              <button
+                type="button"
+                className="admin-receipt-lightbox-close"
+                onClick={() => setSelectedKeyOrder(null)}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Customer & Plan row */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  background: "#050912",
+                  border: "1px solid #141f32",
+                  borderRadius: 8,
+                  padding: "12px 16px",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", marginBottom: 4 }}>
+                    Customer Discord
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 6 }}>
+                    <IconDiscord size={14} />
+                    <span>{selectedKeyOrder.discord_username}</span>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", marginBottom: 4 }}>
+                    Plan / Price
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#00d2ff" }}>
+                    {selectedKeyOrder.tier} ({selectedKeyOrder.price})
+                  </div>
+                </div>
+              </div>
+
+              {/* Monospace Key Block */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#94a3b8", marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
+                  <span>License Key</span>
+                  <span style={{ color: "#10b981", fontSize: 10 }}>● Active VIP Token</span>
+                </div>
+                <div
+                  style={{
+                    background: "#03060c",
+                    border: "1px solid #1c2b44",
+                    borderRadius: 8,
+                    padding: "16px 20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: 17,
+                      fontWeight: 800,
+                      letterSpacing: "0.05em",
+                      color: "#00d2ff",
+                      userSelect: "all",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {selectedKeyOrder.license_key}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedKeyOrder.license_key) {
+                        navigator.clipboard.writeText(selectedKeyOrder.license_key);
+                        setCopiedKeyOrder(true);
+                        setTimeout(() => setCopiedKeyOrder(false), 2000);
+                      }
+                    }}
+                    className="admin-tab-btn"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "8px 14px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: copiedKeyOrder ? "rgba(16, 185, 129, 0.2)" : "#0e1a2e",
+                      borderColor: copiedKeyOrder ? "#10b981" : "#1e3a5f",
+                      color: copiedKeyOrder ? "#10b981" : "#ffffff",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {copiedKeyOrder ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                    <span>{copiedKeyOrder ? "Copied!" : "Copy Key"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Secondary action: Copy Discord DM snippet */}
+              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedKeyOrder.license_key) {
+                      const msg = `👑 **Chameleon VIP License Key**\n\nHello @${selectedKeyOrder.discord_username}!\nYour order \`${selectedKeyOrder.order_id}\` has been approved.\n\n🔑 **License Key:** \`${selectedKeyOrder.license_key}\`\n📋 **Plan:** ${selectedKeyOrder.tier}\n\nDownload the latest build from our Discord or profile page. Enjoy!`;
+                      navigator.clipboard.writeText(msg);
+                      setCopiedDiscordMsg(true);
+                      setTimeout(() => setCopiedDiscordMsg(false), 2000);
+                    }
+                  }}
+                  className="admin-tab-btn"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 14px",
+                    fontSize: 11,
+                    color: copiedDiscordMsg ? "#10b981" : "#94a3b8",
+                  }}
+                  title="Copy pre-formatted notification message for Discord DM"
+                >
+                  <IconDiscord size={13} />
+                  <span>{copiedDiscordMsg ? "Copied Discord DM!" : "Copy Discord DM"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedKeyOrder(null)}
+                  className="admin-tab-btn"
+                  style={{ padding: "8px 16px", fontSize: 12 }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+
   function renderOrders() {
     return paginatedOrders.map((order) => {
       const refMatch = (order.payment_method || "").match(/\[ref:(.*?)\]/);
-      const referredBy = refMatch && refMatch[1] ? refMatch[1].trim() : null;
-      const hasSlip = order.payment_method?.includes("[receipt:");
+      const referredBy = order.referred_by || (refMatch && refMatch[1] ? refMatch[1].trim() : null);
+      const hasSlip = Boolean(order.receipt_url || order.payment_method?.includes("[receipt:"));
       const isPending = order.status === "pending";
 
       return (
@@ -222,26 +387,47 @@ export default function OrdersTab({
               </button>
             </div>
             {hasSlip ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedReceiptOrder(order);
-                  setReceiptZoom(false);
-                }}
-                className="admin-btn-view-receipt"
-                title="View GCash Payment Screenshot"
-              >
-                <IconReceipt size={12} />
-                <span>View Slip</span>
-              </button>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedReceiptOrder(order);
+                    setReceiptZoom(false);
+                  }}
+                  className="admin-btn-view-receipt"
+                  title="View GCash Payment Screenshot"
+                >
+                  <IconReceipt size={12} />
+                  <span>View Slip</span>
+                </button>
+                <label
+                  htmlFor={`admin-slip-upload-${order.order_id}`}
+                  className="admin-btn-copy-inline"
+                  style={{ cursor: "pointer", fontSize: 10, padding: "2px 6px", textDecoration: "none" }}
+                  title="Upload or replace receipt screenshot"
+                >
+                  Replace
+                  <input
+                    id={`admin-slip-upload-${order.order_id}`}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleAdminAttachSlip(order.order_id, e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
             ) : (
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 4 }}>
                 <span className="admin-no-receipt-label">No slip (Manual ref)</span>
                 <label
                   htmlFor={`admin-slip-upload-${order.order_id}`}
                   className="admin-btn-copy-inline"
                   style={{ cursor: "pointer", fontSize: 10, padding: "2px 6px", textDecoration: "none" }}
-                  title="Upload receipt screenshot received via Discord"
+                  title="Upload receipt screenshot"
                 >
                   + Attach
                   <input
@@ -309,15 +495,26 @@ export default function OrdersTab({
     }
     if (order.status === "approved") {
       return (
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontFamily: "monospace", fontSize: 12, color: "#ffffff" }}>
-            {order.license_key}
-          </span>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, justifyContent: "flex-end" }}>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedKeyOrder(order);
+              setCopiedKeyOrder(false);
+              setCopiedDiscordMsg(false);
+            }}
+            className="admin-btn-key-view"
+            title="Click to view VIP license key & copy"
+          >
+            <IconKey size={12} />
+            <span>View Key</span>
+          </button>
           {order.license_key && (
             <button
               type="button"
               onClick={() => handleCopy(order.license_key!)}
               className="admin-btn-copy-inline"
+              title="Quick copy license key"
             >
               {copiedKey === order.license_key ? "Copied" : "Copy"}
             </button>

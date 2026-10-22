@@ -47,10 +47,10 @@ export async function GET(request: Request) {
       let receiptUrl: string | null = null;
 
       // 1. Check embedded tag in payment_method
-      const match = (order.payment_method || "").match(/\[receipt:(.*?)\]/);
+      const match = (order.payment_method || "").match(/\[receipt:([\s\S]*?)\]/);
       if (match && match[1]) {
         const rawUrl = match[1];
-        if (rawUrl.startsWith("/receipts/") && !fs.existsSync(path.join(receiptsDir, path.basename(rawUrl)))) {
+        if (rawUrl.startsWith("data:image/") || (rawUrl.startsWith("/receipts/") && !fs.existsSync(path.join(receiptsDir, path.basename(rawUrl))))) {
           receiptUrl = `/api/order/receipt-image?order_id=${order.order_id}`;
         } else {
           receiptUrl = rawUrl;
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
         receipt_url: receiptUrl,
         referred_by: referredBy,
         payment_method: (order.payment_method || "InstaPay / GCash")
-          .replace(/\s*\[receipt:.*?\]/, "")
+          .replace(/\s*\[receipt:[\s\S]*?\]/, "")
           .replace(/\s*\[ref:.*?\]/, "")
           .trim(),
       };

@@ -1162,6 +1162,40 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
+.admin-key-modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: #070c18;
+  border: 1px solid #142136;
+  border-radius: var(--radius-md, 12px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}
+
+.admin-btn-key-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0d1726;
+  border: 1px solid #1c2e4a;
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-key-view:hover {
+  background: #132238;
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
 .admin-receipt-lightbox-header {
   display: flex;
   align-items: center;
