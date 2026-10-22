@@ -1041,20 +1041,6 @@ export default function Home() {
 
 
         {/* ─── 2.5 Feature Arsenal: Visual ESP, Wallhack Chams, Utility & Menu ─── */}
-        <section className="section" id="assault-fire-legacy">
-          <div className="features-container">
-            <div className="section-header-clean">
-              <h2 className="section-heading">Assault Fire PH and Legacy compatibility</h2>
-              <p className="section-subtext">
-                Looking for an Assault Fire PH wallhack, an AFPH aimbot, or an Assault Fire Legacy cheat? Chameleon VIP is built for supported Assault Fire PH client variants, including Legacy and Reborn. The feature set shown on this page includes player chams, wallhack visuals, health and box ESP, and configurable aim assistance.
-              </p>
-              <p className="section-subtext">
-                Client updates can affect compatibility. Check the current loader version and the setup notes before purchasing, and contact support if you are unsure which client build you use.
-              </p>
-            </div>
-          </div>
-        </section>
-
         <section className="section" id="features">
           <div className="features-container">
             <div className="section-header-clean">
