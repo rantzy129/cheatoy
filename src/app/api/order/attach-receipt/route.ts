@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import { getClientIp, checkRateLimit, createRateLimitResponse, RATE_LIMIT_PRESETS } from "@/lib/rateLimit";
+import { sendOrderCreatedWebhook } from "@/lib/discordWebhook";
 
 export async function POST(request: Request) {
   try {
@@ -86,6 +87,25 @@ export async function POST(request: Request) {
       .from("orders")
       .update({ payment_method: updatedMethod })
       .eq("order_id", order_id);
+
+    // Notify Discord Order Logs of the newly attached proof of payment
+    try {
+      const tempSlipPath = path.join(process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "public", "receipts"), `receipt_${order_id}.${ext}`);
+      await sendOrderCreatedWebhook({
+        order_id: orderData.order_id,
+        discord_id: orderData.discord_id,
+        discord_username: orderData.discord_username,
+        tier: orderData.tier,
+        price: orderData.price,
+        payment_method: updatedMethod,
+        reference_no: orderData.reference_no,
+        sender_name: orderData.sender_name,
+        status: orderData.status,
+        created_at: orderData.created_at,
+      }, fs.existsSync(tempSlipPath) ? tempSlipPath : null);
+    } catch (e) {
+      console.warn("Notice dispatching updated order receipt webhook:", e);
+    }
 
     return NextResponse.json({
       success: true,

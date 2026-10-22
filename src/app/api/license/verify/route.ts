@@ -11,31 +11,67 @@ const SIGNING_SECRET =
   process.env.ADMIN_SECRET_KEY ||
   "4f2e2368fc5f669483af135071a355d4130a9832f8b304024d6cddc7b28c9351";
 
-// In-memory debounce cache to prevent duplicate Discord webhook spam
-// (e.g. Loader verifying followed immediately by Injected DLL verifying)
+// Persistent session deduplication:
+// 1. In-memory cache for ultra-fast local checks
+// 2. Supabase persistent cloud store to prevent duplicates across separate Vercel serverless containers
 const recentSuccessWebhooks = new Map<string, number>();
-const WEBHOOK_DEBOUNCE_WINDOW_MS = 60 * 1000; // 60 seconds debounce window
+const SESSION_DEBOUNCE_WINDOW_MS = 15 * 60 * 1000; // 15-minute game session window
 
-function shouldDispatchSuccessWebhook(licenseKey: string, hwid?: string): boolean {
-  const key = `${licenseKey.trim().toUpperCase()}:${(hwid || "").trim().toUpperCase()}`;
+async function shouldDispatchSessionLaunchWebhook(
+  supabase: any,
+  licenseKey: string,
+  hwid?: string
+): Promise<boolean> {
+  const normKey = licenseKey.trim().toUpperCase();
+  const sessionRowId = `system-launch-${normKey}`;
   const now = Date.now();
 
-  // Prune cache if it grows large
-  if (recentSuccessWebhooks.size > 1000) {
-    for (const [k, time] of recentSuccessWebhooks.entries()) {
-      if (now - time > WEBHOOK_DEBOUNCE_WINDOW_MS) {
-        recentSuccessWebhooks.delete(k);
+  // Fast L1 in-memory check
+  const lastMemory = recentSuccessWebhooks.get(normKey);
+  if (lastMemory && now - lastMemory < SESSION_DEBOUNCE_WINDOW_MS) {
+    return false; // Suppress duplicate within session window
+  }
+
+  // L2 Supabase persistent check (shared across all Vercel lambdas)
+  try {
+    const { data: existing } = await supabase
+      .from("notifications")
+      .select("id, created_at")
+      .eq("id", sessionRowId)
+      .maybeSingle();
+
+    if (existing && existing.created_at) {
+      const lastDbTime = new Date(existing.created_at).getTime();
+      if (now - lastDbTime < SESSION_DEBOUNCE_WINDOW_MS) {
+        recentSuccessWebhooks.set(normKey, lastDbTime);
+        return false; // Suppress duplicate across containers
       }
     }
-  }
 
-  const lastSent = recentSuccessWebhooks.get(key);
-  if (lastSent && now - lastSent < WEBHOOK_DEBOUNCE_WINDOW_MS) {
-    return false; // Suppress duplicate webhook within 60s
-  }
+    // Record new active game session in Supabase
+    recentSuccessWebhooks.set(normKey, now);
+    await supabase.from("notifications").upsert({
+      id: sessionRowId,
+      sender: "system",
+      title: normKey,
+      message: hwid || "unbound",
+      type: "announcement",
+      target: "system_launch",
+      created_at: new Date(now).toISOString(),
+      expires_at: new Date(now + SESSION_DEBOUNCE_WINDOW_MS).toISOString(),
+    });
 
-  recentSuccessWebhooks.set(key, now);
-  return true;
+    return true; // Approved to dispatch Discord launch webhook
+  } catch (err) {
+    console.warn("Session launch deduplication check error:", err);
+    // Fall back to memory check
+    const last = recentSuccessWebhooks.get(normKey);
+    if (last && now - last < SESSION_DEBOUNCE_WINDOW_MS) {
+      return false;
+    }
+    recentSuccessWebhooks.set(normKey, now);
+    return true;
+  }
 }
 
 export async function POST(request: Request) {
@@ -103,6 +139,17 @@ export async function POST(request: Request) {
 
     // Check if banned
     if (license.is_banned) {
+      await sendUserAuthWebhook({
+        license_key: license.license_key,
+        discord_id: license.discord_id || discord_id,
+        discord_username: license.discord_username || "Suspended Member",
+        tier: license.tier || "VIP",
+        hwid,
+        expires_at: license.expires_at || undefined,
+        success: false,
+        message: "Attempted injection with suspended/banned license key",
+      }).catch((e) => console.warn("User auth block webhook error:", e));
+
       return NextResponse.json({ valid: false, error: "This license key has been suspended" }, { status: 403 });
     }
 
@@ -164,6 +211,17 @@ export async function POST(request: Request) {
           .update({ hwid: hwid.trim() })
           .eq("id", license.id);
       } else if (license.hwid.trim() !== hwid.trim()) {
+        await sendUserAuthWebhook({
+          license_key: license.license_key,
+          discord_id: license.discord_id || discord_id,
+          discord_username: license.discord_username || "VIP Member",
+          tier: license.tier || "VIP",
+          hwid,
+          expires_at: license.expires_at || undefined,
+          success: false,
+          message: `Hardware ID (HWID) mismatch. Bound: \`${license.hwid.slice(0, 16)}...\` vs Attempt: \`${hwid.slice(0, 16)}...\``,
+        }).catch((e) => console.warn("User auth block webhook error:", e));
+
         return NextResponse.json({
           valid: false,
           error: "Hardware ID (HWID) mismatch. Reset required.",
@@ -176,19 +234,24 @@ export async function POST(request: Request) {
     const signPayload = `${license.license_key.trim()}:${(hwid || "").trim()}:${timestamp}`;
     const signature = crypto.createHmac("sha256", SIGNING_SECRET).update(signPayload).digest("hex");
 
-    // Dispatch User Activity Webhook (Injector Launch Log) with debounce deduplication
+    // Dispatch User Activity Webhook (Injector / Game Launch Log) with persistent cloud deduplication
     const activeHwid = hwid || license.hwid;
-    if (shouldDispatchSuccessWebhook(license.license_key, activeHwid)) {
-      sendUserAuthWebhook({
-        license_key: license.license_key,
-        discord_id: license.discord_id || discord_id,
-        discord_username: license.discord_username || "Verified VIP",
-        tier: license.tier || "VIP",
-        hwid: activeHwid,
-        expires_at: license.expires_at || "Lifetime",
-        success: true,
-        message: "License validated successfully",
-      }).catch((e) => console.warn("User auth webhook error:", e));
+    const isNewSession = await shouldDispatchSessionLaunchWebhook(supabase, license.license_key, activeHwid);
+    if (isNewSession) {
+      try {
+        await sendUserAuthWebhook({
+          license_key: license.license_key,
+          discord_id: license.discord_id || discord_id,
+          discord_username: license.discord_username || "Verified VIP",
+          tier: license.tier || "VIP",
+          hwid: activeHwid,
+          expires_at: license.expires_at || "Lifetime",
+          success: true,
+          message: "License validated successfully",
+        });
+      } catch (e) {
+        console.warn("User auth webhook error:", e);
+      }
     }
 
     return NextResponse.json({

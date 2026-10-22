@@ -136,10 +136,16 @@ async function sendDiscordEmbedWithFile(
     const blob = new Blob([fileBuffer], { type: mime });
     formData.append("files[0]", blob, fileName);
 
-    await fetch(targetWebhookUrl, {
+    const res = await fetch(targetWebhookUrl, {
       method: "POST",
       body: formData,
     });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.warn(`Discord webhook with attachment failed [HTTP ${res.status}]: ${errText}. Falling back to plain embed.`);
+      await sendDiscordEmbed(targetWebhookUrl, embed, botName);
+    }
   } catch (err) {
     console.warn("Notice: Failed to dispatch Discord Webhook with attachment, falling back to json:", err);
     await sendDiscordEmbed(targetWebhookUrl, embed, botName);
@@ -152,6 +158,11 @@ async function sendDiscordEmbedWithFile(
 export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFilePath?: string | null) {
   // Clean payment method display if it contains receipt tag
   const displayPaymentMethod = (order.payment_method || "InstaPay / GCash").replace(/\s*\[receipt:.*?\]/, "");
+
+  const isSnowflake = order.discord_id && /^\d{17,20}$/.test(order.discord_id.trim());
+  const customerDisplay = isSnowflake
+    ? `<@${order.discord_id.trim()}> (@${order.discord_username})`
+    : `**@${order.discord_username || order.discord_id}**`;
 
   const embed = {
     title: "📦 New VIP Order Submitted (Pending Verification)",
@@ -176,7 +187,7 @@ export async function sendOrderCreatedWebhook(order: OrderWebhookData, receiptFi
       },
       {
         name: "Customer (Discord)",
-        value: `<@${order.discord_id}> (@${order.discord_username})`,
+        value: customerDisplay,
         inline: true,
       },
       {
@@ -238,6 +249,11 @@ export async function sendOrderApprovedWebhook(
     ? `<t:${Math.floor(new Date(expiresAt).getTime() / 1000)}:R> (${new Date(expiresAt).toLocaleDateString()})`
     : "♾️ **Permanent Lifetime Access**";
 
+  const isSnowflake = order.discord_id && /^\d{17,20}$/.test(order.discord_id.trim());
+  const customerDisplay = isSnowflake
+    ? `<@${order.discord_id.trim()}> (@${order.discord_username})`
+    : `**@${order.discord_username || order.discord_id}**`;
+
   const fields: any[] = [
     {
       name: "Order ID",
@@ -251,7 +267,7 @@ export async function sendOrderApprovedWebhook(
     },
     {
       name: "Customer",
-      value: `<@${order.discord_id}> (@${order.discord_username})`,
+      value: customerDisplay,
       inline: true,
     },
     {
@@ -307,6 +323,11 @@ export async function sendOrderApprovedWebhook(
  * Dispatches a rich embed when an admin rejects an order
  */
 export async function sendOrderRejectedWebhook(order: OrderWebhookData) {
+  const isSnowflake = order.discord_id && /^\d{17,20}$/.test(order.discord_id.trim());
+  const customerDisplay = isSnowflake
+    ? `<@${order.discord_id.trim()}> (@${order.discord_username})`
+    : `**@${order.discord_username || order.discord_id}**`;
+
   const embed = {
     title: "❌ Order Rejected / Declined",
     description: `Order was declined by administrator.`,
@@ -319,7 +340,7 @@ export async function sendOrderRejectedWebhook(order: OrderWebhookData) {
       },
       {
         name: "Customer",
-        value: `<@${order.discord_id}> (@${order.discord_username})`,
+        value: customerDisplay,
         inline: true,
       },
       {
@@ -357,7 +378,16 @@ export async function sendOrderRejectedWebhook(order: OrderWebhookData) {
  * Logs a User Authentication / Game Launch event from the Injector
  */
 export async function sendUserAuthWebhook(log: UserAuthLogData) {
-  const userMention = log.discord_id ? `<@${log.discord_id}>` : `\`${log.discord_username || "Unknown"}\``;
+  const rawId = (log.discord_id || "").trim();
+  const isSnowflake = /^\d{17,20}$/.test(rawId);
+  const userMention = isSnowflake
+    ? `<@${rawId}>`
+    : log.discord_username
+    ? `**@${log.discord_username.trim()}**`
+    : rawId
+    ? `**@${rawId}**`
+    : "`Unbound / Guest`";
+
   const usernameClean = log.discord_username ? `@${log.discord_username}` : "Unbound";
 
   const expiryDisplay = log.expires_at && log.expires_at !== "Lifetime"
@@ -367,15 +397,15 @@ export async function sendUserAuthWebhook(log: UserAuthLogData) {
   const isSuccess = log.success;
 
   const embed = {
-    title: isSuccess ? "🎮 VIP User Launched Game" : "⚠️ License Auth Blocked / Failed",
+    title: isSuccess ? "🎮 VIP Session Authenticated (Game Active)" : "⚠️ License Auth Blocked / Failed",
     description: isSuccess
-      ? `User ${userMention} successfully authenticated and injected into Assault Fire PH.`
+      ? `VIP Member ${userMention} successfully authenticated license and started game session.`
       : `Authentication failed for license \`${log.license_key}\`: **${log.message || "Unknown error"}**`,
     color: isSuccess ? 0x8b5cf6 : 0xf59e0b, // Violet for launch, Amber for warning
     fields: [
       {
         name: "User (Discord)",
-        value: `${userMention} (${usernameClean})`,
+        value: isSnowflake ? `${userMention} (${usernameClean})` : `${userMention}`,
         inline: true,
       },
       {

@@ -171,9 +171,11 @@ export async function POST(request: Request) {
     const finalOrder = data || orderRecord;
 
     // Dispatch Discord Webhook Notification (with receipt attachment if present)
-    sendOrderCreatedWebhook(finalOrder, absoluteReceiptPath).catch((e) =>
-      console.warn("Order webhook notice:", e)
-    );
+    try {
+      await sendOrderCreatedWebhook(finalOrder, absoluteReceiptPath);
+    } catch (e) {
+      console.warn("Order webhook notice:", e);
+    }
 
     return NextResponse.json({
       success: true,

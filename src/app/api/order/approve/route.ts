@@ -70,9 +70,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: rejErr.message }, { status: 500 });
       }
 
-      sendOrderRejectedWebhook(order).catch((e) =>
-        console.warn("Reject webhook notice:", e)
-      );
+      try {
+        await sendOrderRejectedWebhook(order);
+      } catch (e) {
+        console.warn("Reject webhook notice:", e);
+      }
 
       return NextResponse.json({ success: true, status: "rejected", message: "Order rejected" });
     }
@@ -243,14 +245,18 @@ export async function POST(request: Request) {
     }
 
     // Dispatch Discord Webhook Notification for Approved Order & Minted Key
-    sendOrderApprovedWebhook(order, newKey, expiresAt, referralRewardStatus).catch((e) =>
-      console.warn("Approve webhook notice:", e)
-    );
+    try {
+      await sendOrderApprovedWebhook(order, newKey, expiresAt, referralRewardStatus);
+    } catch (e) {
+      console.warn("Approve webhook notice:", e);
+    }
 
     // Automatically update the live VIP count card in #current-users channel (edits in-place)
-    updateCurrentUsersCountWebhook().catch((e) =>
-      console.warn("Current users count webhook notice:", e)
-    );
+    try {
+      await updateCurrentUsersCountWebhook();
+    } catch (e) {
+      console.warn("Current users count webhook notice:", e);
+    }
 
     // Automated Discord VIP Role Assignment & Private DM Dispatch
     let discordBotStatus: any = null;
