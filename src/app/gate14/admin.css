@@ -24,11 +24,14 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
+  bottom: 0;
   padding: 20px 14px;
   z-index: 50;
   user-select: none;
+  overflow-y: auto;
 }
 
 .admin-sidebar-brand {
@@ -197,6 +200,8 @@
 /* ─── MAIN CONTENT VIEWPORT ────────────────────────────────────────────── */
 .admin-main {
   flex: 1;
+  margin-left: 250px;
+  width: calc(100% - 250px);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -1091,6 +1096,10 @@
     border-right: none;
     border-bottom: 1px solid #141f32;
   }
+  .admin-main {
+    margin-left: 0;
+    width: 100%;
+  }
   .admin-header {
     padding: 0 16px;
   }
@@ -1405,6 +1414,158 @@
     grid-template-columns: 1fr;
     gap: 10px;
   }
+}
+
+/* ─── VIEW HEADERS & ORDERS/LICENSES WRAPPERS ───────────────────────── */
+.admin-view-header {
+  margin-bottom: 20px;
+}
+
+.admin-view-title {
+  font-family: var(--font-heading, "Outfit", sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.admin-view-sub {
+  font-size: 13px;
+  color: #70849e;
+  line-height: 1.5;
+  display: block;
+}
+
+.admin-orders-wrapper,
+.admin-licenses-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-orders-header,
+.admin-licenses-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-orders-title,
+.admin-licenses-title {
+  font-family: var(--font-heading, "Outfit", sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.admin-orders-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.admin-orders-card {
+  background: #080e1b;
+  border: 1px solid #141f32;
+  border-radius: var(--radius-sm, 8px);
+  overflow: hidden;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  width: 100%;
+  background: #080e1b;
+  border: 1px solid #141f32;
+  border-radius: var(--radius-sm, 8px);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12.5px;
+}
+
+.admin-table th {
+  background: #060b16;
+  color: #70849e;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  border-bottom: 1px solid #141f32;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #0f1827;
+  vertical-align: middle;
+  color: #e2e8f0;
+}
+
+.admin-table tr:hover td {
+  background: #0c1424;
+}
+
+.admin-preset-btn {
+  background: #0d1524;
+  border: 1px solid #1c2b44;
+  color: #94a3b8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-preset-btn:hover {
+  background: #131e33;
+  border-color: #00d2ff;
+  color: #ffffff;
+}
+
+.admin-broadcast-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #050912;
+  border: 1px solid #141f32;
+  border-radius: 8px;
+  gap: 16px;
+  transition: border-color 0.15s ease;
+}
+
+.admin-broadcast-item:hover {
+  border-color: #1c2b44;
+}
+
+.admin-broadcast-delete-btn {
+  background: #1c0a0d;
+  border: 1px solid #3a151b;
+  color: #f87171;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.admin-broadcast-delete-btn:hover {
+  background: #2b1115;
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* ─── ENTERPRISE PAGINATION BAR ────────────────────────────────────────── */
