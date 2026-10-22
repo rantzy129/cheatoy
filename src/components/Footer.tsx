@@ -89,7 +89,7 @@ export default function Footer() {
             <li><Link href="/#pricing">7 Days Pass  ₱300</Link></li>
             <li><Link href="/#pricing">15 Days Pass  ₱550</Link></li>
             <li><Link href="/#pricing">1 Month Pass  ₱850</Link></li>
-            <li><Link href="/#pricing">Lifetime VIP  ₱1,000</Link></li>
+            <li><Link href="/#pricing">Lifetime VIP  ₱1,500</Link></li>
           </ul>
         </div>
 

@@ -77,7 +77,7 @@ export default function RootLayout({
       "@type": "AggregateOffer",
       priceCurrency: "PHP",
       lowPrice: "150",
-      highPrice: "1000",
+      highPrice: "1500",
       offerCount: "5",
       availability: "https://schema.org/InStock",
     },

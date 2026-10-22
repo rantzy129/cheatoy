@@ -314,7 +314,7 @@ const TIERS = [
   {
     id: "lifetime",
     duration: "Lifetime VIP",
-    pricePhp: "₱1,000",
+    pricePhp: "₱1,500",
     desc: "Permanent loader access & all future updates",
   },
 ];

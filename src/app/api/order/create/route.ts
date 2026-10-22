@@ -12,7 +12,7 @@ const VALID_TIERS: Record<string, { duration: string; pricePhp: string }> = {
   "7days": { duration: "7 Days Pass", pricePhp: "₱300" },
   "15days": { duration: "15 Days Pass", pricePhp: "₱550" },
   "month": { duration: "1 Month Pass", pricePhp: "₱850" },
-  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱1,000" },
+  "lifetime": { duration: "Lifetime VIP", pricePhp: "₱1,500" },
 };
 
 export async function POST(request: Request) {
