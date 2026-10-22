@@ -82,9 +82,13 @@ export default function OrdersTab({
       <div className="admin-orders-header">
         <h2 className="admin-orders-title">GCash Approvals</h2>
         <div className="admin-orders-controls">
-          <div className="admin-sync-badge" title="Real-time order synchronization active via Supabase & heartbeat">
+          <div
+            className="admin-sync-badge"
+            style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+            title="Real-time order synchronization active via Supabase & heartbeat"
+          >
             <span className="admin-sync-dot" />
-            <span>Auto-Sync Active</span>
+            <span style={{ whiteSpace: "nowrap" }}>Auto-Sync Active</span>
           </div>
 
           <select
