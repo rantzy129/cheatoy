@@ -74,7 +74,7 @@ async function sendDiscordEmbed(
   try {
     const payload = {
       username: botName,
-      avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
+      avatar_url: "https://chameleon-cheats.tech/favicon.ico",
       embeds: [embed],
     };
 
@@ -121,7 +121,7 @@ async function sendDiscordEmbedWithFile(
     const formData = new FormData();
     const payload = {
       username: botName,
-      avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
+      avatar_url: "https://chameleon-cheats.tech/favicon.ico",
       embeds: [
         {
           ...embed,
@@ -858,7 +858,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
     ],
     footer: {
       text: "Chameleon Cheats • Public Status Channel (Live Auto-Sync)",
-      icon_url: "https://chameleon-cheats.vercel.app/favicon.ico",
+      icon_url: "https://chameleon-cheats.tech/favicon.ico",
     },
     timestamp: now.toISOString(),
   };
@@ -890,7 +890,7 @@ export async function sendCurrentUsersCountWebhook(passedLicenses?: any[]) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: "Chameleon VIP Live Status",
-        avatar_url: "https://chameleon-cheats.vercel.app/favicon.ico",
+        avatar_url: "https://chameleon-cheats.tech/favicon.ico",
         embeds: [embed],
       }),
     });

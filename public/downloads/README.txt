@@ -1,7 +1,7 @@
 ================================================================================
           CHAMELEON VIP — ASSAULT FIRE PH ADVANCED SILHOUETTE CHAMS
 ================================================================================
-Official Portal: https://chameleon-cheats.vercel.app/
+Official Portal: https://chameleon-cheats.tech/
 Status         : Undetected (Bypass Active)
 ================================================================================
   1. QUICK START INSTRUCTIONS
@@ -46,6 +46,6 @@ Please read these terms carefully before utilizing your VIP access key:
   4. SUPPORT & LICENSE RENEWALS
 ================================================================================
 Need a legitimate HWID reset, renewal, or technical assistance?
-- Official Website: https://chameleon-cheats.vercel.app/
+- Official Website: https://chameleon-cheats.tech/
 - Member Vault    : Sign in with Discord on our web portal to check license status
 ================================================================================

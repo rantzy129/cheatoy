@@ -109,7 +109,7 @@ export async function POST(request: Request) {
           outdated: true,
           current_version: version || "legacy",
           required_version: minVersion,
-          download_url: downloadUrl || "https://chameleon-cheats.vercel.app/profile",
+          download_url: downloadUrl || "https://chameleon-cheats.tech/profile",
           error: `UPDATE REQUIRED: Your version (${version || "outdated build"}) is no longer supported. Please download the latest update (v${minVersion}) from the website.`,
         },
         { status: 403 }

@@ -13,7 +13,7 @@ export interface VersionConfig {
 const DEFAULT_CONFIG: VersionConfig = {
   minVersion: process.env.LOADER_MIN_VERSION || "v1.0.7",
   latestVersion: process.env.LOADER_MIN_VERSION || "v1.0.7",
-  downloadUrl: "https://chameleon-cheats.vercel.app/profile",
+  downloadUrl: "https://chameleon-cheats.tech/profile",
   updatedAt: new Date().toISOString(),
 };
 
@@ -99,7 +99,7 @@ export async function getMinLoaderVersion(): Promise<VersionConfig> {
  */
 export async function setMinLoaderVersion(
   minVersion: string,
-  downloadUrl = "https://chameleon-cheats.vercel.app/profile"
+  downloadUrl = "https://chameleon-cheats.tech/profile"
 ): Promise<VersionConfig> {
   const cleanVer = minVersion.trim().replace(/^v/i, "");
   const cleanUrl = downloadUrl.trim() || DEFAULT_CONFIG.downloadUrl;
