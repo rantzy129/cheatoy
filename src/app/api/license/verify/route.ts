@@ -229,9 +229,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Generate Cryptographic HMAC-SHA256 Signature for Anti-Proxy / Anti-Tamper
+    // Generate Cryptographic HMAC-SHA256 Signature for Anti-Proxy / Anti-Tamper & Payload Decryption Key
+    const PAYLOAD_KEY = process.env.PAYLOAD_SERVER_KEY || "0x27";
     const timestamp = Math.floor(Date.now() / 1000);
-    const signPayload = `${license.license_key.trim()}:${(hwid || "").trim()}:${timestamp}`;
+    const signPayload = `${license.license_key.trim()}:${(hwid || "").trim()}:${timestamp}:${PAYLOAD_KEY}`;
     const signature = crypto.createHmac("sha256", SIGNING_SECRET).update(signPayload).digest("hex");
 
     // Dispatch User Activity Webhook (Injector / Game Launch Log) with persistent cloud deduplication
@@ -260,6 +261,7 @@ export async function POST(request: Request) {
       discord_username: license.discord_username || "Verified User",
       expires_at: license.expires_at || "Lifetime",
       timestamp,
+      payload_key: PAYLOAD_KEY,
       signature,
       message: "License validated successfully",
     });

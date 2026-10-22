@@ -12,3 +12,4 @@ run_server.bat
 public/receipts/*
 !public/receipts/.gitkeep
 *.tsbuildinfo
+src/cpp/
