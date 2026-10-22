@@ -11,3 +11,4 @@ scratch/
 run_server.bat
 public/receipts/*
 !public/receipts/.gitkeep
+*.tsbuildinfo
