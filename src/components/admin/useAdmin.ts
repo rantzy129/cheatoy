@@ -160,7 +160,7 @@ export default function useAdmin(): UseAdminReturn {
   const [syncCooldown, setSyncCooldown] = useState<number>(0);
 
   // ── Version control state ──
-  const [minLoaderVersion, setMinLoaderVersion] = useState("1.0.6");
+  const [minLoaderVersion, setMinLoaderVersion] = useState("v1.0.7");
   const [downloadPageUrl, setDownloadPageUrl] = useState("https://chameleon-cheats.vercel.app/profile");
   const [isSavingVersion, setIsSavingVersion] = useState(false);
   const [versionStatusMsg, setVersionStatusMsg] = useState<string | null>(null);
