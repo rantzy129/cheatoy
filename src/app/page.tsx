@@ -353,6 +353,7 @@ const PROOFS = [
     id: "combat",
     title: "In-Game Combat ESP & Wallhack",
     badge: "Live Match Capture",
+    tabLabel: "1. Combat ESP",
     src: "/proofs/proof-1.png",
     alt: "Assault Fire PH live in-game combat showing Cham Wallhack, Snaplines, and 2D Box ESP",
     desc: "Unfiltered combat capture on official container ship map. Shows enemy player chams, directional snaplines, 2D boxes, and player name/weapon tags.",
@@ -364,6 +365,7 @@ const PROOFS = [
     id: "menu",
     title: "Live In-Game VIP Menu Overlay",
     badge: "Hotkey: [INSERT]",
+    tabLabel: "2. VIP Menu [INSERT]",
     src: "/proofs/proof2.png",
     alt: "Chameleon VIP live in-game DirectX menu overlay for Assault Fire PH",
     desc: "DirectX ImGui menu overlay toggled instantly during combat with the [INSERT] key. Full live control for chams colors, 2D boxes, health bars, and snaplines.",
@@ -372,9 +374,22 @@ const PROOFS = [
     hud: "Live Visual Menu",
   },
   {
+    id: "aimbot",
+    title: "In-Game Precision Aimbot System",
+    badge: "New Feature",
+    tabLabel: "3. Aimbot System",
+    src: "/proofs/aimbot-proof.webp",
+    alt: "Chameleon VIP in-game Aimbot menu showing FOV Radius, Smoothness slider, and Target Bone selection for Assault Fire PH",
+    desc: "Direct-memory humanized aimbot engine running on live PlayPark Assault Fire PH. Configurable Target Bone (Head/Chest), Smoothness slider, and custom FOV radius circle with dedicated hold hotkey.",
+    specs: ["Humanized Smooth Aim (3.0)", "Target Bone Selection (Head)", "Dynamic FOV Circle (80px)", "Hold Keybind [Left Alt]"],
+    engine: "Direct Memory Smoothing",
+    hud: "Aimbot Active • FOV 80px",
+  },
+  {
     id: "lobby",
     title: "Lobby Chams Shader Verification",
     badge: "PlayPark Client",
+    tabLabel: "4. Lobby Chams",
     src: "/proof.png",
     alt: "PlayPark Assault Fire PH lobby character screen with active Chameleon chams",
     desc: "High-contrast character chams shader running cleanly on official PlayPark Assault Fire PH client with zero file modifications.",
@@ -970,7 +985,7 @@ export default function Home() {
                   className={`hero-proof-tab-btn ${activeHeroProof === idx ? "active" : ""}`}
                   onClick={() => setActiveHeroProof(idx)}
                 >
-                  <span>{idx === 0 ? "1. Combat ESP & Chams" : idx === 1 ? "2. VIP Menu [INSERT]" : "3. Lobby Chams"}</span>
+                  <span>{p.tabLabel || p.title}</span>
                 </button>
               ))}
             </div>
@@ -1074,7 +1089,47 @@ export default function Home() {
                 </ul>
               </div>
 
-              {/* ──────── Card 2: Chams ──────── */}
+              {/* ──────── Card 2: Precision Aimbot (NEW) ──────── */}
+              <div className="feature-summary-card">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <h3 className="feature-card-heading">Precision Aimbot</h3>
+                  <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(0, 210, 255, 0.12)", color: "#00d2ff", border: "1px solid rgba(0, 210, 255, 0.3)", padding: "2px 7px", borderRadius: 4 }}>
+                    NEW
+                  </span>
+                </div>
+                <p className="feature-card-intro">
+                  Direct-memory humanized aim assistance with smooth tracking and circular FOV lock.
+                </p>
+
+                <ul className="feature-summary-list">
+                  <li>
+                    <span className="feature-item-label">Target bone selection</span>
+                    <span className="feature-item-detail">
+                      Select Head, Neck, or Chest for instant target acquisition and lethal accuracy.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Humanized smoothing</span>
+                    <span className="feature-item-detail">
+                      Customizable smooth scale (1.0–10.0) creates natural crosshair movement to evade spectator bans.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Visual FOV radius circle</span>
+                    <span className="feature-item-detail">
+                      Draws a real-time circular constraint (e.g. 80px) ensuring only close targets are locked.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="feature-item-label">Configurable hold key</span>
+                    <span className="feature-item-detail">
+                      Engage lock-on effortlessly by holding your chosen hotkey (default: Left Alt) or mouse button.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* ──────── Card 3: Chams ──────── */}
               <div className="feature-summary-card">
                 <h3 className="feature-card-heading">Chams</h3>
                 <p className="feature-card-intro">
