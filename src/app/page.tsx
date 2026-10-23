@@ -2128,7 +2128,7 @@ export default function Home() {
                   style={{ width: "100%", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
                   id="download-loader-home-btn"
                 >
-                  <span>Download Loader v1.0.9 (RAR)</span>
+                  <span>Download Loader v1.0.10 (RAR)</span>
                   <IconArrowUpRight size={16} />
                 </a>
               </div>

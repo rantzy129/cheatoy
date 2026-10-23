@@ -32,7 +32,7 @@ export default function LicensesTab({
   handleResetHWID,
   handleToggleBan,
   handleExtendDays,
-  minLoaderVersion = "v1.0.9",
+  minLoaderVersion = "v1.0.10",
   setMinLoaderVersion,
   downloadPageUrl = "https://www.chameleon-cheats.tech/profile",
   setDownloadPageUrl,
@@ -71,7 +71,7 @@ export default function LicensesTab({
   };
 
   const onResetDefault = () => {
-    handleSaveLoaderVersion?.(undefined, "v1.0.9");
+    handleSaveLoaderVersion?.(undefined, "v1.0.10");
   };
 
   return (
@@ -158,7 +158,7 @@ export default function LicensesTab({
               type="text"
               value={minLoaderVersion}
               onChange={(e) => setMinLoaderVersion?.(e.target.value)}
-              placeholder="e.g. v1.0.9"
+              placeholder="e.g. v1.0.10"
               style={{
                 background: "rgba(0, 0, 0, 0.5)",
                 border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -233,9 +233,9 @@ export default function LicensesTab({
                 cursor: "pointer",
                 height: 38,
               }}
-              title="Reset minimum version to standard default (v1.0.9)"
+              title="Reset minimum version to standard default (v1.0.10)"
             >
-              Reset v1.0.9
+              Reset v1.0.10
             </button>
 
             <button
