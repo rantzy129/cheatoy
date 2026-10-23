@@ -194,6 +194,7 @@ export default function ProfilePage() {
   // Active Vault Tab: "license" | "referrals" | "orders" | "notices"
   const [activeTab, setActiveTab] = useState<"license" | "referrals" | "orders" | "notices">("license");
   const [isClanPitchCopied, setIsClanPitchCopied] = useState(false);
+  const [isPasswordCopied, setIsPasswordCopied] = useState(false);
 
   // Referral State
   const [isRefCopied, setIsRefCopied] = useState(false);
@@ -1026,21 +1027,76 @@ export default function ProfilePage() {
                         </div>
 
                         <a
-                          href="/downloads/Chameleon_VIP.zip"
-                          download="Chameleon_VIP.zip"
+                          href="/downloads/Chameleon_VIP.rar"
+                          download="Chameleon_VIP.rar"
                           className="btn-vault-download"
                           id="download-loader-profile-btn"
                         >
                           <IconDownload size={18} />
-                          <span>Download Loader (ZIP)</span>
+                          <span>Download Loader (RAR)</span>
                         </a>
+
+                        {/* Archive Password Card */}
+                        <div
+                          style={{
+                            margin: "12px 0",
+                            padding: "10px 14px",
+                            background: "rgba(0, 210, 255, 0.05)",
+                            border: "1px solid rgba(0, 210, 255, 0.25)",
+                            borderRadius: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "10px",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <IconLock size={15} className="text-cyan-400" />
+                            <span style={{ fontSize: "12px", color: "#94a3b8" }}>RAR Password:</span>
+                            <code
+                              style={{
+                                background: "rgba(0, 0, 0, 0.5)",
+                                color: "#00d2ff",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontWeight: "bold",
+                                fontSize: "13px",
+                                letterSpacing: "1px",
+                                border: "1px solid rgba(0, 210, 255, 0.3)",
+                              }}
+                            >
+                              CC2026
+                            </code>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText("CC2026");
+                              setIsPasswordCopied(true);
+                              setTimeout(() => setIsPasswordCopied(false), 2000);
+                            }}
+                            style={{
+                              background: isPasswordCopied ? "rgba(0, 210, 255, 0.25)" : "transparent",
+                              border: "1px solid rgba(0, 210, 255, 0.35)",
+                              color: "#00d2ff",
+                              borderRadius: "4px",
+                              padding: "4px 10px",
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            {isPasswordCopied ? "✓ Copied" : "Copy"}
+                          </button>
+                        </div>
 
                         <div className="vault-instructions-block">
                           <div className="vault-instructions-title">Setup Guide</div>
 
                           <ol className="vault-instructions-list">
                             <li>
-                              <strong>Extract</strong>: Extract archive to a secure folder.
+                              <strong>Extract</strong>: Extract archive using WinRAR or 7-Zip (Password: <code style={{ color: "#00d2ff", fontWeight: "bold" }}>CC2026</code>).
                             </li>
                             <li>
                               <strong>Run as Admin</strong>: Launch <code>ChameleonLoader.exe</code>.
@@ -1088,7 +1144,7 @@ export default function ProfilePage() {
                         Vouch in Discord &amp; Get +1 Extra Free VIP Day!
                       </h3>
                       <p className="vault-vouch-desc">
-                        Loving your Chameleon VIP features in Assault Fire PH? Drop a quick review and in-game screenshot in our Discord <strong>#vouches</strong> channel. Staff will verify your post and credit an extra <strong>+1 VIP Day (+24 Hours)</strong> directly onto your pass!
+                        Loving your Chameleon VIP features in Assault Fire PH? Drop a quick review and in-game screenshot in our Discord <strong>#vouch-here</strong> channel. Staff will verify your post and credit an extra <strong>+1 VIP Day (+24 Hours)</strong> directly onto your pass!
                       </p>
                       <div className="vault-vouch-steps">
                         <div className="vault-vouch-step-item">
@@ -1097,7 +1153,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="vault-vouch-step-item">
                           <span className="step-num">2</span>
-                          <span>Post review &amp; gameplay screenshot in <code>#vouches</code></span>
+                          <span>Post review &amp; gameplay screenshot in <code>#vouch-here</code></span>
                         </div>
                         <div className="vault-vouch-step-item">
                           <span className="step-num">3</span>
@@ -1114,7 +1170,7 @@ export default function ProfilePage() {
                         className="btn-vouch-action"
                       >
                         <IconDiscord size={18} />
-                        <span>Post Vouch in #vouches</span>
+                        <span>Post Vouch in #vouch-here</span>
                         <IconArrowUpRight size={14} className="btn-arrow-external" />
                       </a>
                       <span className="vault-vouch-note" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>

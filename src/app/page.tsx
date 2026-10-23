@@ -2093,20 +2093,37 @@ export default function Home() {
                   <h4>Quick Injection Instructions:</h4>
                   <ol>
                     <li>Download the <b>Chameleon AF Loader</b> below.</li>
+                    <li>Extract archive with WinRAR / 7-Zip (Password: <b style={{ color: "#00d2ff" }}>CC2026</b>).</li>
                     <li>Right-click and <b>Run as Administrator</b>.</li>
                     <li>Paste your license key and press <b>Inject</b>.</li>
                     <li>Launch <b>Assault Fire PH</b> — player Chams will glow through walls automatically.</li>
                   </ol>
                 </div>
 
+                <div
+                  style={{
+                    margin: "10px 0 12px 0",
+                    padding: "8px 14px",
+                    background: "rgba(0, 210, 255, 0.06)",
+                    border: "1px solid rgba(0, 210, 255, 0.25)",
+                    borderRadius: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>Archive Password:</span>
+                  <code style={{ color: "#00d2ff", fontWeight: "bold", fontSize: "13px", letterSpacing: "1px" }}>CC2026</code>
+                </div>
+
                 <a
-                  href="/downloads/Chameleon_VIP.zip"
-                  download="Chameleon_VIP.zip"
+                  href="/downloads/Chameleon_VIP.rar"
+                  download="Chameleon_VIP.rar"
                   className="buy-key-btn"
-                  style={{ width: "100%", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
+                  style={{ width: "100%", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none" }}
                   id="download-loader-home-btn"
                 >
-                  <span>Download Loader v1.0.9</span>
+                  <span>Download Loader v1.0.9 (RAR)</span>
                   <IconArrowUpRight size={16} />
                 </a>
               </div>

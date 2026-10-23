@@ -187,7 +187,7 @@ export async function assignDiscordVipRoleAndSendDm(
               name: "📥 Quick Setup & Download",
               value:
                 "1. Download the loader from your [Profile Vault](https://www.chameleon-cheats.tech/profile)\n" +
-                "2. Extract the zip folder\n" +
+                "2. Extract the RAR archive (Password: **`CC2026`**)\n" +
                 "3. Right-click **`Chameleon.exe`** → **Run as Administrator**\n" +
                 "4. Paste your key and launch **Assault Fire PH**",
               inline: false,
