@@ -997,19 +997,6 @@ export default function ProfilePage() {
                             )}
                           </div>
                         </div>
-
-                        <div className="vault-hwid-discord">
-                          Need HWID reset?{" "}
-                          <a
-                            href="https://discord.gg/Whwxq9QAEN"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
-                          >
-                            <span>Open a ticket in Discord</span>
-                            <IconArrowUpRight size={12} className="btn-arrow-external" />
-                          </a>
-                        </div>
                       </div>
                     </div>
 
