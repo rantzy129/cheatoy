@@ -11,8 +11,8 @@ export interface VersionConfig {
 }
 
 const DEFAULT_CONFIG: VersionConfig = {
-  minVersion: process.env.LOADER_MIN_VERSION || "v1.0.8",
-  latestVersion: process.env.LOADER_MIN_VERSION || "v1.0.8",
+  minVersion: process.env.LOADER_MIN_VERSION || "v1.0.9",
+  latestVersion: process.env.LOADER_MIN_VERSION || "v1.0.9",
   downloadUrl: "https://www.chameleon-cheats.tech/profile",
   updatedAt: new Date().toISOString(),
 };
@@ -30,7 +30,7 @@ function ensureDir() {
 }
 
 /**
- * Compare two semver-like strings: e.g. "v1.0.8" vs "v1.0.8"
+ * Compare two semver-like strings: e.g. "v1.0.9" vs "v1.0.9"
  * Returns true if clientVersion < requiredVersion or if clientVersion is missing/empty.
  */
 export function isVersionOutdated(clientVersion: string | null | undefined, requiredVersion: string): boolean {
