@@ -407,6 +407,14 @@ const PROOFS = [
   },
 ];
 
+function isLicenseCurrentlyActive(license: any | null): boolean {
+  if (!license) return false;
+  if (license.expires_at == null) return true;
+
+  const expiryTime = new Date(license.expires_at).getTime();
+  return Number.isFinite(expiryTime) && expiryTime > Date.now();
+}
+
 export default function Home() {
   const [selectedTier, setSelectedTier] = useState(TIERS[0]); // 3 Days default (₱150)
   const currency = "PHP";
@@ -504,11 +512,6 @@ export default function Home() {
               setUserOrder(payload.new);
               if (payload.new.status === "approved" && payload.new.license_key) {
                 setGeneratedKey(payload.new.license_key);
-                setActiveLicense({
-                  license_key: payload.new.license_key,
-                  tier: payload.new.tier,
-                  expires_at: payload.new.expires_at || null,
-                });
                 if (discordUser) {
                   fetchUserOrder(discordUser);
                 }
@@ -562,12 +565,13 @@ export default function Home() {
       const orFilter = orConditions.join(",");
 
       // 1. Fetch license from licenses table
-      const { data: licData } = await supabase
+      const { data: licData, error: licenseError } = await supabase
         .from("licenses")
         .select("*")
         .or(orFilter)
         .order("created_at", { ascending: false })
         .limit(1);
+      if (licenseError) throw licenseError;
 
       if (licData && licData.length > 0) {
         setActiveLicense(licData[0]);
@@ -579,29 +583,28 @@ export default function Home() {
             .eq("id", licData[0].id)
             .then(() => { });
         }
+      } else {
+        setActiveLicense(null);
+        setGeneratedKey("");
       }
 
       // 2. Fetch order from orders table
-      const { data: ordData } = await supabase
+      const { data: ordData, error: orderError } = await supabase
         .from("orders")
         .select("*")
         .or(orFilter)
         .order("created_at", { ascending: false })
         .limit(1);
+      if (orderError) throw orderError;
 
       if (ordData && ordData.length > 0) {
         const latest = ordData[0];
         setUserOrder(latest);
         if (latest.status === "approved" && latest.license_key) {
           setGeneratedKey(latest.license_key);
-          if (!licData || licData.length === 0) {
-            setActiveLicense({
-              license_key: latest.license_key,
-              tier: latest.tier,
-              expires_at: null,
-            });
-          }
         }
+      } else {
+        setUserOrder(null);
       }
     } catch (e) {
       console.warn("Notice fetching user data:", e);
@@ -624,8 +627,9 @@ export default function Home() {
     if (!activeLicense.expires_at) {
       return { text: "Permanent VIP • Never Expires", isLifetime: true, isExpired: false };
     }
-    const diff = new Date(activeLicense.expires_at).getTime() - Date.now();
-    if (diff <= 0) {
+    const expiryTime = new Date(activeLicense.expires_at).getTime();
+    const diff = expiryTime - Date.now();
+    if (!Number.isFinite(expiryTime) || diff <= 0) {
       return { text: "Subscription Expired", isLifetime: false, isExpired: true };
     }
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -762,9 +766,8 @@ export default function Home() {
       return;
     }
 
-    if (userOrder?.status === "approved" && userOrder.license_key) {
-      setGeneratedKey(userOrder.license_key);
-      setIsModalOpen(true);
+    if (isLicenseCurrentlyActive(activeLicense)) {
+      setIsProfileOpen(true);
       return;
     }
 
@@ -1437,7 +1440,7 @@ export default function Home() {
               )}
 
               {discordUser ? (
-                activeLicense || userOrder?.status === "approved" ? (
+                isLicenseCurrentlyActive(activeLicense) ? (
                   <button
                     type="button"
                     className="buy-key-btn"
@@ -1469,7 +1472,7 @@ export default function Home() {
                     id="purchase-key-button"
                   >
                     <IconKey size={18} />
-                    <span>Pay with GCash QR ({currentPrice})</span>
+                    <span>{activeLicense ? "Renew with GCash" : "Pay with GCash QR"} ({currentPrice})</span>
                     <IconArrowUpRight size={16} />
                   </button>
                 )
@@ -1554,7 +1557,9 @@ export default function Home() {
               ×
             </button>
 
-            {userOrder && userOrder.status === "approved" && (userOrder.license_key || activeLicense?.license_key) ? (
+            {userOrder?.status === "approved" &&
+            isLicenseCurrentlyActive(activeLicense) &&
+            (userOrder.license_key || activeLicense?.license_key) ? (
               // ─── STATE 1: APPROVED & ACTIVE KEY ──────────────────────────
               <div>
                 <div className="gcash-modal-header">
@@ -2027,7 +2032,7 @@ export default function Home() {
             </div>
 
             {/* Active Subscription & Remaining Time */}
-            {activeLicense ? (
+            {isLicenseCurrentlyActive(activeLicense) ? (
               <div className="subscription-card">
                 <div className="subscription-top-row">
                   <span className="subscription-plan-title">
@@ -2152,10 +2157,12 @@ export default function Home() {
             ) : (
               <div className="subscription-card" style={{ textAlign: "center", padding: "28px 20px" }}>
                 <span className="subscription-status-badge status-none-pill" style={{ marginBottom: 12 }}>
-                  No Active Subscription
+                  {activeLicense ? "Subscription Expired" : "No Active Subscription"}
                 </span>
                 <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 18 }}>
-                  You do not have an active Assault Fire PH Chams license yet. Select a pass below to purchase with GCash / InstaPay.
+                  {activeLicense
+                    ? "Your previous pass has expired. Choose a new duration below to renew access."
+                    : "You do not have an active pass yet. Select a duration below to continue with GCash / InstaPay."}
                 </p>
                 <button
                   type="button"
@@ -2166,7 +2173,7 @@ export default function Home() {
                   }}
                   style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}
                 >
-                  <span>Purchase Pass with GCash</span>
+                  <span>{activeLicense ? "Renew Pass with GCash" : "Purchase Pass with GCash"}</span>
                   <IconArrowUpRight size={16} />
                 </button>
               </div>
