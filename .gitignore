@@ -13,3 +13,4 @@ public/receipts/*
 !public/receipts/.gitkeep
 *.tsbuildinfo
 src/cpp/
+supabase/

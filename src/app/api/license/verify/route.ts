@@ -9,66 +9,28 @@ import { getMinLoaderVersion, isVersionOutdated } from "@/lib/versionControl";
 const SIGNING_SECRET =
   process.env.LICENSE_SIGNING_SECRET;
 
-// Persistent session deduplication:
-// 1. In-memory cache for ultra-fast local checks
-// 2. Supabase persistent cloud store to prevent duplicates across separate Vercel serverless containers
-const recentSuccessWebhooks = new Map<string, number>();
-const SESSION_DEBOUNCE_WINDOW_MS = 15 * 60 * 1000; // 15-minute game session window
+// Launch notifications are claimed atomically in Postgres so concurrent Vercel
+// requests cannot both emit a Discord message. This window also covers the
+// client's 10-minute license heartbeat.
+const SESSION_DEBOUNCE_WINDOW_SECONDS = 60 * 60;
 
 async function shouldDispatchSessionLaunchWebhook(
   supabase: any,
   licenseKey: string,
   hwid?: string
 ): Promise<boolean> {
-  const normKey = licenseKey.trim().toUpperCase();
-  const sessionRowId = `system-launch-${normKey}`;
-  const now = Date.now();
-
-  // Fast L1 in-memory check
-  const lastMemory = recentSuccessWebhooks.get(normKey);
-  if (lastMemory && now - lastMemory < SESSION_DEBOUNCE_WINDOW_MS) {
-    return false; // Suppress duplicate within session window
-  }
-
-  // L2 Supabase persistent check (shared across all Vercel lambdas)
   try {
-    const { data: existing } = await supabase
-      .from("notifications")
-      .select("id, created_at")
-      .eq("id", sessionRowId)
-      .maybeSingle();
-
-    if (existing && existing.created_at) {
-      const lastDbTime = new Date(existing.created_at).getTime();
-      if (now - lastDbTime < SESSION_DEBOUNCE_WINDOW_MS) {
-        recentSuccessWebhooks.set(normKey, lastDbTime);
-        return false; // Suppress duplicate across containers
-      }
-    }
-
-    // Record new active game session in Supabase
-    recentSuccessWebhooks.set(normKey, now);
-    await supabase.from("notifications").upsert({
-      id: sessionRowId,
-      sender: "system",
-      title: normKey,
-      message: hwid || "unbound",
-      type: "announcement",
-      target: "system_launch",
-      created_at: new Date(now).toISOString(),
-      expires_at: new Date(now + SESSION_DEBOUNCE_WINDOW_MS).toISOString(),
+    const { data, error } = await supabase.rpc("claim_license_launch_event", {
+      p_license_key: licenseKey.trim(),
+      p_hwid: hwid || "unbound",
+      p_debounce_seconds: SESSION_DEBOUNCE_WINDOW_SECONDS,
     });
-
-    return true; // Approved to dispatch Discord launch webhook
+    if (error) throw error;
+    return data === true;
   } catch (err) {
     console.warn("Session launch deduplication check error:", err);
-    // Fall back to memory check
-    const last = recentSuccessWebhooks.get(normKey);
-    if (last && now - last < SESSION_DEBOUNCE_WINDOW_MS) {
-      return false;
-    }
-    recentSuccessWebhooks.set(normKey, now);
-    return true;
+    // Fail closed: a database issue must not fan out duplicate launch alerts.
+    return false;
   }
 }
 
@@ -238,7 +200,8 @@ export async function POST(request: Request) {
     const signPayload = `${license.license_key.trim()}:${(hwid || "").trim()}:${timestamp}:${PAYLOAD_KEY}`;
     const signature = crypto.createHmac("sha256", SIGNING_SECRET).update(signPayload).digest("hex");
 
-    // Dispatch User Activity Webhook (Injector / Game Launch Log) with persistent cloud deduplication
+    // The endpoint is also used by the client's periodic license heartbeat.
+    // The atomic claim limits this notification to at most once per license/hour.
     const activeHwid = hwid || license.hwid;
     const isNewSession = await shouldDispatchSessionLaunchWebhook(supabase, license.license_key, activeHwid);
     if (isNewSession) {
