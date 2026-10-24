@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -73,15 +73,6 @@ function IconArrowDown({ size = 16, className = "" }: { size?: number; className
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
       <line x1="12" y1="5" x2="12" y2="19" />
       <polyline points="19 12 12 19 5 12" />
-    </svg>
-  );
-}
-
-function IconSearch({ size = 14, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`icon-svg ${className}`}>
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
 }
@@ -308,7 +299,7 @@ const TIERS = [
   {
     id: "month",
     duration: "1 Month Pass",
-    pricePhp: "₱850",
+    pricePhp: "₱1,000",
     desc: "Best monthly value with priority updates",
   },
   {
@@ -322,36 +313,32 @@ const TIERS = [
 /* ─── FAQs ────────────────────────────────────────────────── */
 const FAQS = [
   {
-    q: "How do I control the features in-game?",
-    a: "Full control is accessed by pressing the [INSERT] key at any time while playing Assault Fire PH. This toggles the live VIP menu overlay, giving you instant on-the-fly toggles for Wallhack, Chams, Health bars, and 2D Box ESP.",
+    q: "How do I open the in-game menu?",
+    a: "Press Insert while the supported game client is running. Insert is the default menu key, and the menu lets you change the available feature toggles.",
   },
   {
-    q: "What features are included in Chameleon VIP?",
-    a: "Chameleon VIP includes 4 primary modules: Direct Wallhack (silhouettes through all map terrain), Player Chams (dual-tone shading for visible vs. hidden enemies), Real-Time Health ESP (exact remaining HP bars), and Dynamic 2D Box ESP (precision target framing).",
+    q: "What features are included?",
+    a: "The current loader includes Skeleton ESP, boxes, snaplines, name, weapon and distance labels, health bars, player chams, and optional aim assistance. Options can be toggled separately.",
   },
   {
     q: "Why do I need to log in with Discord before purchasing?",
-    a: "Your license key and VIP role are securely attached to your Discord account. This ensures you can always recover your key and get automated update notifications.",
+    a: "Orders and licenses are linked to the Discord account you sign in with. Use that same account later to find your order and license in your profile.",
   },
   {
-    q: "Does this work on the official Assault Fire PH client?",
-    a: "Yes. Our build is fully updated and verified for the official PlayPark Assault Fire PH server (Patch 2026.10).",
+    q: "Can I use it after a game update?",
+    a: "A game update can change compatibility. Check the latest Discord announcements or ask support about your exact client build before using the loader.",
   },
   {
-    q: "Does Chameleon VIP support Assault Fire Legacy?",
-    a: "The loader is intended for supported Assault Fire PH client variants, including Legacy and Reborn. Compatibility can change when the game updates, so check the current loader version and ask support if you are unsure about your client build.",
+    q: "How does the optional aim assistance work?",
+    a: "Aim assistance is off by default. The menu supports Head or Body target selection, adjustable field of view and smoothing, and a configurable hold key. The default hold key is Left Alt.",
   },
   {
-    q: "Does it include an AFPH wallhack and aimbot?",
-    a: "The feature set includes wallhack visuals, player chams, health and box ESP, and configurable aim assistance. See the screenshots and feature details on this page for what is included.",
+    q: "Can you guarantee my game account will be safe?",
+    a: "No. Third-party tools may violate the game publisher's rules and can lead to account restrictions or a ban. Review the publisher's terms before use.",
   },
   {
-    q: "Will my Assault Fire account be banned?",
-    a: "Third-party tools may violate game rules and could result in account restrictions or a ban. Chameleon cannot guarantee account safety or detection outcomes; review the game publisher's current terms before use.",
-  },
-  {
-    q: "What are the PC system requirements?",
-    a: "Works on Windows 10 and Windows 11 (64-bit). Fully compatible with Intel and AMD processors and all modern graphics cards with zero FPS impact.",
+    q: "What PC specifications are required?",
+    a: "The loader is a Windows application. We do not publish verified minimum CPU or GPU requirements, so confirm Windows and game-client compatibility with support before purchasing.",
   },
 ];
 
@@ -361,49 +348,37 @@ const PROOFS = [
     id: "combat",
     title: "In-Game Combat ESP & Wallhack",
     badge: "Live Match Capture",
-    tabLabel: "1. Combat ESP",
     src: "/proofs/proof-1.png",
     alt: "Assault Fire PH live in-game combat showing Cham Wallhack, Snaplines, and 2D Box ESP",
     desc: "Unfiltered combat capture on official container ship map. Shows enemy player chams, directional snaplines, 2D boxes, and player name/weapon tags.",
     specs: ["Enemy Wallhack Chams", "Live HP & Weapon Tags", "Directional Snaplines", "Minimap Radar Sync"],
-    engine: "DirectX 9 Hookless",
-    hud: "Ranger HP 100 • Ammo 15/30",
   },
   {
     id: "menu",
     title: "Live In-Game VIP Menu Overlay",
     badge: "Hotkey: [INSERT]",
-    tabLabel: "2. VIP Menu [INSERT]",
     src: "/proofs/proof2.png",
     alt: "Chameleon VIP live in-game DirectX menu overlay for Assault Fire PH",
     desc: "DirectX ImGui menu overlay toggled instantly during combat with the [INSERT] key. Full live control for chams colors, 2D boxes, health bars, and snaplines.",
     specs: ["Instant [INSERT] Toggle", "Skyblue Chams Shading", "Customizable Snaplines", "Zero FPS Drop"],
-    engine: "Overlay Hookless",
-    hud: "Live Visual Menu",
   },
   {
     id: "aimbot",
     title: "In-Game Precision Aimbot System",
     badge: "New Feature",
-    tabLabel: "3. Aimbot System",
     src: "/proofs/aimbot-proof.webp",
     alt: "Chameleon VIP in-game Aimbot menu showing FOV Radius, Smoothness slider, and Target Bone selection for Assault Fire PH",
     desc: "Direct-memory humanized aimbot engine running on live PlayPark Assault Fire PH. Configurable Target Bone (Head/Chest), Smoothness slider, and custom FOV radius circle with dedicated hold hotkey.",
     specs: ["Humanized Smooth Aim (3.0)", "Target Bone Selection (Head)", "Dynamic FOV Circle (80px)", "Hold Keybind [Left Alt]"],
-    engine: "Direct Memory Smoothing",
-    hud: "Aimbot Active • FOV 80px",
   },
   {
     id: "lobby",
     title: "Lobby Chams Shader Verification",
     badge: "PlayPark Client",
-    tabLabel: "4. Lobby Chams",
     src: "/proof.png",
     alt: "PlayPark Assault Fire PH lobby character screen with active Chameleon chams",
     desc: "High-contrast character chams shader running cleanly on official PlayPark Assault Fire PH client with zero file modifications.",
     specs: ["Dual-Tone Shading", "Zero File Modification", "PlayPark 2026.10 Ready", "Undetected Virtualizer"],
-    engine: "PlayPark Verified",
-    hud: "Lobby Silhouette",
   },
 ];
 
@@ -421,6 +396,9 @@ export default function Home() {
 
   // Proofs Showcase State
   const [activeHeroProof, setActiveHeroProof] = useState(0);
+  const activeHeroProofRef = useRef(0);
+  const [isHeroProofPaused, setIsHeroProofPaused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [lightboxProof, setLightboxProof] = useState<typeof PROOFS[0] | null>(null);
 
   // Discord Auth State
@@ -464,6 +442,85 @@ export default function Home() {
   // Real-Time Approval Modal Key State
   const [isModalKeyRevealed, setIsModalKeyRevealed] = useState(false);
   const [isModalKeyCopied, setIsModalKeyCopied] = useState(false);
+
+  // Community Members Avatars (People who's loving it)
+  const [communityAvatars, setCommunityAvatars] = useState<string[]>([]);
+  const [isLoadingAvatars, setIsLoadingAvatars] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.avatars && Array.isArray(data.avatars)) {
+          setCommunityAvatars(data.avatars);
+        }
+      })
+      .catch((err) => console.warn("Notice fetching community avatars:", err))
+      .finally(() => setIsLoadingAvatars(false));
+  }, []);
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setPrefersReducedMotion(motionPreference.matches);
+    updateMotionPreference();
+    motionPreference.addEventListener("change", updateMotionPreference);
+    return () => motionPreference.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    PROOFS.slice(1).forEach(({ src }) => {
+      const image = new window.Image();
+      image.src = src;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion || isHeroProofPaused) return;
+
+    const rotationTimer = window.setInterval(() => {
+      const next = (activeHeroProofRef.current + 1) % PROOFS.length;
+      activeHeroProofRef.current = next;
+      setActiveHeroProof(next);
+    }, 4800);
+
+    return () => window.clearInterval(rotationTimer);
+  }, [isHeroProofPaused, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (prefersReducedMotion || !("IntersectionObserver" in window)) return;
+
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (targets.length === 0) return;
+
+    document.documentElement.classList.add("motion-ready");
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -48px 0px" });
+
+    targets.forEach((target, index) => {
+      target.style.setProperty("--reveal-delay", `${(index % 4) * 75}ms`);
+      observer.observe(target);
+    });
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove("motion-ready");
+      targets.forEach((target) => {
+        target.classList.remove("is-visible");
+        target.style.removeProperty("--reveal-delay");
+      });
+    };
+  }, [prefersReducedMotion]);
+
+  const advanceHeroProof = () => {
+    const next = (activeHeroProofRef.current + 1) % PROOFS.length;
+    activeHeroProofRef.current = next;
+    setActiveHeroProof(next);
+  };
 
   // Referral / Affiliate State
   const [referrerCode, setReferrerCode] = useState<string | null>(null);
@@ -969,75 +1026,42 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ─── In-Game Verification Preview (Real Subject Asset Switcher) ── */}
-          <div className="hero-preview-box">
-            <div className="preview-header">
-              <span className="preview-title">
-                <Image
-                  src="/af-logo.png"
-                  alt="Assault Fire Logo"
-                  width={20}
-                  height={20}
-                  className="game-logo-tag"
-                />
-                <span>Assault Fire PH • In-Game Proofs</span>
-              </span>
-              <span className="preview-status">
-                <span className="status-dot" /> Live Verified
-              </span>
-            </div>
-
-            {/* Proof Selector Tabs */}
-            <div className="hero-proof-selector" role="tablist" aria-label="Proof Switcher">
-              {PROOFS.map((p, idx) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`hero-proof-tab-btn ${activeHeroProof === idx ? "active" : ""}`}
-                  onClick={() => setActiveHeroProof(idx)}
-                >
-                  <span>{p.tabLabel || p.title}</span>
-                </button>
-              ))}
-            </div>
-
-            <div
-              className="showcase-frame clickable-showcase-frame"
-              onClick={() => setLightboxProof(PROOFS[activeHeroProof])}
-              title="Click to inspect full resolution image"
+          {/* ─── Click-through image showcase ──────────────────────────── */}
+          <div className="hero-proof-rotator">
+            <button
+              type="button"
+              className="hero-proof-deck"
+              onClick={advanceHeroProof}
+              onFocus={() => setIsHeroProofPaused(true)}
+              onBlur={() => setIsHeroProofPaused(false)}
+              aria-label={`Show next image. Current image: ${PROOFS[activeHeroProof].title}`}
             >
-              <Image
-                src={PROOFS[activeHeroProof].src}
-                alt={PROOFS[activeHeroProof].alt}
-                width={640}
-                height={360}
-                className="showcase-img"
-                priority
-              />
-              <div className="showcase-zoom-overlay">
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <IconSearch size={13} />
-                  <span>Click to inspect Full HD</span>
-                </span>
-              </div>
-            </div>
+              {[2, 1, 0].map((layer) => {
+                const proofIndex = (activeHeroProof + layer) % PROOFS.length;
+                const proof = PROOFS[proofIndex];
+                const image = (
+                  <Image
+                    src={proof.src}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 48vw"
+                    priority={layer === 0}
+                    className="hero-proof-image"
+                  />
+                );
 
-            <div className="preview-meta-grid">
-              <div className="preview-meta-item">
-                <div className="preview-meta-label">Module Mode</div>
-                <div className="preview-meta-val">{PROOFS[activeHeroProof].engine}</div>
-              </div>
-              <div className="preview-meta-item">
-                <div className="preview-meta-label">In-Game Menu</div>
-                <div className="preview-meta-val">
-                  <kbd style={{ background: "#0f1c30", color: "#38bdf8", padding: "2px 7px", borderRadius: 4, border: "1px solid #1e355b", fontFamily: "monospace", fontSize: 11, fontWeight: 700 }}>INSERT</kbd>
-                </div>
-              </div>
-              <div className="preview-meta-item">
-                <div className="preview-meta-label">Telemetry</div>
-                <div className="preview-meta-val" style={{ color: "#10b981" }}>{PROOFS[activeHeroProof].hud}</div>
-              </div>
-            </div>
+                return (
+                  <div
+                    key={proof.id}
+                    className={`hero-proof-card ${layer === 0 ? "hero-proof-card-front" : `hero-proof-card-layer-${layer}`}`}
+                    aria-hidden="true"
+                  >
+                    {image}
+                  </div>
+                );
+              })}
+            </button>
           </div>
         </section>
 
@@ -1046,7 +1070,7 @@ export default function Home() {
         {/* ─── 2.5 Feature Arsenal: Visual ESP, Wallhack Chams, Utility & Menu ─── */}
         <section className="section" id="features">
           <div className="features-container">
-            <div className="section-header-clean">
+            <div className="section-header-clean" data-reveal>
               <h2 className="section-heading">
                 VIP Feature Arsenal
               </h2>
@@ -1059,15 +1083,16 @@ export default function Home() {
             <div className="features-grid-summary">
 
               {/* ──────── Card 1: Visual ESP ──────── */}
-              <div className="feature-summary-card">
+              <div className="feature-summary-card" data-reveal>
                 <div className="feature-card-header">
                   <h3 className="feature-card-heading">Visual ESP</h3>
                   <span className="feature-card-badge">CORE</span>
                 </div>
                 <p className="feature-card-intro">
-                  Skeleton-accurate enemy telemetry and dynamic HUD overlays.
+                  Player outlines, health, equipment, and movement cues in one view.
                 </p>
                 <ul className="feature-compact-list">
+                  <li><span className="feature-bullet"></span><span><strong>Skeleton ESP:</strong> Bone-line overlay traces player pose</span></li>
                   <li><span className="feature-bullet"></span><span><strong>2D Bounding Boxes:</strong> Head and feet bone alignment</span></li>
                   <li><span className="feature-bullet"></span><span><strong>Dynamic Health Bars:</strong> Real-time color-shifting indicator</span></li>
                   <li><span className="feature-bullet"></span><span><strong>Player &amp; Weapon ESP:</strong> Identifies enemy name and gun</span></li>
@@ -1076,7 +1101,7 @@ export default function Home() {
               </div>
 
               {/* ──────── Card 2: Precision Aimbot ──────── */}
-              <div className="feature-summary-card">
+              <div className="feature-summary-card" data-reveal>
                 <div className="feature-card-header">
                   <h3 className="feature-card-heading">Precision Aimbot</h3>
                   <span className="feature-card-badge new">NEW</span>
@@ -1093,7 +1118,7 @@ export default function Home() {
               </div>
 
               {/* ──────── Card 3: Chams Wallhack ──────── */}
-              <div className="feature-summary-card">
+              <div className="feature-summary-card" data-reveal>
                 <div className="feature-card-header">
                   <h3 className="feature-card-heading">Chams Wallhack</h3>
                   <span className="feature-card-badge">DIRECTX</span>
@@ -1110,7 +1135,7 @@ export default function Home() {
               </div>
 
               {/* ──────── Card 4: Utility & Menu ──────── */}
-              <div className="feature-summary-card">
+              <div className="feature-summary-card" data-reveal>
                 <div className="feature-card-header">
                   <h3 className="feature-card-heading">Utility &amp; Menu</h3>
                   <span className="feature-card-badge">IMGUI</span>
@@ -1130,20 +1155,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ─── 2.8 In-Game Proofs & Live Capture Showcase ─────── */}
+        {/* ─── 2.8 Showcase ───────────────────────────────────── */}
         <section className="section" id="proofs">
-          <div className="section-header-clean">
+          <div className="section-header-clean" data-reveal>
             <h2 className="section-heading">
-              In-Game Combat Proofs &amp; Live Capture
+              Showcase
             </h2>
             <p className="section-subtext">
-              Unfiltered screenshots captured live on official PlayPark Assault Fire Philippines servers. Click any capture to inspect high-resolution HUD telemetry and in-game VIP menu overlays.
+              A closer look at the game and the in-game interface.
             </p>
           </div>
 
           <div className="proofs-gallery-grid">
             {PROOFS.map((proof) => (
-              <div key={proof.id} className="proof-card">
+              <div key={proof.id} className="proof-card" data-reveal>
                 <div
                   className="proof-card-media"
                   onClick={() => setLightboxProof(proof)}
@@ -1156,115 +1181,49 @@ export default function Home() {
                     height={315}
                     className="proof-card-img"
                   />
-                  <div className="proof-card-zoom-badge">
-                    <span>Full HD Capture</span>
-                  </div>
-                  <span className="proof-card-badge">{proof.badge}</span>
                 </div>
 
                 <div className="proof-card-body">
                   <h3 className="proof-card-title">{proof.title}</h3>
                   <p className="proof-card-desc">{proof.desc}</p>
-
-                  <div className="proof-card-specs">
-                    {proof.specs.map((spec, sIdx) => (
-                      <span key={sIdx} className="proof-spec-pill">
-                        {spec}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ─── 3. Kernel Bypass Architecture (Substantive Blueprint) ─ */}
-        <section className="section" id="architecture">
-          <div className="section-header-clean">
-            <h2 className="section-heading">
-              Kernel Bypass Architecture
+        {/* ─── 3. Community Showcase (People who's loving it) ─────────── */}
+        <section className="section community-section" id="community">
+          <div className="community-header-center" data-reveal>
+            <h2 className="community-heading">
+              People who&apos;s <span className="community-heading-accent">loving it</span>
             </h2>
-            <p className="section-subtext">
-              Conventional cheats hook game binaries directly and trigger detection within hours. Chameleon operates as an external, read-only memory virtualizer.
+            <p className="community-subtext">
+              Real VIP members with active licenses across Assault Fire PH
             </p>
           </div>
 
-          <div className="arch-grid">
-            {/* Column A: Conventional Detected Cheats */}
-            <div className="arch-col-detected">
-              <h3 className="arch-title">
-                Direct Process Modification <span className="arch-badge-danger">Detected</span>
-              </h3>
-              <p className="arch-desc">
-                Public tools inject untrusted DLL libraries into the Assault Fire game process, triggering automated anti-cheat signatures and server-side tripwires.
-              </p>
-
-              <ul className="arch-point-list">
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-danger" />
-                  <div>
-                    <strong>Process Memory Tampering</strong>: Writes to game memory space, instantly alerting client watchdog integrity scanners.
-                  </div>
-                </li>
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-danger" />
-                  <div>
-                    <strong>DirectX VTable Hooks</strong>: Overwrites graphics engine function pointers, causing detection by routine hash inspections.
-                  </div>
-                </li>
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-danger" />
-                  <div>
-                    <strong>File Modification</strong>: Replaces .rez archives and executable headers, failing launcher verification checks.
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column B: Chameleon Kernel Virtualization */}
-            <div className="arch-col-safe">
-              <h3 className="arch-title">
-                External Read-Only Pipeline <span className="arch-badge-safe">Undetected</span>
-              </h3>
-              <p className="arch-desc">
-                Chameleon never modifies or writes to Assault Fire process memory. Entity matrices are decoded externally and projected onto Windows DWM.
-              </p>
-
-              <ul className="arch-point-list">
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-safe" />
-                  <div>
-                    <strong>Zero Process Writing</strong>: Game memory space remains bit-for-bit identical to an unmodded, official PlayPark installation.
-                  </div>
-                </li>
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-safe" />
-                  <div>
-                    <strong>Untouched Game Files</strong>: Zero alterations to original .rez archives, executables, or launcher registry keys.
-                  </div>
-                </li>
-                <li className="arch-point-item">
-                  <span className="arch-point-bullet arch-bullet-safe" />
-                  <div>
-                    <strong>Desktop Window Manager Blit</strong>: Overlays render onto Windows desktop composition, remaining invisible to anti-cheat screenshot buffers and OBS streams.
-                  </div>
-                </li>
-              </ul>
-
-              <div className="arch-metrics-bar">
-                <div>
-                  <div className="arch-metric-num">0</div>
-                  <div className="arch-metric-label">Account Bans</div>
-                </div>
-                <div>
-                  <div className="arch-metric-num">&lt;0.18ms</div>
-                  <div className="arch-metric-label">Frame Latency</div>
-                </div>
-                <div>
-                  <div className="arch-metric-num">0.0</div>
-                  <div className="arch-metric-label">FPS Drop</div>
-                </div>
+          <div className="community-avatars-wrap" data-reveal>
+            <div className="community-avatars-card">
+              <div className="community-avatars-grid">
+                {isLoadingAvatars && communityAvatars.length === 0 ? (
+                  Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="community-avatar-skeleton" />
+                  ))
+                ) : (
+                  communityAvatars.map((avatarUrl, idx) => (
+                    <div key={idx} className="community-avatar-item">
+                      <Image
+                        src={avatarUrl}
+                        alt="Active VIP Member"
+                        width={58}
+                        height={58}
+                        unoptimized
+                        className="community-avatar-img"
+                      />
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -1272,7 +1231,7 @@ export default function Home() {
 
         {/* ─── 5. VIP Access Passes (Single Product Suite) ───────── */}
         <section className="pricing-section" id="pricing">
-          <div className="pricing-container">
+          <div className="pricing-container" data-reveal>
             <div className="pricing-info-col">
               <h2>VIP Access Passes</h2>
               <p>
@@ -1297,6 +1256,12 @@ export default function Home() {
                     <IconCheck size={14} />
                   </span>
                   <span>Real-Time Health ESP (Live HP status bars &amp; combat readings)</span>
+                </li>
+                <li>
+                  <span className="check-icon">
+                    <IconCheck size={14} />
+                  </span>
+                  <span>Skeleton ESP (skeletal player overlay)</span>
                 </li>
                 <li>
                   <span className="check-icon">
@@ -1355,7 +1320,7 @@ export default function Home() {
                   />
                   <div className="product-tag-wrap">
                     <h3>Assault Fire PH VIP Suite</h3>
-                    <span>Wallhack • Chams • Health • 2D Box</span>
+                    <span>All Features</span>
                   </div>
                 </div>
               </div>
@@ -1518,18 +1483,18 @@ export default function Home() {
 
         {/* ─── 6. Frequently Answered Questions ──────────────────── */}
         <section className="section" id="faq">
-          <div className="section-header-clean">
+          <div className="section-header-clean" data-reveal>
             <h2 className="section-heading">
               Frequently Answered Questions
             </h2>
             <p className="section-subtext">
-              Common questions regarding Assault Fire Philippines memory virtualization, anti-cheat detection safety, and installation.
+              Answers on controls, supported game builds, included features, and account risk.
             </p>
           </div>
 
-          <div className="faq-wrap">
+          <div className="faq-wrap" data-reveal>
             {FAQS.map((item, index) => (
-              <details className="faq-item" key={index} open={index === 0}>
+              <details className="faq-item" key={index} name="faq">
                 <summary className="faq-question">
                   <span>{item.q}</span>
                   <span className="faq-icon" aria-hidden="true">+</span>

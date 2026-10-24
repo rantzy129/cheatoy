@@ -258,7 +258,7 @@ export default function ProfilePage() {
       if (tier?.includes("3")) return "₱150";
       if (tier?.includes("7")) return "₱300";
       if (tier?.includes("15")) return "₱550";
-      if (tier?.includes("Month")) return "₱850";
+      if (tier?.includes("Month")) return "₱1,000";
       if (tier?.includes("Lifetime")) return "₱1,500";
       return "₱150";
     }
@@ -268,7 +268,7 @@ export default function ProfilePage() {
       if (tier?.includes("3")) return "₱150";
       if (tier?.includes("7")) return "₱300";
       if (tier?.includes("15")) return "₱550";
-      if (tier?.includes("Month")) return "₱850";
+      if (tier?.includes("Month")) return "₱1,000";
       if (tier?.includes("Lifetime")) return "₱1,500";
       return "₱150";
     }

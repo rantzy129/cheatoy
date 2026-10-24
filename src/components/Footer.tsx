@@ -63,7 +63,7 @@ export default function Footer() {
           <h4 className="footer-col-title">Navigation</h4>
           <ul className="footer-links-list">
             <li><Link href="/">Home</Link></li>
-            <li><Link href="/#architecture">Kernel Architecture</Link></li>
+            <li><Link href="/#community">Community</Link></li>
             <li><Link href="/#pricing">Pass Pricing (₱150+)</Link></li>
             <li><Link href="/#faq">Frequently Asked Questions</Link></li>
             <li><Link href="/profile">VIP Profile & Key Vault</Link></li>
@@ -88,7 +88,7 @@ export default function Footer() {
             <li><Link href="/#pricing">3 Days Pass  ₱150</Link></li>
             <li><Link href="/#pricing">7 Days Pass  ₱300</Link></li>
             <li><Link href="/#pricing">15 Days Pass  ₱550</Link></li>
-            <li><Link href="/#pricing">1 Month Pass  ₱850</Link></li>
+            <li><Link href="/#pricing">1 Month Pass  ₱1,000</Link></li>
             <li><Link href="/#pricing">Lifetime VIP  ₱1,500</Link></li>
           </ul>
         </div>

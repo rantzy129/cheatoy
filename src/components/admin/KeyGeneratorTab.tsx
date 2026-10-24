@@ -58,7 +58,7 @@ export default function KeyGeneratorTab({
               <option value="3 Days Pass">3 Days Pass (₱150)</option>
               <option value="7 Days Pass">7 Days Pass (₱300)</option>
               <option value="15 Days Pass">15 Days Pass (₱550)</option>
-              <option value="1 Month Pass">1 Month Pass (₱850)</option>
+              <option value="1 Month Pass">1 Month Pass (₱1,000)</option>
               <option value="Lifetime VIP">Lifetime VIP (₱1,500)</option>
             </select>
           </div>
