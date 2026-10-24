@@ -65,6 +65,7 @@ export default function AdminPage() {
     syncStatusMsg,
     syncCooldown,
     setSyncCooldown,
+    isCheckingExpirations,
     minLoaderVersion,
     setMinLoaderVersion,
     downloadPageUrl,
@@ -90,6 +91,7 @@ export default function AdminPage() {
     handleDeleteNotification,
     handleSaveLoaderVersion,
     handleSyncUserListToDiscord,
+    handleCheckExpirations,
     handleMintKey,
     handleResetHWID,
     handleToggleBan,
@@ -166,6 +168,24 @@ export default function AdminPage() {
                   ? `Cooldown (${syncCooldown}s)`
                   : "Sync Discord VIPs"}
               </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCheckExpirations(false)}
+              disabled={isCheckingExpirations}
+              className="admin-btn-sync"
+              style={{
+                background: "rgba(245, 158, 11, 0.12)",
+                borderColor: "rgba(245, 158, 11, 0.35)",
+                color: "#fbbf24",
+              }}
+              title="Scan and send automated 24-hour expiration reminder DMs to players whose passes expire soon"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>{isCheckingExpirations ? "Checking..." : "24h Expiry DMs"}</span>
             </button>
             <button
               type="button"

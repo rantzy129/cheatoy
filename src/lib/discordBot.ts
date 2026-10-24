@@ -364,3 +364,161 @@ export async function sendVouchBonusDm(params: {
 
   return result;
 }
+
+/**
+ * Sends an automated 24-hour expiration reminder DM to a VIP customer
+ */
+export async function sendExpiryWarningDm(params: {
+  discordUserId: string;
+  discordUsername?: string;
+  tier: string;
+  licenseKey: string;
+  expiresAt: string;
+  hoursRemaining: number;
+}): Promise<{ dmSent: boolean; dmError?: string }> {
+  const result = { dmSent: false, dmError: undefined as string | undefined };
+  const token = DISCORD_BOT_TOKEN.trim();
+  const guildId = DISCORD_GUILD_ID.trim();
+  const rawUserId = (params.discordUserId || "").trim();
+
+  if (!token) {
+    result.dmError = "DISCORD_BOT_TOKEN not configured";
+    return result;
+  }
+
+  let targetUserId = rawUserId;
+  let isSnowflake = /^\d{17,20}$/.test(targetUserId);
+
+  if (!isSnowflake && guildId) {
+    const candidateName = (params.discordUsername || rawUserId).replace(/#.*$/, "").trim();
+    if (candidateName) {
+      try {
+        const searchRes = await fetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members/search?query=${encodeURIComponent(candidateName)}&limit=5`,
+          {
+            headers: {
+              Authorization: `Bot ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (searchRes.ok) {
+          const members = await searchRes.json();
+          const cleanQ = candidateName.toLowerCase();
+          const match =
+            members.find(
+              (m: any) =>
+                m.user?.username?.toLowerCase() === cleanQ ||
+                m.user?.global_name?.toLowerCase() === cleanQ ||
+                m.nick?.toLowerCase() === cleanQ
+            ) || members[0];
+
+          if (match?.user?.id) {
+            targetUserId = match.user.id;
+            isSnowflake = true;
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[Discord Bot] Guild member resolution failed:`, err);
+      }
+    }
+  }
+
+  if (!isSnowflake) {
+    result.dmError = `User ID "${rawUserId}" is not a valid snowflake.`;
+    return result;
+  }
+
+  try {
+    const dmChannelRes = await fetch("https://discord.com/api/v10/users/@me/channels", {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipient_id: targetUserId }),
+    });
+
+    if (!dmChannelRes.ok) {
+      result.dmError = "User has closed DMs or is not in server.";
+      return result;
+    }
+
+    const channelData = await dmChannelRes.json();
+    const dmChannelId = channelData.id;
+
+    const expiryTimestamp = Math.floor(new Date(params.expiresAt).getTime() / 1000);
+    const maskedKey =
+      params.licenseKey.length > 12
+        ? `${params.licenseKey.slice(0, 8)}••••••••`
+        : params.licenseKey;
+
+    const hoursText =
+      params.hoursRemaining <= 1
+        ? "less than 1 hour"
+        : `approximately ${Math.round(params.hoursRemaining)} hours`;
+
+    const embedPayload = {
+      content: `⏳ Hello <@${targetUserId}>! Courtesy reminder: Your **Chameleon Cheats** VIP Pass expires in **${hoursText}**.`,
+      embeds: [
+        {
+          title: "⏳ CHAMELEON CHEATS — VIP PASS EXPIRING SOON",
+          description:
+            `This is an automated courtesy reminder that your private VIP pass for **Assault Fire PH** is set to expire in **${hoursText}**.\n\n` +
+            `To prevent any interruption in your access or in-game feature shutdown, you can renew early. Early renewals stack seamlessly onto your remaining time!`,
+          color: 0xf59e0b, // Amber Warning
+          fields: [
+            {
+              name: "👑 Active Tier",
+              value: `**${params.tier}**`,
+              inline: true,
+            },
+            {
+              name: "⏳ Expiration Time",
+              value: `<t:${expiryTimestamp}:R>\n*(<t:${expiryTimestamp}:F>)*`,
+              inline: true,
+            },
+            {
+              name: "🔑 Your Key",
+              value: `\`${maskedKey}\``,
+              inline: true,
+            },
+            {
+              name: "🔄 Early Renewal Benefit",
+              value:
+                "Any time added during renewal is **automatically added on top** of whatever time you have left. You will not lose a single minute.\n\n" +
+                "👉 **[Renew Your VIP Pass Now](https://www.chameleon-cheats.tech/#pricing)** or check your **[Profile Vault](https://www.chameleon-cheats.tech/profile)**.",
+              inline: false,
+            },
+          ],
+          footer: {
+            text: "Chameleon Cheats • Assault Fire PH VIP • Automated Expiration Notice",
+            icon_url: "https://www.chameleon-cheats.tech/logo.png",
+          },
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    };
+
+    const msgRes = await fetch(`https://discord.com/api/v10/channels/${dmChannelId}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(embedPayload),
+    });
+
+    if (msgRes.ok) {
+      result.dmSent = true;
+      console.log(`[Discord Bot] Successfully sent 24h expiration warning to user ${targetUserId}`);
+    } else {
+      result.dmError = "Failed to deliver DM (User may have DMs disabled).";
+    }
+  } catch (e: any) {
+    result.dmError = e.message;
+  }
+
+  return result;
+}
+

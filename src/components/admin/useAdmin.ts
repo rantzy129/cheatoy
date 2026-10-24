@@ -61,6 +61,7 @@ export interface UseAdminReturn {
   syncStatusMsg: string | null;
   syncCooldown: number;
   setSyncCooldown: (v: number) => void;
+  isCheckingExpirations: boolean;
 
   // Version control state
   minLoaderVersion: string;
@@ -96,6 +97,7 @@ export interface UseAdminReturn {
   handleDeleteNotification: (id: string) => Promise<void>;
   handleSaveLoaderVersion: (e?: React.FormEvent, customVersion?: string) => Promise<void>;
   handleSyncUserListToDiscord: () => Promise<void>;
+  handleCheckExpirations: (dryRun?: boolean) => Promise<void>;
   handleMintKey: (e: React.FormEvent) => Promise<void>;
   handleResetHWID: (licenseId: string) => Promise<void>;
   handleToggleBan: (licenseId: string) => Promise<void>;
@@ -159,6 +161,7 @@ export default function useAdmin(): UseAdminReturn {
   const [isSyncingUsers, setIsSyncingUsers] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
   const [syncCooldown, setSyncCooldown] = useState<number>(0);
+  const [isCheckingExpirations, setIsCheckingExpirations] = useState(false);
 
   // ── Version control state ──
   const [minLoaderVersion, setMinLoaderVersion] = useState("v1.0.10");
@@ -504,6 +507,33 @@ export default function useAdmin(): UseAdminReturn {
       setIsSyncingUsers(false);
     }
   }, [syncCooldown]);
+
+  // ── 24h Expiry Warning Check ──
+  const handleCheckExpirations = useCallback(async (dryRun = false) => {
+    setIsCheckingExpirations(true);
+    try {
+      const url = dryRun ? "/api/cron/check-expirations?dry_run=true" : "/api/cron/check-expirations";
+      const res = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (dryRun) {
+          alert(`[Dry Run] Found ${data.eligible_count} passes expiring in <24h.`);
+        } else {
+          alert(data.message || `Processed 24h expiration notices: ${data.sent_count} DMs sent.`);
+        }
+      } else {
+        alert(data.error || "Failed to execute expiration checks");
+      }
+    } catch (e: any) {
+      alert("Network error checking expirations: " + e.message);
+    } finally {
+      setIsCheckingExpirations(false);
+    }
+  }, []);
   // ── Key minting ──
   const handleMintKey = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -821,6 +851,7 @@ export default function useAdmin(): UseAdminReturn {
     syncStatusMsg,
     syncCooldown,
     setSyncCooldown,
+    isCheckingExpirations,
     // Version
     minLoaderVersion,
     setMinLoaderVersion,
@@ -851,6 +882,7 @@ export default function useAdmin(): UseAdminReturn {
     handleDeleteNotification,
     handleSaveLoaderVersion,
     handleSyncUserListToDiscord,
+    handleCheckExpirations,
     handleMintKey,
     handleResetHWID,
     handleToggleBan,
