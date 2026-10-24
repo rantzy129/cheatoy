@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -458,6 +458,20 @@ export default function Home() {
       .catch((err) => console.warn("Notice fetching community avatars:", err))
       .finally(() => setIsLoadingAvatars(false));
   }, []);
+
+  const row1Avatars = useMemo(() => {
+    if (communityAvatars.length === 0) return [];
+    const half = Math.ceil(communityAvatars.length / 2);
+    const slice = communityAvatars.slice(0, half);
+    return [...slice, ...slice, ...slice, ...slice];
+  }, [communityAvatars]);
+
+  const row2Avatars = useMemo(() => {
+    if (communityAvatars.length === 0) return [];
+    const half = Math.ceil(communityAvatars.length / 2);
+    const slice = communityAvatars.slice(half);
+    return [...slice, ...slice, ...slice, ...slice];
+  }, [communityAvatars]);
 
   useEffect(() => {
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -1194,35 +1208,64 @@ export default function Home() {
 
         {/* ─── 3. Community Showcase (People who's loving it) ─────────── */}
         <section className="section community-section" id="community">
-          <div className="community-header-center" data-reveal>
-            <h2 className="community-heading">
-              People who&apos;s <span className="community-heading-accent">loving it</span>
-            </h2>
-            <p className="community-subtext">
-              Real VIP members with active licenses across Assault Fire PH
-            </p>
-          </div>
+          <div className="community-inner-container">
+            {/* Header Area */}
+            <div className="community-header-center" data-reveal>
+              <h2 className="community-heading">
+                People who&apos;s <span className="community-heading-accent">loving it</span>
+              </h2>
+              <p className="community-subtext">
+                {communityAvatars.length > 0 ? communityAvatars.length : "18"} active members with verified Discord-linked VIP licenses across Assault Fire PH.
+              </p>
+            </div>
 
-          <div className="community-avatars-wrap" data-reveal>
-            <div className="community-avatars-card">
-              <div className="community-avatars-grid">
+            {/* Simple Marquee Showcase */}
+            <div className="community-marquee-wrapper" data-reveal>
+              <div className="community-marquee-mask">
                 {isLoadingAvatars && communityAvatars.length === 0 ? (
-                  Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="community-avatar-skeleton" />
-                  ))
+                  <div className="community-loading-row">
+                    {Array.from({ length: 14 }).map((_, i) => (
+                      <div key={i} className="community-avatar-skeleton" />
+                    ))}
+                  </div>
                 ) : (
-                  communityAvatars.map((avatarUrl, idx) => (
-                    <div key={idx} className="community-avatar-item">
-                      <Image
-                        src={avatarUrl}
-                        alt="Active VIP Member"
-                        width={58}
-                        height={58}
-                        unoptimized
-                        className="community-avatar-img"
-                      />
+                  <>
+                    {/* Row 1 (Drifts Left) */}
+                    <div className="community-marquee-row">
+                      <div className="community-marquee-track-left">
+                        {row1Avatars.map((avatarUrl, idx) => (
+                          <div key={`r1-${idx}`} className="community-avatar-item">
+                            <Image
+                              src={avatarUrl}
+                              alt="Active VIP Member"
+                              width={64}
+                              height={64}
+                              unoptimized
+                              className="community-avatar-img"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))
+
+                    {/* Row 2 (Drifts Right) */}
+                    <div className="community-marquee-row">
+                      <div className="community-marquee-track-right">
+                        {row2Avatars.map((avatarUrl, idx) => (
+                          <div key={`r2-${idx}`} className="community-avatar-item">
+                            <Image
+                              src={avatarUrl}
+                              alt="Active VIP Member"
+                              width={64}
+                              height={64}
+                              unoptimized
+                              className="community-avatar-img"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
