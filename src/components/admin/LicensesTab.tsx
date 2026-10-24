@@ -13,6 +13,7 @@ interface LicensesTabProps {
   setCopiedKey: (v: string | null) => void;
   handleResetHWID: (licenseId: string) => Promise<void>;
   handleToggleBan: (licenseId: string) => Promise<void>;
+  handleDeleteExpiredLicense: (licenseId: string) => Promise<void>;
   handleExtendDays: (lic: License, days?: number) => Promise<void>;
   minLoaderVersion?: string;
   setMinLoaderVersion?: (v: string) => void;
@@ -31,6 +32,7 @@ export default function LicensesTab({
   setCopiedKey,
   handleResetHWID,
   handleToggleBan,
+  handleDeleteExpiredLicense,
   handleExtendDays,
   minLoaderVersion = "v1.0.10",
   setMinLoaderVersion,
@@ -311,7 +313,9 @@ export default function LicensesTab({
   function renderLicenses() {
     return paginatedLicenses.map((lic) => {
       const isLifetime = !lic.expires_at;
-      const isActive = !isLifetime && new Date(lic.expires_at!).getTime() > Date.now();
+      const expiryTime = lic.expires_at ? new Date(lic.expires_at).getTime() : Number.NaN;
+      const isActive = !isLifetime && Number.isFinite(expiryTime) && expiryTime > Date.now();
+      const isExpired = !isLifetime && Number.isFinite(expiryTime) && expiryTime <= Date.now();
       const userLabel = lic.discord_username || lic.discord_id || lic.license_key;
 
       return (
@@ -373,19 +377,19 @@ export default function LicensesTab({
             )}
           </td>
           <td>
-            <span className={`admin-status-badge ${lic.is_banned ? "admin-status-badge-rejected" : "admin-status-badge-approved"}`}>
-              {lic.is_banned ? "BANNED" : "ACTIVE"}
+            <span className={`admin-status-badge ${lic.is_banned || isExpired ? "admin-status-badge-rejected" : "admin-status-badge-approved"}`}>
+              {lic.is_banned ? "BANNED" : isExpired ? "EXPIRED" : "ACTIVE"}
             </span>
           </td>
           <td style={{ textAlign: "right" }}>
-            {renderActions(lic)}
+            {renderActions(lic, isExpired)}
           </td>
         </tr>
       );
     });
   }
 
-  function renderActions(lic: License) {
+  function renderActions(lic: License, isExpired: boolean) {
     return (
       <div style={{ display: "inline-flex", gap: 6 }}>
         {lic.expires_at !== null && (
@@ -416,6 +420,27 @@ export default function LicensesTab({
         >
           {lic.is_banned ? "Unban" : "Ban Key"}
         </button>
+        {isExpired && (
+          <button
+            type="button"
+            onClick={() => handleDeleteExpiredLicense(lic.id)}
+            disabled={actionLoading === lic.id}
+            title="Permanently delete this expired license row; order history is retained"
+            style={{
+              border: "1px solid rgba(239, 68, 68, 0.45)",
+              borderRadius: 6,
+              padding: "6px 10px",
+              color: "#f87171",
+              background: "rgba(127, 29, 29, 0.18)",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: actionLoading === lic.id ? "not-allowed" : "pointer",
+              opacity: actionLoading === lic.id ? 0.6 : 1,
+            }}
+          >
+            {actionLoading === lic.id ? "Deleting…" : "Delete"}
+          </button>
+        )}
       </div>
     );
   }

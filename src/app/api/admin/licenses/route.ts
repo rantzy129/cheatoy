@@ -191,3 +191,74 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const token = getAdminTokenFromRequest(request);
+    if (!verifyAdminSession(token)) {
+      return NextResponse.json({ success: false, error: "Unauthorized access" }, { status: 401 });
+    }
+
+    const { id } = await request.json().catch(() => ({}));
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ success: false, error: "License ID required" }, { status: 400 });
+    }
+
+    // Deletes bypass Supabase RLS only on this server-side admin route. Never expose
+    // this key to the browser or use it before validating the admin session above.
+    const serviceRoleKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) {
+      return NextResponse.json({
+        success: false,
+        error: "Expired-key deletion is not configured. Add SUPABASE_SECRET_KEY (or the legacy SUPABASE_SERVICE_ROLE_KEY) to the server environment and restart the app.",
+      }, { status: 503 });
+    }
+
+    const supabase = createClient(SUPABASE_URL, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: license, error: lookupError } = await supabase
+      .from("licenses")
+      .select("id, expires_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (lookupError) {
+      return NextResponse.json({ success: false, error: lookupError.message }, { status: 500 });
+    }
+    if (!license) {
+      return NextResponse.json({ success: false, error: "License not found" }, { status: 404 });
+    }
+
+    const expiryTime = license.expires_at ? new Date(license.expires_at).getTime() : Number.NaN;
+    if (!Number.isFinite(expiryTime) || expiryTime > Date.now()) {
+      return NextResponse.json({
+        success: false,
+        error: "Only expired, time-limited licenses can be deleted.",
+      }, { status: 400 });
+    }
+
+    const { data: deletedLicense, error: deleteError } = await supabase
+      .from("licenses")
+      .delete()
+      .eq("id", id)
+      .not("expires_at", "is", null)
+      .lte("expires_at", new Date().toISOString())
+      .select("id")
+      .maybeSingle();
+
+    if (deleteError) {
+      return NextResponse.json({ success: false, error: deleteError.message }, { status: 500 });
+    }
+    if (!deletedLicense) {
+      return NextResponse.json({
+        success: false,
+        error: "The license was not deleted. It may have been renewed or is no longer available.",
+      }, { status: 409 });
+    }
+
+    return NextResponse.json({ success: true, message: "Expired license deleted. Order history was not changed." });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}

@@ -99,6 +99,7 @@ export interface UseAdminReturn {
   handleMintKey: (e: React.FormEvent) => Promise<void>;
   handleResetHWID: (licenseId: string) => Promise<void>;
   handleToggleBan: (licenseId: string) => Promise<void>;
+  handleDeleteExpiredLicense: (licenseId: string) => Promise<void>;
   handleExtendDays: (lic: License, days?: number) => Promise<void>;
   handleAdminAttachSlip: (orderId: string, file: File) => Promise<void>;
   handleCopy: (val: string) => void;
@@ -573,6 +574,32 @@ export default function useAdmin(): UseAdminReturn {
     }
   }, [fetchLicenses]);
 
+  const handleDeleteExpiredLicense = useCallback(async (licenseId: string) => {
+    if (!window.confirm("Permanently delete this expired license key? Its license row will be removed, but the related order history will remain.")) {
+      return;
+    }
+
+    setActionLoading(licenseId);
+    try {
+      const res = await fetch("/api/admin/licenses", {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: licenseId }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        window.alert(data.error || "Failed to delete expired license");
+      } else {
+        await fetchLicenses();
+      }
+    } catch (err: any) {
+      window.alert("Error: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  }, [fetchLicenses]);
+
   const handleExtendDays = useCallback(async (lic: License, days: number = 1) => {
     setActionLoading(lic.id);
     try {
@@ -827,6 +854,7 @@ export default function useAdmin(): UseAdminReturn {
     handleMintKey,
     handleResetHWID,
     handleToggleBan,
+    handleDeleteExpiredLicense,
     handleExtendDays,
     handleAdminAttachSlip,
     handleCopy,

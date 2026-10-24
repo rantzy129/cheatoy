@@ -93,6 +93,7 @@ export default function AdminPage() {
     handleMintKey,
     handleResetHWID,
     handleToggleBan,
+    handleDeleteExpiredLicense,
     handleExtendDays,
     handleAdminAttachSlip,
     handleCopy,
@@ -138,7 +139,7 @@ export default function AdminPage() {
         <header className="admin-header">
           <div className="admin-header-title">
             <div className="admin-header-breadcrumb">
-              <span>Command Center</span>
+              <span>Control Dashboard</span>
               <span>/</span>
               <span className="admin-breadcrumb-active">
                 {activeTab === "orders" && "GCash Approvals"}
@@ -210,6 +211,7 @@ export default function AdminPage() {
               setCopiedKey={setCopiedKey}
               handleResetHWID={handleResetHWID}
               handleToggleBan={handleToggleBan}
+              handleDeleteExpiredLicense={handleDeleteExpiredLicense}
               handleExtendDays={handleExtendDays}
               minLoaderVersion={minLoaderVersion}
               setMinLoaderVersion={setMinLoaderVersion}

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
-  IconShieldLock,
   IconOrders,
   IconKeyVault,
   IconKeyMint,
@@ -33,11 +33,11 @@ export default function AdminSidebar({
         {/* Brand Emblem */}
         <div className="admin-sidebar-brand">
           <div className="admin-brand-icon">
-            <IconShieldLock size={22} />
+            <Image src="/logo.png" alt="Chameleon logo" width={28} height={28} priority />
           </div>
           <div className="admin-brand-info">
             <h2>CHAMELEON</h2>
-            <span>Command Center</span>
+            <span>Control Dashboard</span>
           </div>
         </div>
 
